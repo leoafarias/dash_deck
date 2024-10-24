@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:superdeck_cli/src/helpers/exceptions.dart';
+import 'package:superdeck_cli/src/parsers/base_parser.dart';
 import 'package:superdeck_cli/src/parsers/front_matter_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
@@ -48,40 +49,38 @@ List<String> _splitSlides(String content) {
   return slides;
 }
 
+class SlideParser extends Parser<Slide> {
+  @override
+  Slide parse(String input) {
+    final extracted = FrontMatterParser().parse(input);
+
+    final regexComments = RegExp(r'<!--(.*?)-->', dotAll: true);
+
+    final notes = <SlideNote>[];
+    final comments = regexComments.allMatches(extracted.contents);
+
+    for (final comment in comments) {
+      final note = {
+        'content': comment.group(1)?.trim(),
+      };
+      SlideNote.schema.validateOrThrow(note);
+      notes.add(SlideNote.fromMap(note));
+    }
+
+    // Whole content of the match
+    return Slide.fromMap({
+      'options': extracted.frontMatter,
+      'markdown': extracted.contents,
+      'key': extracted.key
+    }).copyWith(notes: notes);
+  }
+}
+
 List<Slide> parseSlides(String markdown) {
   try {
     final slidesRaws = _splitSlides(markdown);
 
-    print('Slides ${slidesRaws.length}');
-    final slides = <Slide>[];
-
-    for (final match in slidesRaws) {
-      final extracted = extractYamlFrontmatter(match);
-
-      final regexComments = RegExp(r'<!--(.*?)-->', dotAll: true);
-
-      final notes = <SlideNote>[];
-      final comments = regexComments.allMatches(extracted.contents);
-
-      for (final comment in comments) {
-        final note = {
-          'content': comment.group(1)?.trim(),
-        };
-        SlideNote.schema.validateOrThrow(note);
-        notes.add(SlideNote.fromMap(note));
-      }
-
-      // Whole content of the match
-      slides.add(
-        Slide.fromMap({
-          'options': extracted.frontMatter,
-          'markdown': extracted.contents,
-          'key': extracted.key
-        }).copyWith(notes: notes),
-      );
-    }
-
-    return slides;
+    return slidesRaws.map((raw) => SlideParser().parse(raw)).toList();
   } on FormatException catch (e) {
     throw SdFormatException(e.message, markdown, e.offset);
   } on SchemaValidationException catch (e) {

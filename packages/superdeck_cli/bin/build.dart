@@ -5,7 +5,7 @@ import 'package:superdeck_cli/superdeck_cli.dart';
 
 void main(List<String> arguments) async {
   try {
-    await SlidesLoader().generate();
+    await SuperdeckRunner().build();
   } on UsageException catch (e) {
     print(e);
     exit(64);
