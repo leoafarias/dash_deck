@@ -5,6 +5,7 @@ import 'package:go_router_paths/go_router_paths.dart';
 import '../../../../../superdeck.dart';
 import '../../../components/molecules/slide_screen.dart';
 import '../../../screens/export_screen.dart';
+import 'dialog_page.dart';
 
 class SDPaths {
   static Path get root => Path('/');
@@ -75,7 +76,7 @@ final goRouterConfig = GoRouter(
             GoRoute(
               path: SDPaths.export.goRoute,
               pageBuilder: (context, state) {
-                return _getPage(const ExportScreen(), state);
+                return _getDialogPage(const ExportScreen(), state);
               },
             ),
           ],
@@ -92,6 +93,13 @@ MaterialPage _getPage(Widget child, GoRouterState state,
     child: child,
     maintainState: true,
     canPop: !isRoot,
+  );
+}
+
+DialogPage _getDialogPage(Widget child, GoRouterState state) {
+  return DialogPage(
+    key: state.pageKey,
+    builder: (context) => child,
   );
 }
 

@@ -82,6 +82,7 @@ class PdfExportController extends ChangeNotifier {
     _status = PdfExportStatus.building;
     notifyListeners();
     await _wait();
+
     final pdf = await _buildPdf(_images);
     await _wait();
     _pageController.jumpToPage(currentPage);

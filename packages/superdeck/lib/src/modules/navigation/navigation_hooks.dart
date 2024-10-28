@@ -29,6 +29,7 @@ typedef NavigationActions = ({
   VoidCallback openPresenterMenu,
   VoidCallback togglePresenterMenu,
   VoidCallback toggleShowNotes,
+  VoidCallback goToExportScreen,
   void Function(int index) goToSlide,
 });
 
@@ -66,6 +67,10 @@ NavigationActions useNavigationActions() {
     [goToSlide, currentIndex],
   );
 
+  final goToExportScreen = useCallback(() {
+    context.push(SDPaths.export.goRoute);
+  }, [context]);
+
   final goToPreviousSlide = useCallback(
     () => goToSlide(currentIndex - 1),
     [
@@ -81,5 +86,6 @@ NavigationActions useNavigationActions() {
     togglePresenterMenu: controller.togglePresenterMenu,
     goToSlide: goToSlide,
     toggleShowNotes: controller.toggleShowNotes,
+    goToExportScreen: goToExportScreen,
   );
 }

@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   cached_network_image: ^3.4.1
-  window_manager: ^0.3.9
+  window_manager: ^0.4.2
   collection: ^1.18.0
   path: ^1.9.0
   animate_do: ^3.3.4
@@ -23,26 +23,26 @@ dependencies:
   go_router: ^14.2.7
   file_picker: ^8.0.7
   path_provider: ^2.1.4
-  url_launcher: ^6.3.0
-  mix: ^1.4.6
+  url_launcher: ^6.3.1
+  mix: ^1.5.2
   mix_annotations: ^0.3.0
-  flutter_markdown: ^0.7.3
+  flutter_markdown: ^0.7.4
   superdeck_core: ^0.0.1
   markdown: ^7.2.2
   flutter_hooks: ^0.20.5
-  web: ^1.0.0
+  web: ^1.1.0
   file_saver: ^0.2.14
   go_router_paths: ^0.2.2
   
   image_picker: ^1.1.2
   open_filex: ^4.5.0
-  google_generative_ai: ^0.4.5
+  google_generative_ai: ^0.4.6
   meta: ^1.15.0
   auto_size_text: ^3.0.0
   material_symbols_icons: ^4.2780.0
   uri: ^1.0.0
-  webview_flutter: ^4.9.0
-  webview_flutter_web: ^0.2.3+2
+  webview_flutter: ^4.10.0
+  webview_flutter_web: ^0.2.3
   google_fonts: ^6.2.1
   
 dev_dependencies:

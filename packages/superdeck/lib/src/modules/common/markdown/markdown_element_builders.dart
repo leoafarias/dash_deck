@@ -394,18 +394,21 @@ class CodeElementBuilder extends MarkdownElementBuilder {
         return Wrap(
           clipBehavior: Clip.hardEdge,
           children: [
-            BoxSpecWidget(
-              spec: interpolatedSpec.container,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: spans.map((span) {
-                  return RichText(
-                    text: TextSpan(
-                      style: interpolatedSpec.textStyle,
-                      children: [span],
-                    ),
-                  );
-                }).toList(),
+            SizedBox.fromSize(
+              size: interpolatedSize,
+              child: BoxSpecWidget(
+                spec: interpolatedSpec.container,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: spans.map((span) {
+                    return RichText(
+                      text: TextSpan(
+                        style: interpolatedSpec.textStyle,
+                        children: [span],
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
           ],
@@ -494,26 +497,21 @@ String _lerpString(String start, String end, double t) {
   // Clamp t between 0 and 1
   t = t.clamp(0.0, 1.0);
 
-  StringBuffer result = StringBuffer();
+  final result = StringBuffer();
 
   if (t <= 0.5) {
-    // First half: reduce start string to empty
-    double progress = t / 0.5; // Normalize t to range [0,1] over [0,0.5]
-    int startLength = start.length;
-    int numCharsToShow = ((1 - progress) * startLength).round();
+    final progress = t / 0.5;
+    final startLength = start.length;
+    final numCharsToShow = ((1 - progress) * startLength).round();
 
-    // Take the first numCharsToShow characters from start string
     if (numCharsToShow > 0) {
       result.write(start.substring(0, numCharsToShow));
     }
   } else {
-    // Second half: build up end string from empty
-    double progress =
-        (t - 0.5) / 0.5; // Normalize t to range [0,1] over [0.5,1]
-    int endLength = end.length;
-    int numCharsToShow = (progress * endLength).round();
+    final progress = (t - 0.5) / 0.5;
+    final endLength = end.length;
+    final numCharsToShow = (progress * endLength).round();
 
-    // Take the first numCharsToShow characters from end string
     if (numCharsToShow > 0) {
       result.write(end.substring(0, numCharsToShow));
     }

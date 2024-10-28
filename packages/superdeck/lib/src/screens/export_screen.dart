@@ -23,13 +23,14 @@ class ExportScreen extends HookWidget {
 
     return Stack(
       children: [
-        Center(
+        Dialog.fullscreen(
           child: export.render(),
         ),
         Positioned.fill(
-            child: Container(
-          color: const Color.fromARGB(255, 14, 14, 14).withOpacity(0.9),
-        )),
+          child: Container(
+            color: const Color.fromARGB(255, 14, 14, 14).withOpacity(0.9),
+          ),
+        ),
         inProgress ? PdfExportBar(export) : ExportDialog(export),
       ],
     );

@@ -1,31 +1,42 @@
 import 'package:yaml/yaml.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
-/// Updates the provided YAML content to include .superdeck/ and .superdeck/generated/ assets.
-/// Returns the updated YAML content as a string.
+/// Updates the 'assets' section of a pubspec.yaml file with superdeck paths.
+///
+/// This function takes a [yamlContent] string representing the contents of a
+/// pubspec.yaml file. It parses the YAML, adds the '.superdeck/' and
+/// '.superdeck/generated/' paths to the 'assets' section under the 'flutter'
+/// key if they don't already exist, and returns the updated YAML as a string.
+///
+/// Returns the updated pubspec YAML content as a string.
 String updatePubspecAssets(String yamlContent) {
+  // Parse the YAML content into a map
   final parsedYaml = loadYaml(yamlContent);
 
-  // Ensure the flutter: key exists
+  // Get the 'flutter' section from the parsed YAML, or an empty map if it doesn't exist
   final flutterSection =
       {...(parsedYaml['flutter'] ?? {}) as Map}.cast<String, dynamic>();
-  // Get the existing assets or create a new list if it doesn't exist
+
+  // Get the 'assets' list from the 'flutter' section, or an empty list if it doesn't exist
   final assets = flutterSection['assets']?.toList() ?? [];
 
-  // Add the new asset paths if they don't exist
+  // Add the '.superdeck/' path to the assets list if it's not already present
   if (!assets.contains('.superdeck/')) {
     assets.add('.superdeck/');
   }
+
+  // Add the '.superdeck/generated/' path to the assets list if it's not already present
   if (!assets.contains('.superdeck/generated/')) {
     assets.add('.superdeck/generated/');
   }
 
-  // Update the flutter section with the new assets list
+  // Update the 'assets' key in the 'flutter' section with the modified assets list
   flutterSection['assets'] = assets;
 
-  // Convert the updated map back to YAML
+  // Create a new map from the parsed YAML and update the 'flutter' key with the modified section
   final updatedYaml = Map<String, dynamic>.from(parsedYaml)
     ..['flutter'] = flutterSection;
 
+  // Convert the updated YAML map back to a string and return it
   return YamlWriter(allowUnquotedStrings: true).write(updatedYaml);
 }

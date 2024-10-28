@@ -42,6 +42,11 @@ class SdBottomBar extends HookWidget {
               ),
               const Spacer(),
               IconButton(
+                icon: const Icon(Icons.file_download),
+                onPressed: actions.goToExportScreen,
+              ),
+              const Spacer(),
+              IconButton(
                 onPressed: actions.closePresenterMenu,
                 icon: const Icon(Icons.close),
               ),
