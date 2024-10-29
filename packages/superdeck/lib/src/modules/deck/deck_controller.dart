@@ -18,7 +18,6 @@ class DeckController extends Controller {
   FixedSlidePart? _footer;
   SlidePart? _background;
   late List<SlideData> _slides = [];
-  late final List<SlideAsset> _assets = [];
 
   AsyncValue<ReferenceDto> asyncData = const AsyncValue.loading();
 

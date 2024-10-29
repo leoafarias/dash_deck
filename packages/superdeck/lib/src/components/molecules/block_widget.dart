@@ -55,7 +55,7 @@ class SectionBlockWidget extends StatelessWidget {
 
     final children = section.blocks.map((block) {
       final flex = block.flex ?? 1;
-      final alignment = ConverterHelper.toColumnAlignment(
+      final alignment = ConverterHelper.toRowAlignment(
         block.align ?? ContentAlignment.center,
       );
       final totalFlex =
@@ -163,8 +163,9 @@ class ColumnBlockWidget extends _BlockWidget<ColumnBlock> {
     }
 
     return ConstrainedBox(
-      constraints:
-          BoxConstraints.loose(blockData.size - const Offset(0, 0) as Size),
+      constraints: BoxConstraints.loose(
+        blockData.size - const Offset(0, 0) as Size,
+      ),
       child: current,
     );
   }
@@ -197,6 +198,7 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetBlock> {
   @override
   Widget build(context) {
     final controller = Controller.of<DeckController>(context);
+    final blockData = Provider.of<BlockData>(context);
 
     final widgetBuilder = controller.getWidget(block.name);
 
@@ -204,7 +206,7 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetBlock> {
       return Container(
         color: Colors.red,
         child: Center(
-          child: Text('Widget not found: ${block.type}'),
+          child: Text('Widget not found: ${block.name}'),
         ),
       );
     }
@@ -212,9 +214,10 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetBlock> {
     return Builder(
       builder: (context) {
         try {
-          final widget = widgetBuilder(context, block);
-
-          return widget;
+          return SizedBox(
+            height: blockData.size.height,
+            child: widgetBuilder(context, block),
+          );
         } catch (e) {
           return Container(
             color: Colors.red,

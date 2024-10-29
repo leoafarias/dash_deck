@@ -92,11 +92,13 @@ class SectionBlock extends Block with SectionBlockMappable {
             : '${lastPart.content}\n$content',
       );
     } else {
-      blocksCopy.add(
-        ColumnBlock(
-          content: content,
-        ),
-      );
+      if (content.trim().isNotEmpty) {
+        blocksCopy.add(
+          ColumnBlock(
+            content: content,
+          ),
+        );
+      }
     }
 
     return copyWith(blocks: blocksCopy);

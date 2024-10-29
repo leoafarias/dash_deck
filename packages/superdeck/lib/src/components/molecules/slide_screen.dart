@@ -17,7 +17,7 @@ class SlideScreen<T extends Slide> extends HookWidget {
   Widget build(BuildContext context) {
     final slides = useSlides();
 
-    final slide = useMemoized(() => slides[slideIndex]);
+    final slide = slides[slideIndex];
     useAutomaticKeepAlive();
 
     return Center(

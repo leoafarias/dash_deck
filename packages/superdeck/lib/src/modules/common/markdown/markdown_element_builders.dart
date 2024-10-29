@@ -497,23 +497,26 @@ String _lerpString(String start, String end, double t) {
   // Clamp t between 0 and 1
   t = t.clamp(0.0, 1.0);
 
+  final commonPrefixLen = start.commonPrefixLength(end);
+  final startSuffix = start.substring(commonPrefixLen);
+  final endSuffix = end.substring(commonPrefixLen);
+
   final result = StringBuffer();
+  result.write(end.substring(0, commonPrefixLen));
 
   if (t <= 0.5) {
     final progress = t / 0.5;
-    final startLength = start.length;
+    final startLength = startSuffix.length;
     final numCharsToShow = ((1 - progress) * startLength).round();
-
     if (numCharsToShow > 0) {
-      result.write(start.substring(0, numCharsToShow));
+      result.write(startSuffix.substring(0, numCharsToShow));
     }
   } else {
     final progress = (t - 0.5) / 0.5;
-    final endLength = end.length;
+    final endLength = endSuffix.length;
     final numCharsToShow = (progress * endLength).round();
-
     if (numCharsToShow > 0) {
-      result.write(end.substring(0, numCharsToShow));
+      result.write(endSuffix.substring(0, numCharsToShow));
     }
   }
 
@@ -563,4 +566,16 @@ List<TextSpan> _lerpTextSpans(
   }
 
   return interpolatedSpans;
+}
+
+extension on String {
+  int commonPrefixLength(String other) {
+    final len = math.min(length, other.length);
+    for (int i = 0; i < len; i++) {
+      if (this[i] != other[i]) {
+        return i;
+      }
+    }
+    return len;
+  }
 }
