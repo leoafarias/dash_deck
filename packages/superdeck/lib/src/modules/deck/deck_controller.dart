@@ -6,7 +6,7 @@ import '../../../superdeck.dart';
 import '../common/helpers/async_value.dart';
 import 'deck_service.dart';
 
-bool _isDebug = true;
+bool _isDebug = false;
 
 class DeckController extends Controller {
   final _referenceService = DeckReferenceService();
