@@ -7,7 +7,6 @@ import '../../modules/navigation/navigation_hooks.dart';
 import '../molecules/bottom_bar.dart';
 import '../molecules/scaled_app.dart';
 import 'note_panel.dart';
-import 'thumbnail_panel.dart';
 
 final kScaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -107,10 +106,10 @@ class SplitView extends HookWidget {
             ),
             child: SizedBox(
               width: _thumbnailWidth,
-              child: const Column(
+              child: Column(
                 children: [
-                  Expanded(flex: 3, child: ThumbnailPanel()),
-                  IntrinsicHeight(
+                  Expanded(flex: 3, child: Container()),
+                  const IntrinsicHeight(
                     child: NotePanel(),
                   ),
                 ],
