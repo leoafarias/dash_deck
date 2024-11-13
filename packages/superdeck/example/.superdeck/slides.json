@@ -94,6 +94,12 @@
           "path": ".superdeck/generated/thumbnail_rPTQlMdP.png",
           "width": 512,
           "height": 288
+        },
+        {
+          "path": ".superdeck/generated/image_caching_lNEW6843.jpeg",
+          "width": 800,
+          "height": 1400,
+          "reference": "https://picsum.photos/800/1400"
         }
       ]
     },
@@ -613,7 +619,13 @@
         }
       ],
       "notes": [],
-      "assets": []
+      "assets": [
+        {
+          "path": ".superdeck/generated/thumbnail_5rmJo1pB.png",
+          "width": 512,
+          "height": 288
+        }
+      ]
     },
     {
       "key": "85oPyLzH",
@@ -867,13 +879,7 @@
         }
       ],
       "notes": [],
-      "assets": [
-        {
-          "path": ".superdeck/generated/thumbnail_UqCN11cB.png",
-          "width": 512,
-          "height": 288
-        }
-      ]
+      "assets": []
     }
   ]
 }

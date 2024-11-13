@@ -1,5 +1,5 @@
 config: {}
-slides: 
+slides:
   - key: 'w2wlREdN'
     options: {}
     markdown: |-
@@ -18,8 +18,8 @@ slides:
           C --> D[Output]
           D --> E[End]
       ``` {.code}
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: |
               ## Another image Another image Another image Another image Another image Another image Another image Another image Another image Another image {.here}
             scrollable: false
@@ -34,7 +34,7 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/mermaid_wgsvOvJJ.png'
         width: 168
         height: 768
@@ -69,10 +69,10 @@ slides:
       {@column}
       
       ![structured_output](https://picsum.photos/800/1400) {.cover}
-    sections: 
+    sections:
       - blocks: []
         type: 'section'
-      - blocks: 
+      - blocks:
           - flex: 2
             align: 'center'
             content: |
@@ -95,7 +95,7 @@ slides:
         flex: 2
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_4OPpCLpy.png'
         width: 512
         height: 288
@@ -109,8 +109,8 @@ slides:
       {@column}
       
       ![structured_output](https://picsum.photos/800/1400) {.cover}
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: |
               ## Another image{.here}
             scrollable: false
@@ -118,10 +118,14 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_rPTQlMdP.png'
         width: 512
         height: 288
+      - path: '.superdeck/generated/image_caching_lNEW6843.jpeg'
+        width: 800
+        height: 1400
+        reference: 'https://picsum.photos/800/1400'
   - key: 'ECisD4gC'
     options: {}
     markdown: |-
@@ -132,8 +136,8 @@ slides:
       {@column}
       
       ## Another image{.here}
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: |
               ![structured_output](https://picsum.photos/800/1400) {.cover}
             scrollable: false
@@ -141,7 +145,7 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_ECisD4gC.png'
         width: 512
         height: 288
@@ -164,8 +168,8 @@ slides:
       - Open Source Contributor
       - Flutter & Dart GDE
       - Passionate about UI/UX/DX
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - align: 'center_right'
             content: |
               #### Leo Farias
@@ -181,7 +185,7 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_P6nguqAy.png'
         width: 512
         height: 288
@@ -198,8 +202,8 @@ slides:
       > This presentation contains live AI-generated content. Unexpected things may occur during the demonstration. 
       
       {@column}
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: ''
             scrollable: false
           - flex: 2
@@ -211,7 +215,7 @@ slides:
           - scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_htEZFxsa.png'
         width: 512
         height: 288
@@ -227,8 +231,8 @@ slides:
       ## VS
       {@column flex: 2}
       ### AI Assisted Code Generation
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - flex: 2
             align: 'center_right'
             content: '### Generative UI'
@@ -240,7 +244,7 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_D4etKl0J.png'
         width: 512
         height: 288
@@ -253,8 +257,8 @@ slides:
       
       - LLMs are great at generating content based on context
       - GUIs are great at providing structured, interactive interfaces for user input and navigation
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: |
               ### What is Generative UI?{.animate}
             scrollable: false
@@ -264,20 +268,20 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_A8nJ3H8k.png'
         width: 512
         height: 288
   - key: '9mHDFwa9'
     options: {}
     markdown: '# LLM ❤️ GUI{.animate}'
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: '# LLM ❤️ GUI{.animate}'
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_9mHDFwa9.png'
         width: 512
         height: 288
@@ -292,8 +296,8 @@ slides:
       Creates dynamic, context-aware UIs by interpreting actions and maintaining state with LLMs for fluid, interactive responses.{.animate}
       
       {@column}
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - scrollable: false
           - flex: 2
             align: 'center'
@@ -303,7 +307,7 @@ slides:
           - scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_bsXHyPoa.png'
         width: 512
         height: 288
@@ -315,8 +319,8 @@ slides:
       - More intuitive and user-friendly, especially for complex tasks
       - Faster feedback loop between users and LLMs
       - Enhances efficiency and interaction
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: |-
               ### Benefits of UI over Chat{.animate}
               
@@ -326,7 +330,7 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_3sLdrfsM.png'
         width: 512
         height: 288
@@ -340,8 +344,8 @@ slides:
       ### Flutter is Well-Suited <br>for Generative UI
       Built for any screen: Ideal for generating<br>adaptive UIs across devices and platforms.
       {@column}
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - flex: 3
             align: 'center'
             content: |-
@@ -351,7 +355,7 @@ slides:
           - scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_CsyEcFYH.png'
         width: 512
         height: 288
@@ -362,8 +366,8 @@ slides:
       
       {@colum}
       ![structured_output](assets/structured_output.png)
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: |
               ## How can LLMs Understtand Your UI?
             scrollable: false
@@ -374,7 +378,7 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_rHHS9FIs.png'
         width: 512
         height: 288
@@ -400,8 +404,8 @@ slides:
         ),
       );
       ```
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: |
               ### Structured Output
             scrollable: false
@@ -423,7 +427,7 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_9jtc9i8W.png'
         width: 512
         height: 288
@@ -446,8 +450,8 @@ slides:
       final response = await model.generateContent([Content.text(prompt)]);
       
       ```
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: |-
               ```dart
               
@@ -467,7 +471,7 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_CtLOsx2s.png'
         width: 512
         height: 288
@@ -483,8 +487,8 @@ slides:
       - Font family
       - Font color
       - Color for each corner of the palette
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: |-
               ### Color Palette Generator
               
@@ -497,7 +501,7 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_6EU2Xxrf.png'
         width: 512
         height: 288
@@ -552,8 +556,8 @@ slides:
       ]);
       
       ```
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: |-
               ```dart
               final schema = Schema.object(properties: {
@@ -605,12 +609,12 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_qek7UrZY.png'
         width: 512
         height: 288
   - key: '8DDlBdti'
-    options: 
+    options:
       style: 'demo'
     markdown: |-
       {@colorPalette
@@ -622,12 +626,12 @@ slides:
           - chocolatey pink unicorn
           - cyberpunk
       }
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - name: 'colorPalette'
             scrollable: false
             type: 'schema'
-            prompts: 
+            prompts:
               - 'tropical'
               - 'vibrant'
               - 'pastel'
@@ -635,12 +639,12 @@ slides:
               - 'cyberpunk'
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_8DDlBdti.png'
         width: 512
         height: 288
   - key: 'm7QWZujG'
-    options: 
+    options:
       style: 'demo'
     markdown: |-
       {@colorPalette
@@ -652,12 +656,12 @@ slides:
           - chocolatey pink unicorn
           - cyberpunk
       }
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - name: 'colorPalette'
             scrollable: false
             type: 'widget'
-            prompts: 
+            prompts:
               - 'tropical'
               - 'vibrant'
               - 'pastel'
@@ -665,20 +669,20 @@ slides:
               - 'cyberpunk'
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_m7QWZujG.png'
         width: 512
         height: 288
   - key: 'H0jUl8Aj'
     options: {}
     markdown: '## LLMs Orchestrate APIs'
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: '## LLMs Orchestrate APIs'
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_H0jUl8Aj.png'
         width: 512
         height: 288
@@ -696,8 +700,8 @@ slides:
       {@section flex: 5}
       
       ![llm tools](assets/llm_tools.png)
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: |
               ### Gemini Function Calling
               The Function Calling feature is in Beta release
@@ -705,15 +709,18 @@ slides:
         flex: 2
         align: 'center_right'
         type: 'section'
-      - blocks: 
+      - blocks:
           - content: '![llm tools](assets/llm_tools.png)'
             scrollable: false
         flex: 5
         type: 'section'
     notes: []
-    assets: []
+    assets:
+      - path: '.superdeck/generated/thumbnail_5rmJo1pB.png'
+        width: 512
+        height: 288
   - key: '85oPyLzH'
-    options: 
+    options:
       style: 'demo'
     markdown: |-
       {@lightControl 
@@ -726,12 +733,12 @@ slides:
           - Lower by half
           - Max brightness
       }
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - name: 'lightControl'
             scrollable: false
             type: 'schema'
-            prompts: 
+            prompts:
               - 'Dim the lights by 20'
               - 'Increase by 35'
               - 'Turn off the lights'
@@ -740,7 +747,7 @@ slides:
               - 'Max brightness'
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_85oPyLzH.png'
         width: 512
         height: 288
@@ -759,8 +766,8 @@ slides:
         flex: 4
       }
       ![llm response](assets/llm_interaction.png)
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - flex: 2
             align: 'bottom_right'
             content: |
@@ -772,7 +779,7 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_Zn801w4G.png'
         width: 512
         height: 288
@@ -788,8 +795,8 @@ slides:
         flex: 3
       }
       ![widget_response](assets/widget_response.png)
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - align: 'center_left'
             content: |
               ### Widget Response{.heading}
@@ -799,12 +806,12 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_aY8Y9HBu.png'
         width: 512
         height: 288
   - key: '3eFdrtdl'
-    options: 
+    options:
       style: 'demo'
     markdown: |-
       {@lightControl
@@ -817,12 +824,12 @@ slides:
           - Lower by half
           - Max brightness
       }
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - name: 'lightControl'
             scrollable: false
             type: 'widget'
-            prompts: 
+            prompts:
               - 'Dim the lights by 20'
               - 'Increase by 35'
               - 'Turn off the lights'
@@ -831,20 +838,20 @@ slides:
               - 'Max brightness'
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_3eFdrtdl.png'
         width: 512
         height: 288
   - key: 'pNxPyfLK'
     options: {}
     markdown: '## What if the tool to use is a widget schema?'
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: '## What if the tool to use is a widget schema?'
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_pNxPyfLK.png'
         width: 512
         height: 288
@@ -873,8 +880,8 @@ slides:
       });
       
       ```
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: |-
               ### Experimental
               
@@ -901,12 +908,12 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_5cGNbsJx.png'
         width: 512
         height: 288
   - key: 'J6DNhZau'
-    options: 
+    options:
       style: 'demo'
     markdown: |-
       {@widgetSchema
@@ -917,32 +924,32 @@ slides:
           - Change all colors
           - Change everything
       }
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - name: 'widgetSchema'
             scrollable: false
             type: 'widget'
-            prompts: 
+            prompts:
               - 'Change top colors'
               - 'Change font'
               - 'Change all colors'
               - 'Change everything'
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_J6DNhZau.png'
         width: 512
         height: 288
   - key: '3kW1wOHd'
     options: {}
     markdown: '## The future of UI might be orchestrating user experiences rather than creating it.'
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: '## The future of UI might be orchestrating user experiences rather than creating it.'
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
+    assets:
       - path: '.superdeck/generated/thumbnail_3kW1wOHd.png'
         width: 512
         height: 288
@@ -954,8 +961,8 @@ slides:
       Leo Farias
       @leoafarias
       (GitHub, Twitter/X)
-    sections: 
-      - blocks: 
+    sections:
+      - blocks:
           - content: |-
               ### Thank you
               
@@ -965,7 +972,4 @@ slides:
             scrollable: false
         type: 'section'
     notes: []
-    assets: 
-      - path: '.superdeck/generated/thumbnail_UqCN11cB.png'
-        width: 512
-        height: 288
+    assets: []
