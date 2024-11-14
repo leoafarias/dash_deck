@@ -44,15 +44,3 @@ extension SlideX on Slide {
     return buffer.toString();
   }
 }
-
-extension ReferenceDtoX on ReferenceDto {
-  String toMarkdown() {
-    final buffer = StringBuffer();
-
-    for (var slide in slides) {
-      buffer.writeln(slide.toMarkdown());
-    }
-
-    return buffer.toString();
-  }
-}

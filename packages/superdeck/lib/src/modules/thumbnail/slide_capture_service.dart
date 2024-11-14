@@ -11,9 +11,8 @@ import '../../components/atoms/slide_view.dart';
 import '../../components/organisms/app_shell.dart';
 import '../common/helpers/constants.dart';
 import '../common/helpers/controller.dart';
-import '../deck/deck_controller.dart';
-import '../navigation/navigation_controller.dart';
-import '../slide/slide_configuration.dart';
+import '../presentation/presentation_controller.dart';
+import '../presentation/slide_data.dart';
 import 'slide_capture_provider.dart';
 
 enum SlideCaptureQuality {
@@ -96,23 +95,20 @@ class SlideCaptureService {
     Size? targetSize,
   }) async {
     try {
-      final controller = Controller.of<DeckController>(context);
-      final navigation = Controller.of<NavigationController>(context);
+      final controller = Provider.of<DeckController>(context);
+
       final child = InheritedTheme.captureAll(
           context,
-          ControllerProvider(
-            controller: navigation,
-            child: ControllerProvider(
-              controller: controller,
-              child: Provider(
-                data: CapturingData(true),
-                child: MediaQuery(
-                  data: MediaQuery.of(context),
-                  child: MaterialApp(
-                    theme: Theme.of(context),
-                    debugShowCheckedModeBanner: false,
-                    home: Scaffold(body: widget),
-                  ),
+          Provider(
+            data: controller,
+            child: Provider(
+              data: CapturingData(true),
+              child: MediaQuery(
+                data: MediaQuery.of(context),
+                child: MaterialApp(
+                  theme: Theme.of(context),
+                  debugShowCheckedModeBanner: false,
+                  home: Scaffold(body: widget),
                 ),
               ),
             ),

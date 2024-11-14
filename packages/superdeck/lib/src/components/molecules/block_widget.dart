@@ -7,8 +7,7 @@ import '../../modules/common/helpers/controller.dart';
 import '../../modules/common/helpers/converters.dart';
 import '../../modules/common/helpers/utils.dart';
 import '../../modules/common/styles/style_spec.dart';
-import '../../modules/deck/deck_controller.dart';
-import '../../modules/slide/slide_configuration.dart';
+import '../../modules/presentation/slide_data.dart';
 import '../../modules/thumbnail/slide_capture_provider.dart';
 import '../atoms/cache_image_widget.dart';
 import '../atoms/markdown_viewer.dart';
@@ -197,10 +196,10 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetBlock> {
 
   @override
   Widget build(context) {
-    final controller = Controller.of<DeckController>(context);
+    final slide = Provider.of<SlideData>(context);
     final blockData = Provider.of<BlockData>(context);
 
-    final widgetBuilder = controller.getWidget(block.name);
+    final widgetBuilder = slide.getWidget(block.name);
 
     if (widgetBuilder == null) {
       return Container(

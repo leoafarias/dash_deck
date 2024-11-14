@@ -9,7 +9,7 @@ class SlideThumbnailTask extends Task {
 
   @override
   FutureOr<TaskContext> run(context) async {
-    final file = context.slide.thumbnailFile;
+    final file = repository.getSlideThumbnail(context.slide);
 
     if (await file.exists()) {
       await context.saveAsAsset(file);

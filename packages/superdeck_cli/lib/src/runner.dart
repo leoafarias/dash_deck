@@ -60,8 +60,8 @@ class SuperdeckRunner {
       BuildSectionsTask(),
     ]);
     try {
-      final references = await pipeline.run();
-      progress.complete('Generated ${references.slides.length} slides.');
+      final slides = await pipeline.run();
+      progress.complete('Generated ${slides.length} slides.');
     } on Exception catch (e, stackTrace) {
       progress.fail();
       _handleException(e);

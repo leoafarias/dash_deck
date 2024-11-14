@@ -7,7 +7,6 @@ import 'src/parts/header.dart';
 import 'src/style.dart';
 
 void main() async {
-  await SuperDeckApp.initialize();
   runApp(
     Builder(builder: (context) {
       return MaterialApp(

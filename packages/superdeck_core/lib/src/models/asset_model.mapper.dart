@@ -6,32 +6,32 @@
 
 part of 'asset_model.dart';
 
-class SlideAssetMapper extends ClassMapperBase<SlideAsset> {
-  SlideAssetMapper._();
+class AssetModelMapper extends ClassMapperBase<AssetModel> {
+  AssetModelMapper._();
 
-  static SlideAssetMapper? _instance;
-  static SlideAssetMapper ensureInitialized() {
+  static AssetModelMapper? _instance;
+  static AssetModelMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals.use(_instance = SlideAssetMapper._());
+      MapperContainer.globals.use(_instance = AssetModelMapper._());
     }
     return _instance!;
   }
 
   @override
-  final String id = 'SlideAsset';
+  final String id = 'AssetModel';
 
-  static String _$path(SlideAsset v) => v.path;
-  static const Field<SlideAsset, String> _f$path = Field('path', _$path);
-  static int _$width(SlideAsset v) => v.width;
-  static const Field<SlideAsset, int> _f$width = Field('width', _$width);
-  static int _$height(SlideAsset v) => v.height;
-  static const Field<SlideAsset, int> _f$height = Field('height', _$height);
-  static String? _$reference(SlideAsset v) => v.reference;
-  static const Field<SlideAsset, String> _f$reference =
+  static String _$path(AssetModel v) => v.path;
+  static const Field<AssetModel, String> _f$path = Field('path', _$path);
+  static int _$width(AssetModel v) => v.width;
+  static const Field<AssetModel, int> _f$width = Field('width', _$width);
+  static int _$height(AssetModel v) => v.height;
+  static const Field<AssetModel, int> _f$height = Field('height', _$height);
+  static String? _$reference(AssetModel v) => v.reference;
+  static const Field<AssetModel, String> _f$reference =
       Field('reference', _$reference);
 
   @override
-  final MappableFields<SlideAsset> fields = const {
+  final MappableFields<AssetModel> fields = const {
     #path: _f$path,
     #width: _f$width,
     #height: _f$height,
@@ -40,8 +40,8 @@ class SlideAssetMapper extends ClassMapperBase<SlideAsset> {
   @override
   final bool ignoreNull = true;
 
-  static SlideAsset _instantiate(DecodingData data) {
-    return SlideAsset(
+  static AssetModel _instantiate(DecodingData data) {
+    return AssetModel(
         path: data.dec(_f$path),
         width: data.dec(_f$width),
         height: data.dec(_f$height),
@@ -51,66 +51,66 @@ class SlideAssetMapper extends ClassMapperBase<SlideAsset> {
   @override
   final Function instantiate = _instantiate;
 
-  static SlideAsset fromMap(Map<String, dynamic> map) {
-    return ensureInitialized().decodeMap<SlideAsset>(map);
+  static AssetModel fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<AssetModel>(map);
   }
 
-  static SlideAsset fromJson(String json) {
-    return ensureInitialized().decodeJson<SlideAsset>(json);
+  static AssetModel fromJson(String json) {
+    return ensureInitialized().decodeJson<AssetModel>(json);
   }
 }
 
-mixin SlideAssetMappable {
+mixin AssetModelMappable {
   String toJson() {
-    return SlideAssetMapper.ensureInitialized()
-        .encodeJson<SlideAsset>(this as SlideAsset);
+    return AssetModelMapper.ensureInitialized()
+        .encodeJson<AssetModel>(this as AssetModel);
   }
 
   Map<String, dynamic> toMap() {
-    return SlideAssetMapper.ensureInitialized()
-        .encodeMap<SlideAsset>(this as SlideAsset);
+    return AssetModelMapper.ensureInitialized()
+        .encodeMap<AssetModel>(this as AssetModel);
   }
 
-  SlideAssetCopyWith<SlideAsset, SlideAsset, SlideAsset> get copyWith =>
-      _SlideAssetCopyWithImpl(this as SlideAsset, $identity, $identity);
+  AssetModelCopyWith<AssetModel, AssetModel, AssetModel> get copyWith =>
+      _AssetModelCopyWithImpl(this as AssetModel, $identity, $identity);
   @override
   String toString() {
-    return SlideAssetMapper.ensureInitialized()
-        .stringifyValue(this as SlideAsset);
+    return AssetModelMapper.ensureInitialized()
+        .stringifyValue(this as AssetModel);
   }
 
   @override
   bool operator ==(Object other) {
-    return SlideAssetMapper.ensureInitialized()
-        .equalsValue(this as SlideAsset, other);
+    return AssetModelMapper.ensureInitialized()
+        .equalsValue(this as AssetModel, other);
   }
 
   @override
   int get hashCode {
-    return SlideAssetMapper.ensureInitialized().hashValue(this as SlideAsset);
+    return AssetModelMapper.ensureInitialized().hashValue(this as AssetModel);
   }
 }
 
-extension SlideAssetValueCopy<$R, $Out>
-    on ObjectCopyWith<$R, SlideAsset, $Out> {
-  SlideAssetCopyWith<$R, SlideAsset, $Out> get $asSlideAsset =>
-      $base.as((v, t, t2) => _SlideAssetCopyWithImpl(v, t, t2));
+extension AssetModelValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, AssetModel, $Out> {
+  AssetModelCopyWith<$R, AssetModel, $Out> get $asAssetModel =>
+      $base.as((v, t, t2) => _AssetModelCopyWithImpl(v, t, t2));
 }
 
-abstract class SlideAssetCopyWith<$R, $In extends SlideAsset, $Out>
+abstract class AssetModelCopyWith<$R, $In extends AssetModel, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({String? path, int? width, int? height, String? reference});
-  SlideAssetCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+  AssetModelCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _SlideAssetCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, SlideAsset, $Out>
-    implements SlideAssetCopyWith<$R, SlideAsset, $Out> {
-  _SlideAssetCopyWithImpl(super.value, super.then, super.then2);
+class _AssetModelCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, AssetModel, $Out>
+    implements AssetModelCopyWith<$R, AssetModel, $Out> {
+  _AssetModelCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<SlideAsset> $mapper =
-      SlideAssetMapper.ensureInitialized();
+  late final ClassMapperBase<AssetModel> $mapper =
+      AssetModelMapper.ensureInitialized();
   @override
   $R call({String? path, int? width, int? height, Object? reference = $none}) =>
       $apply(FieldCopyWithData({
@@ -120,14 +120,14 @@ class _SlideAssetCopyWithImpl<$R, $Out>
         if (reference != $none) #reference: reference
       }));
   @override
-  SlideAsset $make(CopyWithData data) => SlideAsset(
+  AssetModel $make(CopyWithData data) => AssetModel(
       path: data.get(#path, or: $value.path),
       width: data.get(#width, or: $value.width),
       height: data.get(#height, or: $value.height),
       reference: data.get(#reference, or: $value.reference));
 
   @override
-  SlideAssetCopyWith<$R2, SlideAsset, $Out2> $chain<$R2, $Out2>(
+  AssetModelCopyWith<$R2, AssetModel, $Out2> $chain<$R2, $Out2>(
           Then<$Out2, $R2> t) =>
-      _SlideAssetCopyWithImpl($value, $cast, t);
+      _AssetModelCopyWithImpl($value, $cast, t);
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import '../../modules/navigation/navigation_hooks.dart';
+import '../../modules/presentation/presentation_hooks.dart';
 
 class SdBottomBar extends HookWidget {
   const SdBottomBar({
@@ -10,7 +10,7 @@ class SdBottomBar extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final actions = useNavigationActions();
+    final navigation = useDeck();
 
     return SizedBox(
       height: 60,
@@ -34,20 +34,15 @@ class SdBottomBar extends HookWidget {
               const Spacer(),
               IconButton(
                 icon: const Icon(Icons.arrow_back),
-                onPressed: actions.previousSlide,
+                onPressed: navigation.previousSlide,
               ),
               IconButton(
                 icon: const Icon(Icons.arrow_forward),
-                onPressed: actions.nextSlide,
+                onPressed: navigation.nextSlide,
               ),
               const Spacer(),
               IconButton(
-                icon: const Icon(Icons.file_download),
-                onPressed: actions.goToExportScreen,
-              ),
-              const Spacer(),
-              IconButton(
-                onPressed: actions.closePresenterMenu,
+                onPressed: navigation.closeMenu,
                 icon: const Icon(Icons.close),
               ),
             ],

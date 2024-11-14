@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 
-abstract class SlidePart extends StatefulWidget {
-  const SlidePart({
+abstract class SlidePartWidget extends StatefulWidget {
+  const SlidePartWidget({
     super.key,
   });
 
   Widget build(BuildContext context);
 
   @override
-  _SlidePartState<SlidePart> createState() => SlidePartState<SlidePart>();
+  _SlidePartState<SlidePartWidget> createState() =>
+      _SlidePartWidgetState<SlidePartWidget>();
 }
 
-class SlidePartState<T extends SlidePart> extends _SlidePartState<T> {
+class _SlidePartWidgetState<T extends SlidePartWidget>
+    extends _SlidePartState<T> {
   @override
   Widget build(BuildContext context) {
     return widget.build(context);
   }
 }
 
-class _FixedSlidePartState extends _SlidePartState<FixedSlidePart> {
+class _FixedSlidePartState extends _SlidePartState<FixedSlidePartWidget> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -28,13 +30,13 @@ class _FixedSlidePartState extends _SlidePartState<FixedSlidePart> {
   }
 }
 
-abstract class _SlidePartState<T extends SlidePart> extends State<T> {
+abstract class _SlidePartState<T extends SlidePartWidget> extends State<T> {
   @override
   Widget build(BuildContext context);
 }
 
-abstract class FixedSlidePart extends SlidePart {
-  const FixedSlidePart({super.key});
+abstract class FixedSlidePartWidget extends SlidePartWidget {
+  const FixedSlidePartWidget({super.key});
 
   double get height;
 

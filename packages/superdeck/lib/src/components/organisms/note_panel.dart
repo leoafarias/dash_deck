@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
-import '../../modules/deck/deck_hooks.dart';
+import '../../modules/presentation/presentation_hooks.dart';
 
 class NotePanel extends HookWidget {
   const NotePanel({
@@ -11,10 +11,10 @@ class NotePanel extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final slide = useCurrentSlide();
+    final slide = useDeck.activeSlide();
 
     final notes =
-        slide.notes.isEmpty ? [SlideNote(content: 'No notes')] : slide.notes;
+        slide.notes.isEmpty ? [NoteModel(content: 'No notes')] : slide.notes;
 
     if (slide.notes.isEmpty) return const SizedBox.shrink();
 

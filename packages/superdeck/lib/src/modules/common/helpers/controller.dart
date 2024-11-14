@@ -1,61 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-/// Base class for controllers that extends [ChangeNotifier].
-///
-/// Controllers should extend this class to be used with [ControllerProvider].
-abstract class Controller extends ChangeNotifier {
-  /// Retrieves the controller of type [T] from the nearest [ControllerProvider].
-  ///
-  /// Throws a [FlutterError] if no [ControllerProvider] is found in the context.
-  static T of<T extends Controller>(BuildContext context) {
-    final controller = maybeOf<T>(context);
-
-    if (controller == null) {
-      throw FlutterError('The controller (notifier) in Provider<$T> is null');
-    }
-    return controller;
-  }
-
-  /// Retrieves the controller of type [T] from the nearest [ControllerProvider], or null if not found.
-  static T? maybeOf<T extends Controller>(BuildContext context) {
-    final ControllerProvider<T>? provider =
-        context.dependOnInheritedWidgetOfExactType<ControllerProvider<T>>();
-
-    if (T == Controller) {
-      throw FlutterError('You should provide a type for the controller');
-    }
-    return provider?.notifier;
-  }
-}
-
-/// An [InheritedNotifier] that provides an [Controller] to its descendants.
-///
-/// Widgets can access the controller using [ControllerProvider.of] or [ControllerProvider.maybeOf].
-class ControllerProvider<T extends Controller> extends InheritedNotifier<T> {
-  /// Creates an [ControllerProvider] that provides the [controller] to its descendants.
-  ///
-  /// The [controller] must not be null.
-  const ControllerProvider({
-    super.key,
-    required T controller,
-    required super.child,
-  }) : super(notifier: controller);
-}
-
-T useController<T extends Controller>() {
+T useProvider<T>() {
   final context = useContext();
 
-  return Controller.of<T>(context);
+  return Provider.of<T>(context);
 }
 
-T useSelector<P extends Controller, T>(T Function(P) selector) {
-  final controller = useController<P>();
-  return useListenableSelector(
-    controller,
-    () => selector(controller),
-  );
+T _useController<T extends Controller>() {
+  final controller = useProvider<T>();
+  return useListenable(controller);
 }
+
+abstract class UseController<T extends Controller> {
+  final T controller;
+  UseController(this.controller);
+
+  T call() => useProvider<T>();
+  T watch() => _useController<T>();
+  R select<R>(R Function(T) selector) => useControllerSelect(selector);
+}
+
+Return useControllerSelect<T extends Controller, Return>(
+    Return Function(T) selector) {
+  final controller = useProvider<T>();
+  return useListenableSelector(controller, () => selector(controller));
+}
+
+Return useProviderSelect<Param, Return>(Return Function(Param) selector) {
+  final controller = useProvider<Param>();
+
+  if (controller is Listenable) {
+    return useListenableSelector(controller, () => selector(controller));
+  }
+  final selectedValue = selector(controller);
+
+  return useMemoized(() => selectedValue, [selectedValue]);
+}
+
+abstract class Controller extends ChangeNotifier {}
 
 class Provider<T> extends InheritedWidget {
   final T data;

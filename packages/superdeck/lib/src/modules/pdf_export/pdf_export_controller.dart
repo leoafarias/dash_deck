@@ -9,7 +9,7 @@ import 'package:pdf/widgets.dart' as pw;
 
 import '../../components/molecules/slide_screen.dart';
 import '../common/helpers/constants.dart';
-import '../slide/slide_configuration.dart';
+import '../presentation/slide_data.dart';
 import '../thumbnail/slide_capture_service.dart';
 
 enum PdfExportStatus {

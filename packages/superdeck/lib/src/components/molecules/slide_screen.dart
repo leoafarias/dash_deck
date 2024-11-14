@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
-import '../../modules/deck/deck_hooks.dart';
+import '../../modules/presentation/presentation_hooks.dart';
 import '../atoms/slide_view.dart';
 
 class SlideScreen<T extends Slide> extends HookWidget {
@@ -15,7 +15,7 @@ class SlideScreen<T extends Slide> extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final slides = useSlides();
+    final slides = useDeck.slides();
 
     final slide = slides[slideIndex];
     useAutomaticKeepAlive();

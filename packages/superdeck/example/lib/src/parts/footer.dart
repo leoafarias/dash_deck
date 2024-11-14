@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:superdeck/superdeck.dart';
 
-class FooterPart extends FixedSlidePart {
+class FooterPart extends FixedSlidePartWidget {
   const FooterPart({
     super.key,
   });

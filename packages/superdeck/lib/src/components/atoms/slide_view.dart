@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
 
 import '../../modules/common/helpers/controller.dart';
-import '../../modules/slide/slide_configuration.dart';
+import '../../modules/presentation/slide_data.dart';
 import '../molecules/block_widget.dart';
 
 class SlideView extends StatelessWidget {

@@ -7,20 +7,18 @@ import 'package:image/image.dart' as img;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 import 'package:superdeck_cli/src/helpers/exceptions.dart';
-import 'package:superdeck_cli/src/helpers/extensions.dart';
 import 'package:superdeck_cli/src/parsers/slide_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
-import 'package:yaml_writer/yaml_writer.dart';
 
 typedef PipelineResult = ({
   List<Slide> slides,
-  List<SlideAsset> neededAssets,
+  List<AssetModel> neededAssets,
 });
 
 class TaskContext {
   final int index;
   Slide slide;
-  List<SlideAsset> assets;
+  List<AssetModel> assets;
 
   TaskContext({
     required this.slide,
@@ -28,7 +26,7 @@ class TaskContext {
     required this.assets,
   });
 
-  final List<SlideAsset> _neededAssets = [];
+  final List<AssetModel> _neededAssets = [];
 
   bool assetExists(String assetName) {
     for (var element in assets) {
@@ -54,7 +52,7 @@ class TaskContext {
       throw Exception('Image could not be decoded');
     }
 
-    final asset = SlideAsset(
+    final asset = AssetModel(
       path: file.path,
       width: image.width,
       height: image.height,
@@ -72,6 +70,7 @@ class TaskContext {
 
 class TaskPipeline {
   final List<Task> tasks;
+  final repository = DeckRepository(canRunLocal: true);
 
   TaskPipeline(
     this.tasks,
@@ -91,17 +90,14 @@ class TaskPipeline {
     return context;
   }
 
-  Future<ReferenceDto> run() async {
-    await kMarkdownFile.ensureExists();
-    await kGeneratedAssetsDir.ensureExists();
-    await kReferenceFile.ensureExists();
-    final markdownRaw = await kMarkdownFile.readAsString();
+  Future<List<Slide>> run() async {
+    final markdownRaw = await repository.loadMarkdown();
 
     // final loadedReference = SuperDeckReference.loadYaml(kReferenceFileYaml);
-    final loadedReference = ReferenceDto.loadFile(kReferenceFile);
+    final savedSlides = await repository.loadSlides();
 
     final slides = parseSlides(markdownRaw);
-    final assets = loadedReference.slides
+    final assets = savedSlides
         .map((e) => e.assets)
         .expand((e) => e)
         .toList()
@@ -131,21 +127,15 @@ class TaskPipeline {
       await task.dispose();
     }
 
-    final reference = ReferenceDto(
-      config: Config.loadFile(kProjectConfigFile),
-      slides: finalizedSlides.toList(),
-    );
+    final newSlides = finalizedSlides.toList();
 
-    await kReferenceFile.writeAsString(prettyJson(reference.toMap()));
-    await kReferenceFileYaml
-        .writeAsString(YamlWriter().write(reference.toMap()));
-    await kReferenceMarkdownCopy.writeAsString(reference.toMarkdown());
+    await repository.saveSlides(newSlides);
 
-    return reference;
+    return newSlides;
   }
 }
 
-Future<void> _cleanupGeneratedFiles(Iterable<SlideAsset> assets) async {
+Future<void> _cleanupGeneratedFiles(Iterable<AssetModel> assets) async {
   final files = await _loadGeneratedFiles();
   final neededPaths = assets.map((asset) => asset.path).toSet();
 
@@ -160,6 +150,7 @@ Future<void> _cleanupGeneratedFiles(Iterable<SlideAsset> assets) async {
 
 abstract class Task {
   final String name;
+  final repository = DeckRepository(canRunLocal: true);
   Task(this.name);
 
   FutureOr<void> run(TaskContext context);

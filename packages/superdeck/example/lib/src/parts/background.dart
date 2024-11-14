@@ -33,22 +33,22 @@ OMeshRect _meshBuilder(List<Color> colors) {
   );
 }
 
-class BackgroundPart extends SlidePart {
+class BackgroundPart extends SlidePartWidget {
   const BackgroundPart({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    final controller = Controller.of<DeckController>(context);
-    final configuration = Provider.of<SlideData>(context);
-    final previousIndex = configuration.slideIndex > 0 &&
-            configuration.slideIndex < controller.slides.length - 1
-        ? configuration.slideIndex - 1
-        : 0;
+    final slideCount = useDeck.slideCount();
+    final activeSlide = useDeck.activeSlide();
+    final previousIndex =
+        activeSlide.slideIndex > 0 && activeSlide.slideIndex < slideCount - 1
+            ? activeSlide.slideIndex - 1
+            : 0;
 
     return _AnimatedSwitcherOMesh(
-      colors: _determiniscOrderBasedOnIndex(configuration.slideIndex),
+      colors: _determiniscOrderBasedOnIndex(activeSlide.slideIndex),
       previousColors: _determiniscOrderBasedOnIndex(previousIndex),
       duration: const Duration(milliseconds: 1000),
     );

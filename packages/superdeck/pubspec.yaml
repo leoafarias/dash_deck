@@ -33,7 +33,6 @@ dependencies:
   web: ^1.1.0
   file_saver: ^0.2.14
   go_router_paths: ^0.2.2
-  
   image_picker: ^1.1.2
   open_filex: ^4.5.0
   meta: ^1.15.0
@@ -43,15 +42,17 @@ dependencies:
   webview_flutter: ^4.10.0
   webview_flutter_web: ^0.2.3
   google_fonts: ^6.2.1
+  dart_mappable: ^4.3.0
   
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
   mix_generator: ^0.3.0
-  custom_lint: ^0.6.5
+  custom_lint: ^0.6.8
   # mix_lint: ^0.1.1
-  build_runner: ^2.4.12
+  build_runner: ^2.4.13
+  dart_mappable_builder: ^4.3.0
   
 flutter:
   assets:

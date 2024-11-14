@@ -14,7 +14,7 @@ const onDebug = Variant('debug');
 const onImage = Variant('image');
 
 class DeckStyle {
-  DeckStyle();
+  const DeckStyle();
   SlideSpecUtility<SlideSpecAttribute> get $ => SlideSpecUtility.self;
 
   Style build() {

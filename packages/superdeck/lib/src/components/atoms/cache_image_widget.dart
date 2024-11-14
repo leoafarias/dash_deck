@@ -84,7 +84,7 @@ class _CachedImageState extends State<CachedImage> {
   }
 }
 
-Size _calculateImageSize(Size size, SlideAsset? asset) {
+Size _calculateImageSize(Size size, AssetModel? asset) {
   int? cacheWidth;
   int? cacheHeight;
   //  check if height or asset is larger

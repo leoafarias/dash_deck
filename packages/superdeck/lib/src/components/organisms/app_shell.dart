@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../modules/common/helpers/hooks.dart';
-import '../../modules/navigation/navigation_hooks.dart';
+import '../../modules/presentation/presentation_hooks.dart';
 import '../molecules/bottom_bar.dart';
 import '../molecules/scaled_app.dart';
 import 'note_panel.dart';
@@ -23,29 +23,29 @@ class AppShell extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final actions = useNavigationActions();
+    final actions = useDeck.actions();
 
     final bindings = {
       const SingleActivator(
         LogicalKeyboardKey.arrowRight,
         meta: true,
-      ): actions.nextSlide,
+      ): actions.nextPage,
       const SingleActivator(
         LogicalKeyboardKey.arrowDown,
         meta: true,
-      ): actions.nextSlide,
+      ): actions.nextPage,
       const SingleActivator(
         LogicalKeyboardKey.space,
         meta: true,
-      ): actions.nextSlide,
+      ): actions.nextPage,
       const SingleActivator(
         LogicalKeyboardKey.arrowLeft,
         meta: true,
-      ): actions.previousSlide,
+      ): actions.previousPage,
       const SingleActivator(
         LogicalKeyboardKey.arrowUp,
         meta: true,
-      ): actions.previousSlide,
+      ): actions.previousPage,
     };
 
     return CallbackShortcuts(
@@ -70,29 +70,29 @@ class SplitView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = useNavigationState();
-    final navigationActions = useNavigationActions();
+    final isMenuOpen = useDeck.isMenuOpen();
+    final actions = useDeck.actions();
 
     final bottomAnimation = useAnimationController(
       duration: _duration,
-      initialValue: state.isPresenterMenuOpen ? 1.0 : 0.0,
+      initialValue: isMenuOpen ? 1.0 : 0.0,
     );
 
     usePostFrameEffect(() {
-      if (state.isPresenterMenuOpen) {
+      if (isMenuOpen) {
         bottomAnimation.forward();
       } else {
         bottomAnimation.reverse();
       }
-    }, [state.isPresenterMenuOpen]);
+    }, [isMenuOpen]);
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 9, 9, 9),
       key: kScaffoldKey,
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
-      floatingActionButton: !state.isPresenterMenuOpen
+      floatingActionButton: !isMenuOpen
           ? IconButton(
-              onPressed: navigationActions.openPresenterMenu,
+              onPressed: actions.openMenu,
               icon: const Icon(Icons.menu),
             )
           : null,

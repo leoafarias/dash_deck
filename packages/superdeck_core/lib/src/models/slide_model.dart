@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:path/path.dart' as p;
 import 'package:superdeck_core/superdeck_core.dart';
 
 part 'slide_model.mapper.dart';
@@ -12,8 +9,8 @@ class Slide with SlideMappable {
   final SlideOptions? options;
   final String markdown;
   final List<SectionBlock> sections;
-  final List<SlideNote> notes;
-  final List<SlideAsset> assets;
+  final List<NoteModel> notes;
+  final List<AssetModel> assets;
 
   const Slide({
     required this.key,
@@ -24,17 +21,6 @@ class Slide with SlideMappable {
     this.assets = const [],
   });
 
-  File get thumbnailFile => File(
-        p.join(kGeneratedAssetsDir.path, 'thumbnail_$key.png'),
-      );
-
-  static Slide fromMap(Map<String, dynamic> map) {
-    Slide.schema.validateOrThrow(map);
-    return SlideMapper.fromMap(map);
-  }
-
-  static const fromJson = SlideMapper.fromJson;
-
   static final schema = SchemaShape(
     {
       "key": Schema.string.required(),
@@ -43,26 +29,22 @@ class Slide with SlideMappable {
       'options': SlideOptions.schema.optional(),
       'sections': SchemaList(SectionBlock.schema).optional(),
       'notes': SchemaList(Schema.string).optional(),
-      'assets': SchemaList(SlideAsset.schema).optional(),
+      'assets': SchemaList(AssetModel.schema).optional(),
     },
     additionalProperties: false,
   );
+
+  static Slide fromMap(Map<String, dynamic> map) {
+    schema.validateOrThrow(map);
+    return SlideMapper.fromMap(map);
+  }
 }
 
 @MappableClass()
-class SlideNote with SlideNoteMappable {
+class NoteModel with NoteModelMappable {
   final String content;
 
-  SlideNote({
-    required this.content,
-  });
-
-  static SlideNote fromMap(Map<String, dynamic> map) {
-    SlideNote.schema.validateOrThrow(map);
-    return SlideNoteMapper.fromMap(map);
-  }
-
-  static const fromJson = SlideNoteMapper.fromJson;
+  NoteModel({required this.content});
 
   static final schema = SchemaShape(
     {
@@ -70,4 +52,9 @@ class SlideNote with SlideNoteMappable {
     },
     additionalProperties: false,
   );
+
+  static NoteModel fromMap(Map<String, dynamic> map) {
+    schema.validateOrThrow(map);
+    return NoteModelMapper.fromMap(map);
+  }
 }

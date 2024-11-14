@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
 
 import '../../modules/common/helpers/constants.dart';
-import '../../modules/slide/slide_configuration.dart';
+import '../../modules/presentation/slide_data.dart';
 import '../../modules/thumbnail/thumbnail_controller.dart';
 import 'cache_image_widget.dart';
 import 'loading_indicator.dart';

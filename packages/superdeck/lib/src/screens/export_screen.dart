@@ -2,17 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../modules/common/helpers/extensions.dart';
-import '../modules/deck/deck_hooks.dart';
-import '../modules/navigation/navigation_hooks.dart';
 import '../modules/pdf_export/pdf_export_controller.dart';
+import '../modules/presentation/presentation_hooks.dart';
 
 class ExportScreen extends HookWidget {
   const ExportScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final slides = useSlides();
-    final currentSlideIndex = useCurrentSlideIndex();
+    final slides = useDeck.slides();
+    final currentSlideIndex = useDeck.currentPage() - 1;
 
     final export = usePdfExportController(
       slides: slides,

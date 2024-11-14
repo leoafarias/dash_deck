@@ -4,8 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../components/molecules/slide_screen.dart';
 import '../modules/common/helpers/hooks.dart';
-import '../modules/deck/deck_hooks.dart';
-import '../modules/navigation/navigation_hooks.dart';
+import '../modules/presentation/presentation_hooks.dart';
 
 class PresentationScreen extends HookWidget {
   const PresentationScreen({super.key});
@@ -15,10 +14,10 @@ class PresentationScreen extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final slideIndex = useCurrentSlideIndex();
+    final slideIndex = useDeck.currentSlideIndex();
     final pageController = usePageController(initialPage: slideIndex);
 
-    final slides = useSlides();
+    final slides = useDeck.slides();
 
     usePostFrameEffect(() {
       if (slideIndex >= slides.length) {

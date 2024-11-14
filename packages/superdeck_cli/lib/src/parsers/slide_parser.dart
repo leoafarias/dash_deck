@@ -56,15 +56,15 @@ class SlideParser extends Parser<Slide> {
 
     final regexComments = RegExp(r'<!--(.*?)-->', dotAll: true);
 
-    final notes = <SlideNote>[];
+    final notes = <NoteModel>[];
     final comments = regexComments.allMatches(extracted.contents);
 
     for (final comment in comments) {
       final note = {
         'content': comment.group(1)?.trim(),
       };
-      SlideNote.schema.validateOrThrow(note);
-      notes.add(SlideNote.fromMap(note));
+      NoteModel.schema.validateOrThrow(note);
+      notes.add(NoteModel.fromMap(note));
     }
 
     // Whole content of the match

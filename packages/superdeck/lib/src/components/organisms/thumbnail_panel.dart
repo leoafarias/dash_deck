@@ -5,8 +5,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../modules/common/helpers/hooks.dart';
 import '../../modules/common/helpers/utils.dart';
-import '../../modules/deck/deck_hooks.dart';
-import '../../modules/navigation/navigation_hooks.dart';
+import '../../modules/presentation/presentation_hooks.dart';
 import '../atoms/slide_thumbnail.dart';
 
 class ThumbnailPanel extends HookWidget {
@@ -19,24 +18,24 @@ class ThumbnailPanel extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final navActions = useNavigationActions();
+    final actions = useDeck.actions();
 
-    final currentSlideIndex = useCurrentSlideIndex();
+    final activeSlide = useDeck.activeSlide();
+    final slideCount = useDeck.slideCount();
 
-    final slides = useSlides();
     final controller = useScrollVisibleController();
     final visibleItems = controller.visibleItems;
 
     usePostFrameEffect(() {
       if (visibleItems.isEmpty) return;
 
-      final visibleItem =
-          visibleItems.firstWhereOrNull((e) => e.index == currentSlideIndex);
+      final visibleItem = visibleItems
+          .firstWhereOrNull((e) => e.index == activeSlide.slideIndex);
 
       double alignment;
 
       if (visibleItem == null) {
-        final isBeginning = visibleItems.first.index > currentSlideIndex;
+        final isBeginning = visibleItems.first.index > activeSlide.slideIndex;
 
         alignment = isBeginning ? 0 : 0.7;
       } else {
@@ -51,34 +50,35 @@ class ThumbnailPanel extends HookWidget {
         }
       }
       controller.itemScrollController.scrollTo(
-        index: currentSlideIndex,
+        index: activeSlide.slideIndex,
         alignment: alignment,
         duration: _duration,
         curve: _curve,
       );
 
       return;
-    }, [currentSlideIndex, slides]);
+    }, [activeSlide]);
 
     return Container(
       color: Colors.black,
       child: ScrollablePositionedList.builder(
           scrollDirection: context.isSmall ? Axis.horizontal : Axis.vertical,
-          itemCount: slides.length,
+          itemCount: slideCount,
           itemPositionsListener: controller.itemPositionsListener,
           itemScrollController: controller.itemScrollController,
           padding: const EdgeInsets.all(20),
           itemBuilder: (context, index) {
+            final page = index + 1;
             return Padding(
               padding: const EdgeInsets.symmetric(
                 vertical: 8,
                 horizontal: 10,
               ),
               child: SlideThumbnail(
-                page: index + 1,
-                selected: currentSlideIndex == index,
-                onTap: () => navActions.goToSlide(index),
-                slide: slides[index],
+                page: page,
+                selected: activeSlide.slideIndex == index,
+                onTap: () => actions.goToPage(page),
+                slide: activeSlide,
               ),
             );
           }),

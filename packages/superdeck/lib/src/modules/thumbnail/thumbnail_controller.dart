@@ -4,15 +4,17 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
+import 'package:superdeck_core/superdeck_core.dart';
 
 import '../common/helpers/async_value.dart';
 import '../common/helpers/constants.dart';
-import '../slide/slide_configuration.dart';
+import '../presentation/slide_data.dart';
 import 'slide_capture_service.dart';
 
 class ThumbnailController with ChangeNotifier {
   late AsyncValue<File> _asyncData = const AsyncValue.loading();
   bool _disposed = false;
+  final repository = DeckRepository();
 
   ThumbnailController();
 
@@ -20,7 +22,7 @@ class ThumbnailController with ChangeNotifier {
     try {
       final result = kCanRunProcess
           ? await _generateThumbnail(slide)
-          : slide.thumbnailFile;
+          : repository.getSlideThumbnail(slide.data);
       _asyncData = AsyncValue.data(result);
     } catch (e, stackTrace) {
       _asyncData = AsyncValue.error(e, stackTrace);
@@ -70,8 +72,12 @@ class ThumbnailController with ChangeNotifier {
   }
 }
 
-Future<File> _generateThumbnail(SlideData slide, {bool force = false}) async {
-  final thumbnailFile = slide.thumbnailFile;
+Future<File> _generateThumbnail(
+  SlideData slide, {
+  bool force = false,
+}) async {
+  final repository = DeckRepository();
+  final thumbnailFile = repository.getSlideThumbnail(slide.data);
 
   if (await thumbnailFile.exists() && !force) {
     return thumbnailFile;
