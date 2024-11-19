@@ -6,7 +6,7 @@ import 'package:window_manager/window_manager.dart';
 import 'helpers/constants.dart';
 import 'helpers/syntax_highlighter.dart';
 
-Future<void> _initialize() async {
+Future<void> initializeDependencies() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Future.wait([

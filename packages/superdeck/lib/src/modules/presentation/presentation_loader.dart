@@ -34,8 +34,8 @@ class _PresentationLoaderBuilderState extends State<PresentationLoaderBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-        stream: _deckRepository.watch(),
+    return FutureBuilder(
+        future: _deckRepository.loadSlides(),
         builder: (context, snapshot) {
           return Stack(
             children: [
@@ -50,5 +50,21 @@ class _PresentationLoaderBuilderState extends State<PresentationLoaderBuilder> {
             ],
           );
         });
+    // return StreamBuilder(
+    //     stream: _deckRepository.watch(),
+    //     builder: (context, snapshot) {
+    //       return Stack(
+    //         children: [
+    //           if (snapshot.hasData) widget.builder(snapshot.requireData),
+    //           if (snapshot.hasError)
+    //             Center(
+    //               child: Text('Error loading presentation ${snapshot.error}'),
+    //             ),
+    //           LoadingOverlay(
+    //             isLoading: snapshot.connectionState == ConnectionState.waiting,
+    //           ),
+    //         ],
+    //       );
+    //     });
   }
 }

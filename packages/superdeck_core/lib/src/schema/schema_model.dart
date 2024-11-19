@@ -154,11 +154,13 @@ class SchemaList<T extends SchemaValue> extends SchemaValue<List<T>> {
 
   @override
   List<T>? tryParse(Object? value) {
+    final anotherRuntimeType = value.runtimeType;
     if (value is List) {
       final parsedList = value.map((e) => items.tryParse(e)).toList();
       if (parsedList.any((e) => e == null)) {
         return null;
       }
+      final runtimeType = parsedList.runtimeType;
       return parsedList as List<T>;
     }
     return null;

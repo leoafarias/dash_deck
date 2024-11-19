@@ -26,16 +26,16 @@ class Slide with SlideMappable {
       "key": Schema.string.required(),
       "markdown": Schema.string.required(),
       "title": Schema.string.optional(),
-      'options': SlideOptions.schema.optional(),
-      'sections': SchemaList(SectionBlock.schema).optional(),
-      'notes': SchemaList(Schema.string).optional(),
-      'assets': SchemaList(AssetModel.schema).optional(),
+      // 'options': SlideOptions.schema.optional(),
+      // 'sections': SchemaList(SectionBlock.schema).optional(),
+      // 'notes': SchemaList(NoteModel.schema).optional(),
+      // 'assets': SchemaList(AssetModel.schema).optional(),
     },
-    additionalProperties: false,
+    additionalProperties: true,
   );
 
   static Slide fromMap(Map<String, dynamic> map) {
-    schema.validateOrThrow(map);
+    // schema.validateOrThrow(map);
     return SlideMapper.fromMap(map);
   }
 }

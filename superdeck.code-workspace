@@ -37,6 +37,8 @@
 			"titleBar.inactiveBackground": "#000b0c99",
 			"titleBar.inactiveForeground": "#e7e7e799"
 		},
-		"peacock.color": "#000b0c"
+		"peacock.color": "#000b0c",
+		"window.confirmSaveUntitledWorkspace": false,
+		"cursor.general.enableShadowWorkspace": true
 	}
 }

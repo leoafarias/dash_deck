@@ -110,7 +110,7 @@ class SectionBlock extends Block with SectionBlockMappable {
   }
 
   static final schema = Block.schema.extend({
-    'blocks': Schema.list(ContentBlock.typeSchema),
+    'blocks': SchemaList(ContentBlock.typeSchema).optional(),
   });
 
   SectionBlock appendContent(ContentBlock part) {

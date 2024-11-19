@@ -13,8 +13,7 @@ T _useController<T extends Controller>() {
 }
 
 abstract class UseController<T extends Controller> {
-  final T controller;
-  UseController(this.controller);
+  UseController();
 
   T call() => useProvider<T>();
   T watch() => _useController<T>();

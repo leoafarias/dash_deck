@@ -5,14 +5,16 @@ import 'presentation_controller.dart';
 import 'slide_data.dart';
 
 UseDeckController get useDeck {
-  final controller = useProvider<DeckController>();
-  return UseDeckController(controller);
+  return UseDeckController();
 }
 
 class UseDeckController extends UseController<DeckController> {
-  UseDeckController(super.controller);
+  UseDeckController();
 
-  UseDeckActions actions() => UseDeckActions(controller);
+  UseDeckActions actions() {
+    final context = useContext();
+    return UseDeckActions(Provider.of<DeckController>(context));
+  }
 
   List<SlideData> slides() => select((controller) => controller.slides);
   DeckConfiguration configuration() => select((c) => c.configuration);

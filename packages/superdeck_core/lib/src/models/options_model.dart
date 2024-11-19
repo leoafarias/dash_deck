@@ -12,7 +12,7 @@ sealed class Options {
 
   static final schema = SchemaShape(
     {
-      "style": Schema.string,
+      "style": Schema.string.optional(),
     },
   );
 }

@@ -63,7 +63,9 @@ class DeckController extends Controller {
     _router.routeInformationProvider.addListener(() {
       final uri = _router.routeInformationProvider.value.uri;
 
-      final pathParam = uri.queryParameters[SDPaths.slides.slide.id] ?? '0';
+      final pathParam = uri.toString().startsWith(SDPaths.slides.path)
+          ? uri.pathSegments.last
+          : '0';
       final slideIndex = int.tryParse(pathParam) ?? 0;
 
       print('Slide index: $slideIndex');
@@ -234,31 +236,67 @@ typedef WidgetBuilderWithOptions = Widget Function(
 );
 
 final kRootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+final kShellRouteNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'shell');
+
+Widget _buildSlidePage(BuildContext context, GoRouterState state) {
+  final slideIndex = int.tryParse(
+        state.path ?? '0',
+      ) ??
+      0;
+
+  return SlideScreen(
+    slideIndex,
+  );
+}
 
 GoRouter _buildRouter(List<SlideData> slides) {
   return GoRouter(
-    navigatorKey: kRootNavigatorKey,
-    initialLocation: SDPaths.root.path,
-    redirect: (context, state) => SDPaths.slides.slide.define('0').path,
-    restorationScopeId: 'root',
-    routes: <RouteBase>[
-      ShellRoute(
-        navigatorKey: kRootNavigatorKey,
-        builder: (context, state, child) => AppShell(child: child),
-        routes: slides.mapIndexed((index, slide) {
-          return GoRoute(
-            path: SDPaths.slides.slide.define(index.toString()).path,
-            pageBuilder: (context, state) {
-              return getPageTransition(
-                SlideScreen(index),
+      initialLocation: SDPaths.slides.goRoute,
+      redirect: (context, state) =>
+          state.path == SDPaths.root.path ? SDPaths.slides.goRoute : null,
+      navigatorKey: kRootNavigatorKey,
+      restorationScopeId: 'root',
+      routes: <RouteBase>[
+        ShellRoute(
+          navigatorKey: kShellRouteNavigatorKey,
+          builder: (context, state, child) => AppShell(child: child),
+          routes: [
+            GoRoute(
+              parentNavigatorKey: kShellRouteNavigatorKey,
+              path: SDPaths.slides.goRoute,
+              builder: (context, state) => const SlideScreen(0),
+              routes: slides.mapIndexed((index, slide) {
+                return GoRoute(
+                  path: '${slide.slideIndex}',
+                  pageBuilder: (context, state) =>
+                      getPageTransition(_buildSlidePage(context, state), state),
+                );
+              }).toList(),
+            )
+          ],
+        ),
+      ]);
+}
+
+class SlideRoute extends GoRoute {
+  SlideRoute({
+    required Widget Function(BuildContext, GoRouterState) builder,
+  }) : super(
+          path: SDPaths.slides.goRoute,
+          pageBuilder: (context, state) => getPageTransition(
+            builder(context, state),
+            state,
+          ),
+          routes: [
+            GoRoute(
+              path: SDPaths.slides.slide.goRoute,
+              pageBuilder: (context, state) => getPageTransition(
+                builder(context, state),
                 state,
-              );
-            },
-          );
-        }).toList(),
-      ),
-    ],
-  );
+              ),
+            ),
+          ],
+        );
 }
 
 CustomTransitionPage<void> getPageTransition(

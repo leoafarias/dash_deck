@@ -1,9 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 import '../modules/common/helpers/controller.dart';
 import '../modules/common/helpers/theme.dart';
-import '../modules/common/helpers/utils.dart';
+import '../modules/common/initializer_provider.dart';
 import '../modules/common/styles/style.dart';
 import '../modules/presentation/presentation_controller.dart';
 import '../modules/presentation/presentation_loader.dart';
@@ -26,6 +27,10 @@ class SuperDeckApp extends StatelessWidget {
   final FixedSlidePartWidget? header;
   final FixedSlidePartWidget? footer;
   final SlidePartWidget? background;
+
+  static Future<void> initialize() async {
+    await initializeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +90,7 @@ class _SuperDeckProviderState extends State<SuperDeckProvider> {
   void didUpdateWidget(SuperDeckProvider oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (!deepEquals(
+    if (!listEquals(
           widget.slides,
           oldWidget.slides,
         ) ||

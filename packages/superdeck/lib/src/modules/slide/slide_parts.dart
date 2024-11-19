@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
-abstract class SlidePartWidget extends StatefulWidget {
+abstract class SlidePartWidget extends StatefulHookWidget {
   const SlidePartWidget({
     super.key,
   });

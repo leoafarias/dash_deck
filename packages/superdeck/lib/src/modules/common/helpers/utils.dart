@@ -106,5 +106,3 @@ extension BuildContextExt on BuildContext {
   double get width => size.width;
   double get height => size.height;
 }
-
-final deepEquals = const DeepCollectionEquality().equals;

@@ -58,11 +58,17 @@ class DeckRepository {
 
     final json = await _jsonDecoder(content);
 
-    final slides = json['slides'] as List;
+    if (json == null) {
+      return [];
+    }
 
-    return (slides)
-        .map((e) => Slide.fromMap(e as Map<String, dynamic>))
-        .toList();
+    List<Slide> slides = [];
+
+    for (final slide in json) {
+      slides.add(Slide.fromMap(slide));
+    }
+
+    return slides;
   }
 
   Stream<List<Slide>> watch() {
@@ -91,6 +97,7 @@ class DeckRepository {
       } catch (e) {
         // Handle any errors by adding an error to the stream
         controller.addError(e);
+        rethrow;
       }
     });
 

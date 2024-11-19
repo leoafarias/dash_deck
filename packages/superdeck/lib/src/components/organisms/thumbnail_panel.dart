@@ -21,6 +21,7 @@ class ThumbnailPanel extends HookWidget {
     final actions = useDeck.actions();
 
     final activeSlide = useDeck.activeSlide();
+    final slides = useDeck.slides();
     final slideCount = useDeck.slideCount();
 
     final controller = useScrollVisibleController();
@@ -29,8 +30,9 @@ class ThumbnailPanel extends HookWidget {
     usePostFrameEffect(() {
       if (visibleItems.isEmpty) return;
 
-      final visibleItem = visibleItems
-          .firstWhereOrNull((e) => e.index == activeSlide.slideIndex);
+      final visibleItem = visibleItems.firstWhereOrNull(
+        (e) => e.index == activeSlide.slideIndex,
+      );
 
       double alignment;
 
@@ -78,7 +80,7 @@ class ThumbnailPanel extends HookWidget {
                 page: page,
                 selected: activeSlide.slideIndex == index,
                 onTap: () => actions.goToPage(page),
-                slide: activeSlide,
+                slide: slides[index],
               ),
             );
           }),
