@@ -68,7 +68,7 @@ class SlideParser extends Parser<Slide> {
     }
 
     // Whole content of the match
-    return Slide.fromMap({
+    return Slide.parse({
       'options': extracted.frontMatter,
       'markdown': extracted.contents,
       'key': extracted.key

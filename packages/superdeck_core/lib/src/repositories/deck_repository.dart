@@ -65,7 +65,7 @@ class DeckRepository {
     List<Slide> slides = [];
 
     for (final slide in json) {
-      slides.add(Slide.fromMap(slide));
+      slides.add(Slide.parse(slide));
     }
 
     return slides;
@@ -89,7 +89,7 @@ class DeckRepository {
 
         // Map the JSON data to a List of Slide objects
         final slides = (json as List)
-            .map((e) => Slide.fromMap(e as Map<String, dynamic>))
+            .map((e) => Slide.parse(e as Map<String, dynamic>))
             .toList();
 
         // Add the updated slides to the stream

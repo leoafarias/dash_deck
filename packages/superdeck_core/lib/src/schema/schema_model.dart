@@ -77,7 +77,8 @@ class SchemaObj extends SchemaValue<JSON> {
       if (value == null) {
         return optionalValue
             ? ValidationResult.valid(path)
-            : throw RequiredPropMissingValidationError(property: path.last);
+            : throw RequiredPropMissingValidationError(
+                property: path.join('.'));
       }
 
       final parsedValue = tryParse(value);
@@ -155,9 +156,7 @@ class SchemaList<T extends SchemaValue<V>, V> extends SchemaValue<List<V>> {
   @override
   List<V>? tryParse(Object? value) {
     if (value is List) {
-      print('Runtimetype: ${itemSchema.runtimeType}');
-      print('Expected: ${value.runtimeType}');
-      print('Value: $value');
+      if (value is List<V>) return value;
       final isInvalid = value.any((v) => itemSchema.tryParse(v) == null);
 
       if (isInvalid) {

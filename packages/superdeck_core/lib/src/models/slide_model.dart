@@ -27,14 +27,14 @@ class Slide with SlideMappable {
       "markdown": Schema.string.required(),
       "title": Schema.string.optional(),
       'options': SlideOptions.schema.optional(),
-      // 'sections': Schema.list(SectionBlock.schema).optional(),
-      // 'notes': Schema.list(Note.schema).optional(),
+      'sections': Schema.list(SectionBlock.schema).optional(),
+      'notes': Schema.list(Note.schema).optional(),
       'assets': Schema.list(Asset.schema).optional(),
     },
     additionalProperties: true,
   );
 
-  static Slide fromMap(Map<String, dynamic> map) {
+  static Slide parse(Map<String, dynamic> map) {
     schema.validateOrThrow(map);
     return SlideMapper.fromMap(map);
   }

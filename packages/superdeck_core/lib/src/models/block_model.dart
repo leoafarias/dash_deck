@@ -44,6 +44,7 @@ sealed class Block with BlockMappable {
   }
 
   static final schema = Schema.object({
+    "type": Schema.string.isEnum(BlockType.values),
     "align": ContentAlignment.schema.optional(),
     "flex": Schema.int.optional(),
     "scrollable": Schema.boolean.optional(),
