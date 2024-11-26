@@ -15,8 +15,8 @@ class SlideMapper extends ClassMapperBase<Slide> {
       MapperContainer.globals.use(_instance = SlideMapper._());
       SlideOptionsMapper.ensureInitialized();
       SectionBlockMapper.ensureInitialized();
-      NoteModelMapper.ensureInitialized();
-      AssetModelMapper.ensureInitialized();
+      NoteMapper.ensureInitialized();
+      AssetMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -34,11 +34,11 @@ class SlideMapper extends ClassMapperBase<Slide> {
   static List<SectionBlock> _$sections(Slide v) => v.sections;
   static const Field<Slide, List<SectionBlock>> _f$sections =
       Field('sections', _$sections, opt: true, def: const []);
-  static List<NoteModel> _$notes(Slide v) => v.notes;
-  static const Field<Slide, List<NoteModel>> _f$notes =
+  static List<Note> _$notes(Slide v) => v.notes;
+  static const Field<Slide, List<Note>> _f$notes =
       Field('notes', _$notes, opt: true, def: const []);
-  static List<AssetModel> _$assets(Slide v) => v.assets;
-  static const Field<Slide, List<AssetModel>> _f$assets =
+  static List<Asset> _$assets(Slide v) => v.assets;
+  static const Field<Slide, List<Asset>> _f$assets =
       Field('assets', _$assets, opt: true, def: const []);
 
   @override
@@ -112,17 +112,15 @@ abstract class SlideCopyWith<$R, $In extends Slide, $Out>
   SlideOptionsCopyWith<$R, SlideOptions, SlideOptions>? get options;
   ListCopyWith<$R, SectionBlock,
       SectionBlockCopyWith<$R, SectionBlock, SectionBlock>> get sections;
-  ListCopyWith<$R, NoteModel, NoteModelCopyWith<$R, NoteModel, NoteModel>>
-      get notes;
-  ListCopyWith<$R, AssetModel, AssetModelCopyWith<$R, AssetModel, AssetModel>>
-      get assets;
+  ListCopyWith<$R, Note, NoteCopyWith<$R, Note, Note>> get notes;
+  ListCopyWith<$R, Asset, AssetCopyWith<$R, Asset, Asset>> get assets;
   $R call(
       {String? key,
       SlideOptions? options,
       String? markdown,
       List<SectionBlock>? sections,
-      List<NoteModel>? notes,
-      List<AssetModel>? assets});
+      List<Note>? notes,
+      List<Asset>? assets});
   SlideCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -141,12 +139,12 @@ class _SlideCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Slide, $Out>
       get sections => ListCopyWith($value.sections,
           (v, t) => v.copyWith.$chain(t), (v) => call(sections: v));
   @override
-  ListCopyWith<$R, NoteModel, NoteModelCopyWith<$R, NoteModel, NoteModel>>
-      get notes => ListCopyWith(
+  ListCopyWith<$R, Note, NoteCopyWith<$R, Note, Note>> get notes =>
+      ListCopyWith(
           $value.notes, (v, t) => v.copyWith.$chain(t), (v) => call(notes: v));
   @override
-  ListCopyWith<$R, AssetModel, AssetModelCopyWith<$R, AssetModel, AssetModel>>
-      get assets => ListCopyWith($value.assets, (v, t) => v.copyWith.$chain(t),
+  ListCopyWith<$R, Asset, AssetCopyWith<$R, Asset, Asset>> get assets =>
+      ListCopyWith($value.assets, (v, t) => v.copyWith.$chain(t),
           (v) => call(assets: v));
   @override
   $R call(
@@ -154,8 +152,8 @@ class _SlideCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Slide, $Out>
           Object? options = $none,
           String? markdown,
           List<SectionBlock>? sections,
-          List<NoteModel>? notes,
-          List<AssetModel>? assets}) =>
+          List<Note>? notes,
+          List<Asset>? assets}) =>
       $apply(FieldCopyWithData({
         if (key != null) #key: key,
         if (options != $none) #options: options,
@@ -178,106 +176,98 @@ class _SlideCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Slide, $Out>
       _SlideCopyWithImpl($value, $cast, t);
 }
 
-class NoteModelMapper extends ClassMapperBase<NoteModel> {
-  NoteModelMapper._();
+class NoteMapper extends ClassMapperBase<Note> {
+  NoteMapper._();
 
-  static NoteModelMapper? _instance;
-  static NoteModelMapper ensureInitialized() {
+  static NoteMapper? _instance;
+  static NoteMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals.use(_instance = NoteModelMapper._());
+      MapperContainer.globals.use(_instance = NoteMapper._());
     }
     return _instance!;
   }
 
   @override
-  final String id = 'NoteModel';
+  final String id = 'Note';
 
-  static String _$content(NoteModel v) => v.content;
-  static const Field<NoteModel, String> _f$content =
-      Field('content', _$content);
+  static String _$content(Note v) => v.content;
+  static const Field<Note, String> _f$content = Field('content', _$content);
 
   @override
-  final MappableFields<NoteModel> fields = const {
+  final MappableFields<Note> fields = const {
     #content: _f$content,
   };
   @override
   final bool ignoreNull = true;
 
-  static NoteModel _instantiate(DecodingData data) {
-    return NoteModel(content: data.dec(_f$content));
+  static Note _instantiate(DecodingData data) {
+    return Note(content: data.dec(_f$content));
   }
 
   @override
   final Function instantiate = _instantiate;
 
-  static NoteModel fromMap(Map<String, dynamic> map) {
-    return ensureInitialized().decodeMap<NoteModel>(map);
+  static Note fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<Note>(map);
   }
 
-  static NoteModel fromJson(String json) {
-    return ensureInitialized().decodeJson<NoteModel>(json);
+  static Note fromJson(String json) {
+    return ensureInitialized().decodeJson<Note>(json);
   }
 }
 
-mixin NoteModelMappable {
+mixin NoteMappable {
   String toJson() {
-    return NoteModelMapper.ensureInitialized()
-        .encodeJson<NoteModel>(this as NoteModel);
+    return NoteMapper.ensureInitialized().encodeJson<Note>(this as Note);
   }
 
   Map<String, dynamic> toMap() {
-    return NoteModelMapper.ensureInitialized()
-        .encodeMap<NoteModel>(this as NoteModel);
+    return NoteMapper.ensureInitialized().encodeMap<Note>(this as Note);
   }
 
-  NoteModelCopyWith<NoteModel, NoteModel, NoteModel> get copyWith =>
-      _NoteModelCopyWithImpl(this as NoteModel, $identity, $identity);
+  NoteCopyWith<Note, Note, Note> get copyWith =>
+      _NoteCopyWithImpl(this as Note, $identity, $identity);
   @override
   String toString() {
-    return NoteModelMapper.ensureInitialized()
-        .stringifyValue(this as NoteModel);
+    return NoteMapper.ensureInitialized().stringifyValue(this as Note);
   }
 
   @override
   bool operator ==(Object other) {
-    return NoteModelMapper.ensureInitialized()
-        .equalsValue(this as NoteModel, other);
+    return NoteMapper.ensureInitialized().equalsValue(this as Note, other);
   }
 
   @override
   int get hashCode {
-    return NoteModelMapper.ensureInitialized().hashValue(this as NoteModel);
+    return NoteMapper.ensureInitialized().hashValue(this as Note);
   }
 }
 
-extension NoteModelValueCopy<$R, $Out> on ObjectCopyWith<$R, NoteModel, $Out> {
-  NoteModelCopyWith<$R, NoteModel, $Out> get $asNoteModel =>
-      $base.as((v, t, t2) => _NoteModelCopyWithImpl(v, t, t2));
+extension NoteValueCopy<$R, $Out> on ObjectCopyWith<$R, Note, $Out> {
+  NoteCopyWith<$R, Note, $Out> get $asNote =>
+      $base.as((v, t, t2) => _NoteCopyWithImpl(v, t, t2));
 }
 
-abstract class NoteModelCopyWith<$R, $In extends NoteModel, $Out>
+abstract class NoteCopyWith<$R, $In extends Note, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({String? content});
-  NoteModelCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+  NoteCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _NoteModelCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, NoteModel, $Out>
-    implements NoteModelCopyWith<$R, NoteModel, $Out> {
-  _NoteModelCopyWithImpl(super.value, super.then, super.then2);
+class _NoteCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Note, $Out>
+    implements NoteCopyWith<$R, Note, $Out> {
+  _NoteCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<NoteModel> $mapper =
-      NoteModelMapper.ensureInitialized();
+  late final ClassMapperBase<Note> $mapper = NoteMapper.ensureInitialized();
   @override
   $R call({String? content}) =>
       $apply(FieldCopyWithData({if (content != null) #content: content}));
   @override
-  NoteModel $make(CopyWithData data) =>
-      NoteModel(content: data.get(#content, or: $value.content));
+  Note $make(CopyWithData data) =>
+      Note(content: data.get(#content, or: $value.content));
 
   @override
-  NoteModelCopyWith<$R2, NoteModel, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _NoteModelCopyWithImpl($value, $cast, t);
+  NoteCopyWith<$R2, Note, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _NoteCopyWithImpl($value, $cast, t);
 }

@@ -14,7 +14,7 @@ class NotePanel extends HookWidget {
     final slide = useDeck.activeSlide();
 
     final notes =
-        slide.notes.isEmpty ? [NoteModel(content: 'No notes')] : slide.notes;
+        slide.notes.isEmpty ? [Note(content: 'No notes')] : slide.notes;
 
     if (slide.notes.isEmpty) return const SizedBox.shrink();
 

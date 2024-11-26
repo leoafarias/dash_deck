@@ -9,8 +9,8 @@ class Slide with SlideMappable {
   final SlideOptions? options;
   final String markdown;
   final List<SectionBlock> sections;
-  final List<NoteModel> notes;
-  final List<AssetModel> assets;
+  final List<Note> notes;
+  final List<Asset> assets;
 
   const Slide({
     required this.key,
@@ -21,40 +21,40 @@ class Slide with SlideMappable {
     this.assets = const [],
   });
 
-  static final schema = SchemaShape(
+  static final schema = Schema.object(
     {
       "key": Schema.string.required(),
       "markdown": Schema.string.required(),
       "title": Schema.string.optional(),
-      // 'options': SlideOptions.schema.optional(),
-      // 'sections': SchemaList(SectionBlock.schema).optional(),
-      // 'notes': SchemaList(NoteModel.schema).optional(),
-      // 'assets': SchemaList(AssetModel.schema).optional(),
+      'options': SlideOptions.schema.optional(),
+      // 'sections': Schema.list(SectionBlock.schema).optional(),
+      // 'notes': Schema.list(Note.schema).optional(),
+      // 'assets': Schema.list(Asset.schema).optional(),
     },
     additionalProperties: true,
   );
 
   static Slide fromMap(Map<String, dynamic> map) {
-    // schema.validateOrThrow(map);
+    schema.validateOrThrow(map);
     return SlideMapper.fromMap(map);
   }
 }
 
 @MappableClass()
-class NoteModel with NoteModelMappable {
+class Note with NoteMappable {
   final String content;
 
-  NoteModel({required this.content});
+  Note({required this.content});
 
-  static final schema = SchemaShape(
+  static final schema = Schema.object(
     {
       "content": Schema.string.required(),
     },
     additionalProperties: false,
   );
 
-  static NoteModel fromMap(Map<String, dynamic> map) {
+  static Note fromMap(Map<String, dynamic> map) {
     schema.validateOrThrow(map);
-    return NoteModelMapper.fromMap(map);
+    return NoteMapper.fromMap(map);
   }
 }

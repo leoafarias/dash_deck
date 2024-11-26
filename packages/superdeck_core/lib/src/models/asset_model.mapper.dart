@@ -6,32 +6,32 @@
 
 part of 'asset_model.dart';
 
-class AssetModelMapper extends ClassMapperBase<AssetModel> {
-  AssetModelMapper._();
+class AssetMapper extends ClassMapperBase<Asset> {
+  AssetMapper._();
 
-  static AssetModelMapper? _instance;
-  static AssetModelMapper ensureInitialized() {
+  static AssetMapper? _instance;
+  static AssetMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals.use(_instance = AssetModelMapper._());
+      MapperContainer.globals.use(_instance = AssetMapper._());
     }
     return _instance!;
   }
 
   @override
-  final String id = 'AssetModel';
+  final String id = 'Asset';
 
-  static String _$path(AssetModel v) => v.path;
-  static const Field<AssetModel, String> _f$path = Field('path', _$path);
-  static int _$width(AssetModel v) => v.width;
-  static const Field<AssetModel, int> _f$width = Field('width', _$width);
-  static int _$height(AssetModel v) => v.height;
-  static const Field<AssetModel, int> _f$height = Field('height', _$height);
-  static String? _$reference(AssetModel v) => v.reference;
-  static const Field<AssetModel, String> _f$reference =
+  static String _$path(Asset v) => v.path;
+  static const Field<Asset, String> _f$path = Field('path', _$path);
+  static int _$width(Asset v) => v.width;
+  static const Field<Asset, int> _f$width = Field('width', _$width);
+  static int _$height(Asset v) => v.height;
+  static const Field<Asset, int> _f$height = Field('height', _$height);
+  static String? _$reference(Asset v) => v.reference;
+  static const Field<Asset, String> _f$reference =
       Field('reference', _$reference);
 
   @override
-  final MappableFields<AssetModel> fields = const {
+  final MappableFields<Asset> fields = const {
     #path: _f$path,
     #width: _f$width,
     #height: _f$height,
@@ -40,8 +40,8 @@ class AssetModelMapper extends ClassMapperBase<AssetModel> {
   @override
   final bool ignoreNull = true;
 
-  static AssetModel _instantiate(DecodingData data) {
-    return AssetModel(
+  static Asset _instantiate(DecodingData data) {
+    return Asset(
         path: data.dec(_f$path),
         width: data.dec(_f$width),
         height: data.dec(_f$height),
@@ -51,66 +51,59 @@ class AssetModelMapper extends ClassMapperBase<AssetModel> {
   @override
   final Function instantiate = _instantiate;
 
-  static AssetModel fromMap(Map<String, dynamic> map) {
-    return ensureInitialized().decodeMap<AssetModel>(map);
+  static Asset fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<Asset>(map);
   }
 
-  static AssetModel fromJson(String json) {
-    return ensureInitialized().decodeJson<AssetModel>(json);
+  static Asset fromJson(String json) {
+    return ensureInitialized().decodeJson<Asset>(json);
   }
 }
 
-mixin AssetModelMappable {
+mixin AssetMappable {
   String toJson() {
-    return AssetModelMapper.ensureInitialized()
-        .encodeJson<AssetModel>(this as AssetModel);
+    return AssetMapper.ensureInitialized().encodeJson<Asset>(this as Asset);
   }
 
   Map<String, dynamic> toMap() {
-    return AssetModelMapper.ensureInitialized()
-        .encodeMap<AssetModel>(this as AssetModel);
+    return AssetMapper.ensureInitialized().encodeMap<Asset>(this as Asset);
   }
 
-  AssetModelCopyWith<AssetModel, AssetModel, AssetModel> get copyWith =>
-      _AssetModelCopyWithImpl(this as AssetModel, $identity, $identity);
+  AssetCopyWith<Asset, Asset, Asset> get copyWith =>
+      _AssetCopyWithImpl(this as Asset, $identity, $identity);
   @override
   String toString() {
-    return AssetModelMapper.ensureInitialized()
-        .stringifyValue(this as AssetModel);
+    return AssetMapper.ensureInitialized().stringifyValue(this as Asset);
   }
 
   @override
   bool operator ==(Object other) {
-    return AssetModelMapper.ensureInitialized()
-        .equalsValue(this as AssetModel, other);
+    return AssetMapper.ensureInitialized().equalsValue(this as Asset, other);
   }
 
   @override
   int get hashCode {
-    return AssetModelMapper.ensureInitialized().hashValue(this as AssetModel);
+    return AssetMapper.ensureInitialized().hashValue(this as Asset);
   }
 }
 
-extension AssetModelValueCopy<$R, $Out>
-    on ObjectCopyWith<$R, AssetModel, $Out> {
-  AssetModelCopyWith<$R, AssetModel, $Out> get $asAssetModel =>
-      $base.as((v, t, t2) => _AssetModelCopyWithImpl(v, t, t2));
+extension AssetValueCopy<$R, $Out> on ObjectCopyWith<$R, Asset, $Out> {
+  AssetCopyWith<$R, Asset, $Out> get $asAsset =>
+      $base.as((v, t, t2) => _AssetCopyWithImpl(v, t, t2));
 }
 
-abstract class AssetModelCopyWith<$R, $In extends AssetModel, $Out>
+abstract class AssetCopyWith<$R, $In extends Asset, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({String? path, int? width, int? height, String? reference});
-  AssetModelCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+  AssetCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _AssetModelCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, AssetModel, $Out>
-    implements AssetModelCopyWith<$R, AssetModel, $Out> {
-  _AssetModelCopyWithImpl(super.value, super.then, super.then2);
+class _AssetCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Asset, $Out>
+    implements AssetCopyWith<$R, Asset, $Out> {
+  _AssetCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<AssetModel> $mapper =
-      AssetModelMapper.ensureInitialized();
+  late final ClassMapperBase<Asset> $mapper = AssetMapper.ensureInitialized();
   @override
   $R call({String? path, int? width, int? height, Object? reference = $none}) =>
       $apply(FieldCopyWithData({
@@ -120,14 +113,13 @@ class _AssetModelCopyWithImpl<$R, $Out>
         if (reference != $none) #reference: reference
       }));
   @override
-  AssetModel $make(CopyWithData data) => AssetModel(
+  Asset $make(CopyWithData data) => Asset(
       path: data.get(#path, or: $value.path),
       width: data.get(#width, or: $value.width),
       height: data.get(#height, or: $value.height),
       reference: data.get(#reference, or: $value.reference));
 
   @override
-  AssetModelCopyWith<$R2, AssetModel, $Out2> $chain<$R2, $Out2>(
-          Then<$Out2, $R2> t) =>
-      _AssetModelCopyWithImpl($value, $cast, t);
+  AssetCopyWith<$R2, Asset, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _AssetCopyWithImpl($value, $cast, t);
 }

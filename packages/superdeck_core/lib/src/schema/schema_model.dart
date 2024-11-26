@@ -1,11 +1,11 @@
 part of 'schema.dart';
 
-typedef JSON = Map<String, dynamic>;
+typedef JSON = Map<String, Object?>;
 
-class SchemaMap extends SchemaValue<Map<String, dynamic>> {
+class SchemaObj extends SchemaValue<JSON> {
   final Map<String, SchemaValue> properties;
   final bool additionalProperties;
-  const SchemaMap(
+  const SchemaObj(
     this.properties, {
     super.optional = true,
     this.additionalProperties = false,
@@ -13,13 +13,13 @@ class SchemaMap extends SchemaValue<Map<String, dynamic>> {
   });
 
   @override
-  SchemaMap copyWith({
+  SchemaObj copyWith({
     bool? optional,
     bool? additionalProperties,
     Map<String, SchemaValue>? properties,
     List<Validator<Map<String, dynamic>>>? validators,
   }) {
-    return SchemaMap(
+    return SchemaObj(
       properties ?? this.properties,
       additionalProperties: additionalProperties ?? this.additionalProperties,
       optional: optional ?? optionalValue,
@@ -28,11 +28,11 @@ class SchemaMap extends SchemaValue<Map<String, dynamic>> {
   }
 
   @override
-  Map<String, dynamic>? tryParse(Object? value) {
-    return value is Map<String, dynamic> ? value : null;
+  JSON? tryParse(Object? value) {
+    return value is JSON ? value : null;
   }
 
-  SchemaMap mergeSchema(SchemaMap schema) {
+  SchemaObj mergeSchema(SchemaObj schema) {
     return extend(
       schema.properties,
       additionalProperties: schema.additionalProperties,
@@ -43,7 +43,7 @@ class SchemaMap extends SchemaValue<Map<String, dynamic>> {
     return properties[key] as T?;
   }
 
-  SchemaMap extend(
+  SchemaObj extend(
     Map<String, SchemaValue> properties, {
     bool? additionalProperties,
     bool? optional,
@@ -57,7 +57,7 @@ class SchemaMap extends SchemaValue<Map<String, dynamic>> {
 
       final existingProp = mergedProperties[key];
 
-      if (existingProp is SchemaMap && prop is SchemaMap) {
+      if (existingProp is SchemaObj && prop is SchemaObj) {
         mergedProperties[key] = existingProp.extend(prop.properties);
       } else {
         mergedProperties[key] = prop;
@@ -154,14 +154,13 @@ class SchemaList<T extends SchemaValue> extends SchemaValue<List<T>> {
 
   @override
   List<T>? tryParse(Object? value) {
-    final anotherRuntimeType = value.runtimeType;
     if (value is List) {
-      final parsedList = value.map((e) => items.tryParse(e)).toList();
-      if (parsedList.any((e) => e == null)) {
-        return null;
-      }
-      final runtimeType = parsedList.runtimeType;
-      return parsedList as List<T>;
+      print('Runtimetype: ${items.runtimeType}');
+      print('Expected: ${value.runtimeType}');
+      print('Value: $value');
+      final parsedList = value.map((e) => items.tryParse(e) as T?);
+
+      return parsedList.any((e) => e == null) ? null : List<T>.from(parsedList);
     }
     return null;
   }
@@ -189,24 +188,18 @@ class SchemaList<T extends SchemaValue> extends SchemaValue<List<T>> {
   }
 }
 
-class SchemaShape extends SchemaMap {
-  const SchemaShape(
-    super.properties, {
-    super.additionalProperties = false,
-  });
-}
-
 typedef _DoubleType = double;
+typedef _IntType = int;
 
 class Schema {
   const Schema._();
 
   static const string = SchemaValue<String>();
-  static const map = SchemaShape.new;
+  static const object = SchemaObj.new;
   static const double = SchemaValue<_DoubleType>();
-  static const integer = SchemaValue<int>();
+  static const int = SchemaValue<_IntType>();
   static const boolean = SchemaValue<bool>();
-  static const any = SchemaShape({}, additionalProperties: true);
+  static const any = SchemaObj({}, additionalProperties: true);
   static const list = SchemaList.new;
 }
 
@@ -226,7 +219,7 @@ class DiscriminatorSchema extends SchemaValue<Map<String, dynamic>> {
   @override
   DiscriminatorSchema copyWith({
     bool? optional,
-    Map<String, SchemaShape>? schemas,
+    Map<String, SchemaObj>? schemas,
     List<Validator<Map<String, dynamic>>>? validators,
   }) {
     return DiscriminatorSchema(

@@ -31,9 +31,8 @@ class SchemaValue<V> {
   bool get requiredValue => !optionalValue;
 
   V? tryParse(Object? value) {
-    if (value is V) {
-      return value;
-    }
+    if (value is V) return value;
+
     final type = V.toString();
 
     return switch (type) {

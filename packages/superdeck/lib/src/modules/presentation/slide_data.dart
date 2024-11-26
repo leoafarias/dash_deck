@@ -35,7 +35,7 @@ class SlideData with SlideDataMappable {
         _background = background,
         _widgets = widgets;
 
-  AssetModel? getAssetByReference(String contents) {
+  Asset? getAssetByReference(String contents) {
     final reference = assetHash(contents);
 
     return _slide.assets.firstWhereOrNull((asset) =>
@@ -52,7 +52,7 @@ class SlideData with SlideDataMappable {
 
   List<SectionBlock> get sections => _slide.sections;
 
-  List<NoteModel> get notes => _slide.notes;
+  List<Note> get notes => _slide.notes;
 
   String get markdown => _slide.markdown;
 

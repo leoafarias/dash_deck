@@ -17,7 +17,7 @@ extension WidgetTesterX on WidgetTester {
     bool isSnapshot = false,
     DeckStyle? style,
     Map<String, WidgetBuilderWithOptions> widgets = const {},
-    List<AssetModel> assets = const [],
+    List<Asset> assets = const [],
   }) async {
     final controller = DeckController(
         options: DeckConfiguration(

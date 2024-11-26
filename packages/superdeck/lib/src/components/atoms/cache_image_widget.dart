@@ -3,10 +3,12 @@ import 'dart:math' as math;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:mix/mix.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 import '../../modules/common/helpers/constants.dart';
+import '../../modules/presentation/presentation_hooks.dart';
 
 ImageProvider getImageProvider(Uri uri) {
   switch (uri.scheme) {
@@ -22,7 +24,7 @@ ImageProvider getImageProvider(Uri uri) {
   }
 }
 
-class CachedImage extends StatefulWidget {
+class CachedImage extends StatefulHookWidget {
   final Uri uri;
   final Size? targetSize;
 
@@ -42,7 +44,7 @@ class CachedImage extends StatefulWidget {
 class _CachedImageState extends State<CachedImage> {
   @override
   Widget build(BuildContext context) {
-    final imageProvider = getImageProvider(widget.uri);
+    final imageProvider = useImageProvider(widget.uri);
     // final asset = Controller.of<SlideController>(context)
     //     .getAssetByReference(widget.uri.toString());
 
@@ -84,7 +86,7 @@ class _CachedImageState extends State<CachedImage> {
   }
 }
 
-Size _calculateImageSize(Size size, AssetModel? asset) {
+Size _calculateImageSize(Size size, Asset? asset) {
   int? cacheWidth;
   int? cacheHeight;
   //  check if height or asset is larger

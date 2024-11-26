@@ -10,7 +10,7 @@ sealed class Options {
     this.style,
   });
 
-  static final schema = SchemaShape(
+  static final schema = Schema.object(
     {
       "style": Schema.string.optional(),
     },

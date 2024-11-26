@@ -43,9 +43,9 @@ sealed class Block with BlockMappable {
     };
   }
 
-  static final schema = SchemaShape({
+  static final schema = Schema.object({
     "align": ContentAlignment.schema.optional(),
-    "flex": Schema.integer.optional(),
+    "flex": Schema.int.optional(),
     "scrollable": Schema.boolean.optional(),
   });
 }
@@ -110,7 +110,7 @@ class SectionBlock extends Block with SectionBlockMappable {
   }
 
   static final schema = Block.schema.extend({
-    'blocks': SchemaList(ContentBlock.typeSchema).optional(),
+    'blocks': Schema.list(ContentBlock.typeSchema).optional(),
   });
 
   SectionBlock appendContent(ContentBlock part) {

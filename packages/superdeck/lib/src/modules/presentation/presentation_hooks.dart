@@ -1,11 +1,29 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
+import '../../components/atoms/cache_image_widget.dart';
 import '../common/helpers/controller.dart';
 import 'presentation_controller.dart';
 import 'slide_data.dart';
 
 UseDeckController get useDeck {
   return UseDeckController();
+}
+
+SlideData useSlide() {
+  final slideData = useProvider<SlideData>();
+  return useMemoized(() => slideData, [slideData]);
+}
+
+ImageProvider<Object> useImageProvider(Uri uri) {
+  final slideData = useSlide();
+
+  final asset = useMemoized(
+    () => slideData.getAssetByReference(uri.toString()),
+    [uri, slideData],
+  );
+
+  return useMemoized(() => getImageProvider(asset?.uri ?? uri), [asset, uri]);
 }
 
 class UseDeckController extends UseController<DeckController> {

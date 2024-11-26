@@ -12,13 +12,13 @@ import 'package:superdeck_core/superdeck_core.dart';
 
 typedef PipelineResult = ({
   List<Slide> slides,
-  List<AssetModel> neededAssets,
+  List<Asset> neededAssets,
 });
 
 class TaskContext {
   final int index;
   Slide slide;
-  List<AssetModel> assets;
+  List<Asset> assets;
 
   TaskContext({
     required this.slide,
@@ -26,7 +26,7 @@ class TaskContext {
     required this.assets,
   });
 
-  final List<AssetModel> _neededAssets = [];
+  final List<Asset> _neededAssets = [];
 
   bool assetExists(String assetName) {
     for (var element in assets) {
@@ -52,7 +52,7 @@ class TaskContext {
       throw Exception('Image could not be decoded');
     }
 
-    final asset = AssetModel(
+    final asset = Asset(
       path: file.path,
       width: image.width,
       height: image.height,
@@ -135,7 +135,7 @@ class TaskPipeline {
   }
 }
 
-Future<void> _cleanupGeneratedFiles(Iterable<AssetModel> assets) async {
+Future<void> _cleanupGeneratedFiles(Iterable<Asset> assets) async {
   final files = await _loadGeneratedFiles();
   final neededPaths = assets.map((asset) => asset.path).toSet();
 

@@ -5,12 +5,12 @@ import 'package:superdeck_core/src/schema/schema.dart';
 part 'asset_model.mapper.dart';
 
 @MappableClass()
-final class AssetModel with AssetModelMappable {
+final class Asset with AssetMappable {
   final String path;
   final int width;
   final int height;
   final String? reference;
-  AssetModel({
+  Asset({
     required this.path,
     required this.width,
     required this.height,
@@ -25,18 +25,20 @@ final class AssetModel with AssetModelMappable {
 
   double get aspectRatio => width / height;
 
-  static final schema = SchemaShape(
+  Uri get uri => Uri.parse(path);
+
+  static final schema = Schema.object(
     {
       "path": Schema.string.required(),
-      "width": Schema.integer.required(),
-      "height": Schema.integer.required(),
+      "width": Schema.int.required(),
+      "height": Schema.int.required(),
       "reference": Schema.string.optional(),
     },
     additionalProperties: true,
   );
 
-  static AssetModel fromMap(Map<String, dynamic> map) {
+  static Asset fromMap(Map<String, dynamic> map) {
     schema.validateOrThrow(map);
-    return AssetModelMapper.fromMap(map);
+    return AssetMapper.fromMap(map);
   }
 }

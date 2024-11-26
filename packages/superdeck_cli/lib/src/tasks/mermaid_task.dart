@@ -206,6 +206,15 @@ class MermaidConverterTask extends Task {
       if (await mermaidFile.exists()) {
         await context.saveAsAsset(mermaidFile);
       }
+
+      final imageMarkdown = '![mermaid](${mermaidFile.path})';
+
+      context.slide = context.slide.copyWith(
+        markdown: context.slide.markdown.replaceAll(
+          match.group(0)!,
+          imageMarkdown,
+        ),
+      );
     }
   }
 }

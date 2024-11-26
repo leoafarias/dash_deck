@@ -25,7 +25,7 @@ class SpecMarkdownBuilders {
     CustomImageSyntax(),
   ];
 
-  late final Map<String, MarkdownElementBuilder> builders = {
+  late final builders = <String, MarkdownElementBuilder>{
     'h1': TextBuilder(spec.h1),
     'h2': TextBuilder(spec.h2),
     'h3': TextBuilder(spec.h3),
@@ -69,9 +69,7 @@ class _ZeroPaddingBuilder extends MarkdownPaddingBuilder {
   EdgeInsets getPadding() => EdgeInsets.zero;
 }
 
-String _transformLineBreaks(String text) {
-  return text.replaceAll('<br>', '\n');
-}
+String _transformLineBreaks(String text) => text.replaceAll('<br>', '\n');
 
 class TextBuilder extends MarkdownElementBuilder {
   final TextSpec? spec;
@@ -210,8 +208,12 @@ class ImageElementBuilder extends MarkdownElementBuilder {
     BuildContext fromHeroContext,
     BuildContext toHeroContext,
   ) {
-    final fromBlock = Provider.of<_ImageElementData>(fromHeroContext);
-    final toBlock = Provider.of<_ImageElementData>(toHeroContext);
+    final fromBlock = Provider.maybeOf<_ImageElementData>(fromHeroContext);
+    final toBlock = Provider.maybeOf<_ImageElementData>(toHeroContext);
+
+    if (fromBlock == null || toBlock == null) {
+      return const SizedBox();
+    }
 
     final interpolatedSize =
         Size.lerp(fromBlock.size, toBlock.size, animation.value)!;
@@ -364,8 +366,12 @@ class CodeElementBuilder extends MarkdownElementBuilder {
     BuildContext fromHeroContext,
     BuildContext toHeroContext,
   ) {
-    final fromBlock = Provider.of<_CodeElementData>(fromHeroContext);
-    final toBlock = Provider.of<_CodeElementData>(toHeroContext);
+    final fromBlock = Provider.maybeOf<_CodeElementData>(fromHeroContext);
+    final toBlock = Provider.maybeOf<_CodeElementData>(toHeroContext);
+
+    if (fromBlock == null || toBlock == null) {
+      return const SizedBox();
+    }
 
     return AnimatedBuilder(
       animation: animation,
