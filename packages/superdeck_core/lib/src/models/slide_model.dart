@@ -29,7 +29,7 @@ class Slide with SlideMappable {
       'options': SlideOptions.schema.optional(),
       // 'sections': Schema.list(SectionBlock.schema).optional(),
       // 'notes': Schema.list(Note.schema).optional(),
-      // 'assets': Schema.list(Asset.schema).optional(),
+      'assets': Schema.list(Asset.schema).optional(),
     },
     additionalProperties: true,
   );

@@ -132,35 +132,38 @@ class SchemaObj extends SchemaValue<JSON> {
   }
 }
 
-class SchemaList<T extends SchemaValue> extends SchemaValue<List<T>> {
-  final T items;
+class SchemaList<T extends SchemaValue<V>, V> extends SchemaValue<List<V>> {
+  final T itemSchema;
   const SchemaList(
-    this.items, {
+    this.itemSchema, {
     super.optional = true,
     super.validators = const [],
   });
 
   @override
-  SchemaList<T> copyWith({
+  SchemaList<T, V> copyWith({
     bool? optional,
-    List<Validator<List<T>>>? validators,
+    List<Validator<List<V>>>? validators,
   }) {
     return SchemaList(
-      items,
+      itemSchema,
       optional: optional ?? optionalValue,
       validators: validators ?? this.validators,
     );
   }
 
   @override
-  List<T>? tryParse(Object? value) {
+  List<V>? tryParse(Object? value) {
     if (value is List) {
-      print('Runtimetype: ${items.runtimeType}');
+      print('Runtimetype: ${itemSchema.runtimeType}');
       print('Expected: ${value.runtimeType}');
       print('Value: $value');
-      final parsedList = value.map((e) => items.tryParse(e) as T?);
+      final isInvalid = value.any((v) => itemSchema.tryParse(v) == null);
 
-      return parsedList.any((e) => e == null) ? null : List<T>.from(parsedList);
+      if (isInvalid) {
+        return null;
+      }
+      return value as List<V>;
     }
     return null;
   }
@@ -175,7 +178,8 @@ class SchemaList<T extends SchemaValue> extends SchemaValue<List<T>> {
       final parsedValue = tryParse(value)!;
 
       for (var i = 0; i < parsedValue.length; i++) {
-        final result = items.validate([...path, i.toString()], parsedValue[i]);
+        final result =
+            itemSchema.validate([...path, i.toString()], parsedValue[i]);
         if (!result.isValid) {
           return result;
         }
