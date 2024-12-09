@@ -1,3 +1,5 @@
+// deck_repository.dart (After)
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -5,12 +7,6 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:superdeck_core/src/helpers/watcher.dart';
 import 'package:superdeck_core/superdeck_core.dart';
-
-final _assetDir = Directory(p.join('.superdeck'));
-final _slidesRef = File(p.join(_assetDir.path, 'slides.json'));
-final _generatedDir = Directory(p.join(_assetDir.path, 'generated'));
-final _projectConfigFile = File('superdeck.yaml');
-final _markdownFile = File('slides.md');
 
 typedef CustomJsonDecoder = FutureOr<dynamic> Function(String);
 typedef CustomAssetLoader = FutureOr<String> Function(String key);
@@ -20,124 +16,146 @@ Future<String> _loadString(String key) async {
 }
 
 class DeckRepository {
-  final CustomJsonDecoder _jsonDecoder;
-  final CustomAssetLoader _assetLoader;
+  late final Directory assetDir;
+  late final File slidesFile;
+  late final Directory generatedDir;
+  late final File markdownFile;
+
+  late final CustomJsonDecoder _jsonDecoder;
+  late final CustomAssetLoader _assetLoader;
+  final bool canRunLocal;
+  late final FileWatcher _watcher;
+
+  DeckRepository({
+    Directory? assetDir,
+    File? slidesFile,
+    Directory? generatedDir,
+    File? markdownFile,
+    CustomJsonDecoder? decoder,
+    CustomAssetLoader? assetLoader,
+    this.canRunLocal = false,
+  }) {
+    this.assetDir = assetDir ?? Directory(p.join('.superdeck'));
+    this.slidesFile =
+        slidesFile ?? File(p.join(this.assetDir.path, 'slides.json'));
+    this.generatedDir =
+        generatedDir ?? Directory(p.join(this.assetDir.path, 'generated'));
+    this.markdownFile = markdownFile ?? File('slides.md');
+
+    _watcher = FileWatcher(
+        slidesFile ?? File(p.join(this.assetDir.path, 'slides.json')));
+
+    _jsonDecoder = decoder ?? jsonDecode;
+    _assetLoader = assetLoader ?? _loadString;
+  }
 
   Future<void> ensureReady() async {
-    if (!await _generatedDir.exists()) {
-      await _generatedDir.create(recursive: true);
+    if (!await generatedDir.exists()) {
+      await generatedDir.create(recursive: true);
     }
 
-    if (!await _markdownFile.exists()) {
-      await _markdownFile.create(recursive: true);
+    if (!await markdownFile.exists()) {
+      await markdownFile.create(recursive: true);
     }
 
-    try {
-      await loadSlides();
-    } catch (e) {
-      if (await _slidesRef.exists()) {
-        await _slidesRef.delete();
+    // If slides file is missing or invalid, initialize with empty array
+    if (!await slidesFile.exists()) {
+      await slidesFile.writeAsString('[]');
+    } else {
+      try {
+        await loadSlides(); // Validate load once
+      } catch (_) {
+        // If invalid, reset to empty list
+        await slidesFile.writeAsString('[]');
       }
-      await _slidesRef.writeAsString('{}');
     }
   }
 
-  /// Whether the repository can do local File I/O operations
-  final bool canRunLocal;
-  final _watcher = FileWatcher(_slidesRef);
-
-  DeckRepository({
-    CustomJsonDecoder decoder = jsonDecode,
-    CustomAssetLoader assetLoader = _loadString,
-    this.canRunLocal = false,
-  })  : _jsonDecoder = decoder,
-        _assetLoader = assetLoader;
-
   Future<List<Slide>> loadSlides() async {
-    final content = await _slidesRef.readAsString();
+    final content = await slidesFile.readAsString();
+    final jsonData = await _jsonDecoder(content);
 
-    final json = await _jsonDecoder(content);
-
-    if (json == null) {
+    if (jsonData is! List) {
+      // If not a list, consider this invalid data
       return [];
     }
 
-    List<Slide> slides = [];
-
-    for (final slide in json) {
-      slides.add(Slide.parse(slide));
+    final slides = <Slide>[];
+    for (final slide in jsonData) {
+      try {
+        slides.add(Slide.parse(slide));
+      } catch (e) {
+        // Could log a warning about invalid slide data
+        // Skipping invalid slides might be acceptable, or you can fail fast
+      }
     }
 
     return slides;
   }
 
   Stream<List<Slide>> watch() {
-    if (canRunLocal) {
-      return Stream.fromFuture(loadSlides());
+    if (!canRunLocal) {
+      // If not running locally, you might return an empty stream or throw
+      return const Stream.empty();
     }
-    // Create a StreamController to handle changes
+
     final controller = StreamController<List<Slide>>();
 
-    // Watch the file for changes and emit a new list of slides when it changes
-    _slidesRef.watch(events: FileSystemEvent.modify).listen((event) async {
-      try {
-        // Read the updated content as a string
-        final content = await _slidesRef.readAsString();
+    // Listen for file modifications
+    final subscription =
+        slidesFile.watch(events: FileSystemEvent.modify).listen(
+      (event) async {
+        try {
+          final slides = await loadSlides();
+          controller.add(slides);
+        } catch (e) {
+          controller.addError(e);
+        }
+      },
+      onError: (error) {
+        controller.addError(error);
+      },
+    );
 
-        // Decode the JSON content
-        final json = jsonDecode(content);
-
-        // Map the JSON data to a List of Slide objects
-        final slides = (json as List)
-            .map((e) => Slide.parse(e as Map<String, dynamic>))
-            .toList();
-
-        // Add the updated slides to the stream
-        controller.add(slides);
-      } catch (e) {
-        // Handle any errors by adding an error to the stream
-        controller.addError(e);
-        rethrow;
-      }
-    });
-
-    // Close the controller when it's no longer in use
-    controller.onCancel = () {
-      controller.close();
+    controller.onCancel = () async {
+      await subscription.cancel();
+      await controller.close();
     };
 
     return controller.stream;
   }
 
   Future<void> saveSlides(List<Slide> slides) async {
-    final json = jsonEncode(slides.map((e) => e.toMap()).toList());
-
-    await _slidesRef.writeAsString(json);
+    final json = prettyJson(slides.map((e) => e.toMap()).toList());
+    await slidesFile.writeAsString(json);
   }
 
   Future<String> loadMarkdown() async {
-    return _markdownFile.readAsString();
+    return markdownFile.readAsString();
   }
 
   Future<String> loadAssetAsString(String path) async {
-    return _assetLoader(path);
+    try {
+      return await _assetLoader(path);
+    } catch (e) {
+      // Log or handle asset loading error
+      rethrow;
+    }
   }
 
   File getAssetFile(String fileName) {
-    return File(p.join(_generatedDir.path, fileName));
+    return File(p.join(generatedDir.path, fileName));
   }
 
-  File getSlideThumbnail(Slide slide) {
+  File getSlideThumbnail(String slideKey) {
     return File(
-      p.join(_generatedDir.path, 'thumbnail_${slide.key}.png'),
+      p.join(generatedDir.path, 'thumbnail_$slideKey.png'),
     );
   }
 
   void startListening(FutureOr<void> Function() callback) {
-    if (canRunLocal) {
-      if (!_watcher.isWatching) {
-        _watcher.start(callback);
-      }
+    if (canRunLocal && !_watcher.isWatching) {
+      _watcher.start(callback);
     }
   }
 

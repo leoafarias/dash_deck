@@ -258,7 +258,7 @@ class BlockMapper extends ClassMapperBase<Block> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = BlockMapper._());
       SectionBlockMapper.ensureInitialized();
-      ContentBlockMapper.ensureInitialized();
+      ColumnBlockMapper.ensureInitialized();
       ContentAlignmentMapper.ensureInitialized();
       BlockTypeMapper.ensureInitialized();
     }
@@ -327,7 +327,7 @@ class SectionBlockMapper extends SubClassMapperBase<SectionBlock> {
       MapperContainer.globals.use(_instance = SectionBlockMapper._());
       BlockMapper.ensureInitialized().addSubMapper(_instance!);
       MapperContainer.globals.useAll([NullIfEmptyBlock()]);
-      ContentBlockMapper.ensureInitialized();
+      ColumnBlockMapper.ensureInitialized();
       ContentAlignmentMapper.ensureInitialized();
     }
     return _instance!;
@@ -336,8 +336,8 @@ class SectionBlockMapper extends SubClassMapperBase<SectionBlock> {
   @override
   final String id = 'SectionBlock';
 
-  static List<ContentBlock> _$blocks(SectionBlock v) => v.blocks;
-  static const Field<SectionBlock, List<ContentBlock>> _f$blocks =
+  static List<ColumnBlock> _$blocks(SectionBlock v) => v.blocks;
+  static const Field<SectionBlock, List<ColumnBlock>> _f$blocks =
       Field('blocks', _$blocks, opt: true, def: const []);
   static int? _$flex(SectionBlock v) => v.flex;
   static const Field<SectionBlock, int> _f$flex =
@@ -429,10 +429,10 @@ extension SectionBlockValueCopy<$R, $Out>
 
 abstract class SectionBlockCopyWith<$R, $In extends SectionBlock, $Out>
     implements BlockCopyWith<$R, $In, $Out> {
-  ListCopyWith<$R, ContentBlock,
-      ContentBlockCopyWith<$R, ContentBlock, ContentBlock>> get blocks;
+  ListCopyWith<$R, ColumnBlock,
+      ColumnBlockCopyWith<$R, ColumnBlock, ColumnBlock>> get blocks;
   @override
-  $R call({List<ContentBlock>? blocks, int? flex, ContentAlignment? align});
+  $R call({List<ColumnBlock>? blocks, int? flex, ContentAlignment? align});
   SectionBlockCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -445,13 +445,13 @@ class _SectionBlockCopyWithImpl<$R, $Out>
   late final ClassMapperBase<SectionBlock> $mapper =
       SectionBlockMapper.ensureInitialized();
   @override
-  ListCopyWith<$R, ContentBlock,
-          ContentBlockCopyWith<$R, ContentBlock, ContentBlock>>
+  ListCopyWith<$R, ColumnBlock,
+          ColumnBlockCopyWith<$R, ColumnBlock, ColumnBlock>>
       get blocks => ListCopyWith($value.blocks, (v, t) => v.copyWith.$chain(t),
           (v) => call(blocks: v));
   @override
   $R call(
-          {List<ContentBlock>? blocks,
+          {List<ColumnBlock>? blocks,
           Object? flex = $none,
           Object? align = $none}) =>
       $apply(FieldCopyWithData({
@@ -471,15 +471,14 @@ class _SectionBlockCopyWithImpl<$R, $Out>
       _SectionBlockCopyWithImpl($value, $cast, t);
 }
 
-class ContentBlockMapper extends SubClassMapperBase<ContentBlock> {
-  ContentBlockMapper._();
+class ColumnBlockMapper extends SubClassMapperBase<ColumnBlock> {
+  ColumnBlockMapper._();
 
-  static ContentBlockMapper? _instance;
-  static ContentBlockMapper ensureInitialized() {
+  static ColumnBlockMapper? _instance;
+  static ColumnBlockMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals.use(_instance = ContentBlockMapper._());
+      MapperContainer.globals.use(_instance = ColumnBlockMapper._());
       BlockMapper.ensureInitialized().addSubMapper(_instance!);
-      ColumnBlockMapper.ensureInitialized();
       ImageBlockMapper.ensureInitialized();
       WidgetBlockMapper.ensureInitialized();
       DartPadBlockMapper.ensureInitialized();
@@ -490,118 +489,34 @@ class ContentBlockMapper extends SubClassMapperBase<ContentBlock> {
   }
 
   @override
-  final String id = 'ContentBlock';
-
-  static String? _$_content(ContentBlock v) => v._content;
-  static const Field<ContentBlock, String> _f$_content =
-      Field('_content', _$_content, key: 'content', opt: true);
-  static int? _$flex(ContentBlock v) => v.flex;
-  static const Field<ContentBlock, int> _f$flex =
-      Field('flex', _$flex, opt: true);
-  static ContentAlignment? _$align(ContentBlock v) => v.align;
-  static const Field<ContentBlock, ContentAlignment> _f$align =
-      Field('align', _$align, opt: true);
-  static BlockType _$type(ContentBlock v) => v.type;
-  static const Field<ContentBlock, BlockType> _f$type = Field('type', _$type);
-  static bool _$scrollable(ContentBlock v) => v.scrollable;
-  static const Field<ContentBlock, bool> _f$scrollable =
-      Field('scrollable', _$scrollable, opt: true, def: false);
-  static String _$key(ContentBlock v) => v.key;
-  static const Field<ContentBlock, String> _f$key =
-      Field('key', _$key, mode: FieldMode.member);
-
-  @override
-  final MappableFields<ContentBlock> fields = const {
-    #_content: _f$_content,
-    #flex: _f$flex,
-    #align: _f$align,
-    #type: _f$type,
-    #scrollable: _f$scrollable,
-    #key: _f$key,
-  };
-  @override
-  final bool ignoreNull = true;
-
-  @override
-  final String discriminatorKey = 'type';
-  @override
-  final dynamic discriminatorValue = 'ContentBlock';
-  @override
-  late final ClassMapperBase superMapper = BlockMapper.ensureInitialized();
-
-  static ContentBlock _instantiate(DecodingData data) {
-    throw MapperException.missingSubclass(
-        'ContentBlock', 'type', '${data.value['type']}');
-  }
-
-  @override
-  final Function instantiate = _instantiate;
-
-  static ContentBlock fromMap(Map<String, dynamic> map) {
-    return ensureInitialized().decodeMap<ContentBlock>(map);
-  }
-
-  static ContentBlock fromJson(String json) {
-    return ensureInitialized().decodeJson<ContentBlock>(json);
-  }
-}
-
-mixin ContentBlockMappable {
-  String toJson();
-  Map<String, dynamic> toMap();
-  ContentBlockCopyWith<ContentBlock, ContentBlock, ContentBlock> get copyWith;
-}
-
-abstract class ContentBlockCopyWith<$R, $In extends ContentBlock, $Out>
-    implements BlockCopyWith<$R, $In, $Out> {
-  @override
-  $R call(
-      {String? content, int? flex, ContentAlignment? align, bool? scrollable});
-  ContentBlockCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
-}
-
-class ColumnBlockMapper extends SubClassMapperBase<ColumnBlock> {
-  ColumnBlockMapper._();
-
-  static ColumnBlockMapper? _instance;
-  static ColumnBlockMapper ensureInitialized() {
-    if (_instance == null) {
-      MapperContainer.globals.use(_instance = ColumnBlockMapper._());
-      ContentBlockMapper.ensureInitialized().addSubMapper(_instance!);
-      ContentAlignmentMapper.ensureInitialized();
-    }
-    return _instance!;
-  }
-
-  @override
   final String id = 'ColumnBlock';
 
+  static String? _$_content(ColumnBlock v) => v._content;
+  static const Field<ColumnBlock, String> _f$_content =
+      Field('_content', _$_content, key: 'content', opt: true);
   static int? _$flex(ColumnBlock v) => v.flex;
   static const Field<ColumnBlock, int> _f$flex =
       Field('flex', _$flex, opt: true);
   static ContentAlignment? _$align(ColumnBlock v) => v.align;
   static const Field<ColumnBlock, ContentAlignment> _f$align =
       Field('align', _$align, opt: true);
-  static String? _$_content(ColumnBlock v) => v._content;
-  static const Field<ColumnBlock, String> _f$_content =
-      Field('_content', _$_content, key: 'content', opt: true);
+  static BlockType _$type(ColumnBlock v) => v.type;
+  static const Field<ColumnBlock, BlockType> _f$type =
+      Field('type', _$type, opt: true, def: BlockType.column);
   static bool _$scrollable(ColumnBlock v) => v.scrollable;
   static const Field<ColumnBlock, bool> _f$scrollable =
       Field('scrollable', _$scrollable, opt: true, def: false);
-  static BlockType _$type(ColumnBlock v) => v.type;
-  static const Field<ColumnBlock, BlockType> _f$type =
-      Field('type', _$type, mode: FieldMode.member);
   static String _$key(ColumnBlock v) => v.key;
   static const Field<ColumnBlock, String> _f$key =
       Field('key', _$key, mode: FieldMode.member);
 
   @override
   final MappableFields<ColumnBlock> fields = const {
+    #_content: _f$_content,
     #flex: _f$flex,
     #align: _f$align,
-    #_content: _f$_content,
-    #scrollable: _f$scrollable,
     #type: _f$type,
+    #scrollable: _f$scrollable,
     #key: _f$key,
   };
   @override
@@ -612,14 +527,14 @@ class ColumnBlockMapper extends SubClassMapperBase<ColumnBlock> {
   @override
   final dynamic discriminatorValue = MappableClass.useAsDefault;
   @override
-  late final ClassMapperBase superMapper =
-      ContentBlockMapper.ensureInitialized();
+  late final ClassMapperBase superMapper = BlockMapper.ensureInitialized();
 
   static ColumnBlock _instantiate(DecodingData data) {
     return ColumnBlock(
+        content: data.dec(_f$_content),
         flex: data.dec(_f$flex),
         align: data.dec(_f$align),
-        content: data.dec(_f$_content),
+        type: data.dec(_f$type),
         scrollable: data.dec(_f$scrollable));
   }
 
@@ -673,10 +588,10 @@ extension ColumnBlockValueCopy<$R, $Out>
 }
 
 abstract class ColumnBlockCopyWith<$R, $In extends ColumnBlock, $Out>
-    implements ContentBlockCopyWith<$R, $In, $Out> {
+    implements BlockCopyWith<$R, $In, $Out> {
   @override
   $R call(
-      {int? flex, ContentAlignment? align, String? content, bool? scrollable});
+      {String? content, int? flex, ContentAlignment? align, bool? scrollable});
   ColumnBlockCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -690,21 +605,22 @@ class _ColumnBlockCopyWithImpl<$R, $Out>
       ColumnBlockMapper.ensureInitialized();
   @override
   $R call(
-          {Object? flex = $none,
+          {Object? content = $none,
+          Object? flex = $none,
           Object? align = $none,
-          Object? content = $none,
           bool? scrollable}) =>
       $apply(FieldCopyWithData({
+        if (content != $none) #content: content,
         if (flex != $none) #flex: flex,
         if (align != $none) #align: align,
-        if (content != $none) #content: content,
         if (scrollable != null) #scrollable: scrollable
       }));
   @override
   ColumnBlock $make(CopyWithData data) => ColumnBlock(
+      content: data.get(#content, or: $value._content),
       flex: data.get(#flex, or: $value.flex),
       align: data.get(#align, or: $value.align),
-      content: data.get(#content, or: $value._content),
+      type: data.get(#type, or: $value.type),
       scrollable: data.get(#scrollable, or: $value.scrollable));
 
   @override
@@ -720,7 +636,7 @@ class ImageBlockMapper extends SubClassMapperBase<ImageBlock> {
   static ImageBlockMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ImageBlockMapper._());
-      ContentBlockMapper.ensureInitialized().addSubMapper(_instance!);
+      ColumnBlockMapper.ensureInitialized().addSubMapper(_instance!);
       ImageFitMapper.ensureInitialized();
       ContentAlignmentMapper.ensureInitialized();
     }
@@ -782,7 +698,7 @@ class ImageBlockMapper extends SubClassMapperBase<ImageBlock> {
   final dynamic discriminatorValue = 'image';
   @override
   late final ClassMapperBase superMapper =
-      ContentBlockMapper.ensureInitialized();
+      ColumnBlockMapper.ensureInitialized();
 
   static ImageBlock _instantiate(DecodingData data) {
     return ImageBlock(
@@ -846,7 +762,7 @@ extension ImageBlockValueCopy<$R, $Out>
 }
 
 abstract class ImageBlockCopyWith<$R, $In extends ImageBlock, $Out>
-    implements ContentBlockCopyWith<$R, $In, $Out> {
+    implements ColumnBlockCopyWith<$R, $In, $Out> {
   @override
   $R call(
       {String? src,
@@ -912,7 +828,7 @@ class WidgetBlockMapper extends SubClassMapperBase<WidgetBlock> {
   static WidgetBlockMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = WidgetBlockMapper._());
-      ContentBlockMapper.ensureInitialized().addSubMapper(_instance!);
+      ColumnBlockMapper.ensureInitialized().addSubMapper(_instance!);
       ContentAlignmentMapper.ensureInitialized();
     }
     return _instance!;
@@ -965,7 +881,7 @@ class WidgetBlockMapper extends SubClassMapperBase<WidgetBlock> {
   final dynamic discriminatorValue = 'widget';
   @override
   late final ClassMapperBase superMapper =
-      ContentBlockMapper.ensureInitialized();
+      ColumnBlockMapper.ensureInitialized();
 
   @override
   final MappingHook hook = const UnmappedPropertiesHook('args');
@@ -1029,7 +945,7 @@ extension WidgetBlockValueCopy<$R, $Out>
 }
 
 abstract class WidgetBlockCopyWith<$R, $In extends WidgetBlock, $Out>
-    implements ContentBlockCopyWith<$R, $In, $Out> {
+    implements ColumnBlockCopyWith<$R, $In, $Out> {
   MapCopyWith<$R, String, dynamic, ObjectCopyWith<$R, dynamic, dynamic>>
       get args;
   @override
@@ -1093,7 +1009,7 @@ class DartPadBlockMapper extends SubClassMapperBase<DartPadBlock> {
   static DartPadBlockMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = DartPadBlockMapper._());
-      ContentBlockMapper.ensureInitialized().addSubMapper(_instance!);
+      ColumnBlockMapper.ensureInitialized().addSubMapper(_instance!);
       DartPadThemeMapper.ensureInitialized();
       ContentAlignmentMapper.ensureInitialized();
     }
@@ -1151,7 +1067,7 @@ class DartPadBlockMapper extends SubClassMapperBase<DartPadBlock> {
   final dynamic discriminatorValue = 'DartPadBlock';
   @override
   late final ClassMapperBase superMapper =
-      ContentBlockMapper.ensureInitialized();
+      ColumnBlockMapper.ensureInitialized();
 
   static DartPadBlock _instantiate(DecodingData data) {
     return DartPadBlock(
@@ -1215,7 +1131,7 @@ extension DartPadBlockValueCopy<$R, $Out>
 }
 
 abstract class DartPadBlockCopyWith<$R, $In extends DartPadBlock, $Out>
-    implements ContentBlockCopyWith<$R, $In, $Out> {
+    implements ColumnBlockCopyWith<$R, $In, $Out> {
   @override
   $R call(
       {String? id,

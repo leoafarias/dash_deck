@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:superdeck_cli/src/generator_pipeline.dart';
+import 'package:superdeck_cli/src/parsers/slide_parser.dart';
 
 /// This task marks the thumbnail file as needed if it exists.
 /// The goal is to ensure that any generated thumbnails are kept.
@@ -9,11 +10,11 @@ class SlideThumbnailTask extends Task {
 
   @override
   FutureOr<TaskContext> run(context) async {
-    final file = repository.getSlideThumbnail(context.slide);
+    final asset = SlideThumbnailAssetRaw.fromSlideKey(context.slide.key);
 
-    if (await file.exists()) {
-      await context.saveAsAsset(file);
-    }
+    // Basic check just to mark asset as needed
+    await context.checkAssetExists(asset);
+
     return context;
   }
 }

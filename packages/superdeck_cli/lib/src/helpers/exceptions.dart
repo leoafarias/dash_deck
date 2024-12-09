@@ -15,6 +15,7 @@ class SdMarkdownParsingException implements Exception {
 }
 
 class SdTaskException implements Exception {
+  final int slideIndex;
   final String taskName;
   final TaskContext controller;
   final Exception exception;
@@ -23,10 +24,11 @@ class SdTaskException implements Exception {
     this.taskName,
     this.controller,
     this.exception,
+    this.slideIndex,
   );
 
   String get message {
-    return 'Error running task on slide ${controller.index}';
+    return 'Error running task on slide $slideIndex';
   }
 
   @override

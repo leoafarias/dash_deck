@@ -3,12 +3,10 @@ import 'dart:math' as math;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:mix/mix.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 import '../../modules/common/helpers/constants.dart';
-import '../../modules/presentation/presentation_hooks.dart';
 
 ImageProvider getImageProvider(Uri uri) {
   switch (uri.scheme) {
@@ -24,8 +22,9 @@ ImageProvider getImageProvider(Uri uri) {
   }
 }
 
-class CachedImage extends StatefulHookWidget {
+class CachedImage extends StatelessWidget {
   final Uri uri;
+
   final Size? targetSize;
 
   final ImageSpec spec;
@@ -38,28 +37,12 @@ class CachedImage extends StatefulHookWidget {
   });
 
   @override
-  _CachedImageState createState() => _CachedImageState();
-}
-
-class _CachedImageState extends State<CachedImage> {
-  @override
   Widget build(BuildContext context) {
-    final imageProvider = useImageProvider(widget.uri);
-    // final asset = Controller.of<SlideController>(context)
-    //     .getAssetByReference(widget.uri.toString());
-
-    // if (asset != null) {
-    //   imageProvider = getImageProvider(Uri.parse(asset.path));
-
-    //   final size = _calculateImageSize(size, asset)
-
-    //   imageProvider =
-    //       ResizeImage(imageProvider, width: asset.width, height: asset.height);
-    // }
+    final imageProvider = getImageProvider(uri);
 
     return AnimatedImageSpecWidget(
       image: imageProvider,
-      spec: widget.spec,
+      spec: spec,
       // frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
       //   return Container(
       //     padding: const EdgeInsets.all(0),
@@ -78,7 +61,7 @@ class _CachedImageState extends State<CachedImage> {
         return Container(
           color: Colors.red,
           child: Center(
-            child: Text('Error loading image: ${widget.uri} '),
+            child: Text('Error loading image: $uri '),
           ),
         );
       },

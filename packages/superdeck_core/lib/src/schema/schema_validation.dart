@@ -1,23 +1,17 @@
 part of 'schema.dart';
 
-class SchemaValidationException implements Exception {
-  final ValidationResult result;
+class ValidationResult {
+  final List<String> path;
+  final List<ValidationError> errors;
 
-  const SchemaValidationException(this.result);
+  const ValidationResult(
+    this.path, {
+    required this.errors,
+  });
 
-  @override
-  String toString() {
-    return 'SchemaValidationException: ${result.errors.map((e) => e.message).join('\n')}';
-  }
-}
+  bool get isValid => errors.isEmpty;
 
-enum SchemaErrorType {
-  unallowedAdditionalProperty,
-  enumViolated,
-  requiredPropMissing,
-  invalidType,
-  constraints,
-  unknown;
+  const ValidationResult.valid(this.path) : errors = const [];
 }
 
 sealed class ValidationError {
@@ -26,15 +20,26 @@ sealed class ValidationError {
   const ValidationError();
 }
 
-class UnalowedAdditionalPropertyValidationError extends ValidationError {
-  final String property;
+class DiscriminatorMissingValidationError extends ValidationError {
+  final String propertyKey;
 
-  const UnalowedAdditionalPropertyValidationError({
-    required this.property,
+  const DiscriminatorMissingValidationError({
+    required this.propertyKey,
   });
 
   @override
-  String get message => 'Unallowed property: [$property]';
+  String get message => 'Missing discriminator key: [$propertyKey]';
+}
+
+class UnalowedAdditionalPropertyValidationError extends ValidationError {
+  final String propertyKey;
+
+  const UnalowedAdditionalPropertyValidationError({
+    required this.propertyKey,
+  });
+
+  @override
+  String get message => 'Unallowed property: [$propertyKey]';
 }
 
 class EnumViolatedValidationError extends ValidationError {
@@ -90,16 +95,19 @@ class UnknownValidationError extends ValidationError {
   String get message => 'Unknown Validation error';
 }
 
-class ValidationResult {
-  final List<String> path;
-  final List<ValidationError> errors;
+/// An exception thrown when schema validation fails.
+class SchemaValidationException implements Exception {
+  final ValidationResult result;
 
-  const ValidationResult({
-    required this.path,
-    required this.errors,
-  });
+  const SchemaValidationException(this.result);
 
-  bool get isValid => errors.isEmpty;
-
-  const ValidationResult.valid(this.path) : errors = const [];
+  @override
+  String toString() {
+    final errorMessages =
+        result.errors.map((e) => '${e.runtimeType}: ${e.message}').join('\n');
+    final location = result.path.isNotEmpty
+        ? 'Location: ${result.path.join('.')}'
+        : 'No specific location in schema.';
+    return 'SchemaValidationException:\n$errorMessages\n$location';
+  }
 }

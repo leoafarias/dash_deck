@@ -21,7 +21,7 @@ class BlockData {
   });
 
   final SlideSpec spec;
-  final ContentBlock block;
+  final ColumnBlock block;
   final Size size;
 
   @override
@@ -95,12 +95,12 @@ class SectionBlockWidget extends StatelessWidget {
                               mainAxisAlignment: alignment.$1,
                               children: [
                                 switch (block) {
-                                  ColumnBlock block => ColumnBlockWidget(block),
                                   ImageBlock block => _ImageBlockWidget(block),
                                   WidgetBlock block =>
                                     _WidgetBlockWidget(block),
                                   DartPadBlock block =>
                                     _DartPadBlockWidget(block),
+                                  ColumnBlock block => ColumnBlockWidget(block),
                                 },
                               ],
                             ),
@@ -125,7 +125,7 @@ class SectionBlockWidget extends StatelessWidget {
   }
 }
 
-abstract class _BlockWidget<T extends ContentBlock> extends StatelessWidget {
+abstract class _BlockWidget<T extends ColumnBlock> extends StatelessWidget {
   const _BlockWidget(
     this.block, {
     super.key,

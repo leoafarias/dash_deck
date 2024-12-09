@@ -15,7 +15,7 @@ enum BlockType {
 }
 
 @MappableClass(discriminatorKey: 'type')
-sealed class Block with BlockMappable {
+abstract class Block with BlockMappable {
   final ContentAlignment? align;
   final int? flex;
   final BlockType type;
@@ -33,8 +33,8 @@ sealed class Block with BlockMappable {
     return copyWith.$merge(other);
   }
 
-  static parse(BlockType type, Map<String, dynamic> map) {
-    return switch (type) {
+  static parse(BlockType blockType, Map<String, dynamic> map) {
+    return switch (blockType) {
       BlockType.column => ColumnBlock.parse(map),
       BlockType.image => ImageBlock.parse(map),
       BlockType.widget => WidgetBlock.parse(map),
@@ -43,12 +43,14 @@ sealed class Block with BlockMappable {
     };
   }
 
-  static final schema = Schema.object({
-    "type": Schema.string.isEnum(BlockType.values),
-    "align": ContentAlignment.schema.optional(),
-    "flex": Schema.int.optional(),
-    "scrollable": Schema.boolean.optional(),
-  });
+  static final schema = Schema.object(
+    {
+      "type": Schema.string.isEnum(BlockType.values),
+      "align": ContentAlignment.schema.optional(),
+      "flex": Schema.int.optional(),
+      "scrollable": Schema.boolean.optional(),
+    },
+  );
 }
 
 class NullIfEmptyBlock extends SimpleMapper<Block> {
@@ -56,7 +58,7 @@ class NullIfEmptyBlock extends SimpleMapper<Block> {
 
   @override
   Block decode(dynamic value) {
-    return ContentBlockMapper.fromMap(value);
+    return ColumnBlockMapper.fromMap(value);
   }
 
   @override
@@ -74,7 +76,7 @@ class NullIfEmptyBlock extends SimpleMapper<Block> {
   includeCustomMappers: [NullIfEmptyBlock()],
 )
 class SectionBlock extends Block with SectionBlockMappable {
-  final List<ContentBlock> blocks;
+  final List<ColumnBlock> blocks;
 
   SectionBlock({
     this.blocks = const [],
@@ -111,24 +113,24 @@ class SectionBlock extends Block with SectionBlockMappable {
   }
 
   static final schema = Block.schema.extend({
-    'blocks': Schema.list(ContentBlock.typeSchema).optional(),
+    'blocks': Schema.list(ColumnBlock.typeSchema).optional(),
   });
 
-  SectionBlock appendContent(ContentBlock part) {
+  SectionBlock appendContent(ColumnBlock part) {
     return copyWith(blocks: [...blocks, part]);
   }
 }
 
-@MappableClass(discriminatorKey: 'type')
-sealed class ContentBlock extends Block with ContentBlockMappable {
+@MappableClass(discriminatorValue: 'column')
+class ColumnBlock extends Block with ColumnBlockMappable {
   final String? _content;
   final bool scrollable;
 
-  ContentBlock({
+  ColumnBlock({
     String? content,
     super.flex,
     super.align,
-    required super.type,
+    super.type = BlockType.column,
     this.scrollable = false,
   }) : _content = content;
 
@@ -139,8 +141,12 @@ sealed class ContentBlock extends Block with ContentBlockMappable {
     'scrollable': Schema.boolean.optional(),
   });
 
-  static final typeSchema = DiscriminatorSchema(
-    baseSchema: schema,
+  static ColumnBlock parse(Map<String, dynamic> map) {
+    schema.validateOrThrow(map);
+    return ColumnBlockMapper.fromMap(map);
+  }
+
+  static final typeSchema = DiscriminatedObjectSchema(
     discriminatorKey: 'type',
     schemas: {
       BlockType.column.name: ColumnBlock.schema,
@@ -151,25 +157,8 @@ sealed class ContentBlock extends Block with ContentBlockMappable {
   );
 }
 
-@MappableClass(discriminatorValue: MappableClass.useAsDefault)
-class ColumnBlock extends ContentBlock with ColumnBlockMappable {
-  ColumnBlock({
-    super.flex,
-    super.align,
-    super.content,
-    super.scrollable,
-  }) : super(type: BlockType.column);
-
-  static final schema = ContentBlock.schema;
-
-  static ColumnBlock parse(Map<String, dynamic> map) {
-    schema.validateOrThrow(map);
-    return ColumnBlockMapper.fromMap(map);
-  }
-}
-
 @MappableClass(discriminatorValue: 'image')
-class ImageBlock extends ContentBlock with ImageBlockMappable {
+class ImageBlock extends ColumnBlock with ImageBlockMappable {
   final String src;
   final ImageFit? fit;
   final double? width;
@@ -188,11 +177,11 @@ class ImageBlock extends ContentBlock with ImageBlockMappable {
 
   static ImageBlock parse(Map<String, dynamic> map) {
     schema.validateOrThrow(map);
-    print(map);
+
     return ImageBlockMapper.fromMap(map);
   }
 
-  static final schema = ContentBlock.schema.extend({
+  static final schema = ColumnBlock.schema.extend({
     "fit": ImageFit.schema,
     "src": Schema.string.required(),
     "width": Schema.double.optional(),
@@ -204,7 +193,7 @@ class ImageBlock extends ContentBlock with ImageBlockMappable {
   discriminatorValue: 'widget',
   hook: UnmappedPropertiesHook('args'),
 )
-class WidgetBlock extends ContentBlock with WidgetBlockMappable {
+class WidgetBlock extends ColumnBlock with WidgetBlockMappable {
   final String name;
   final Map<String, dynamic> args;
 
@@ -223,8 +212,10 @@ class WidgetBlock extends ContentBlock with WidgetBlockMappable {
     return WidgetBlockMapper.fromMap(map);
   }
 
-  static final schema = ContentBlock.schema.extend(
-    {"name": Schema.string.required()},
+  static final schema = ColumnBlock.schema.extend(
+    {
+      "name": Schema.string.required(),
+    },
     additionalProperties: true,
   );
 }
@@ -238,7 +229,7 @@ enum DartPadTheme {
 }
 
 @MappableClass()
-class DartPadBlock extends ContentBlock with DartPadBlockMappable {
+class DartPadBlock extends ColumnBlock with DartPadBlockMappable {
   final String id;
   final DartPadTheme? theme;
   final bool embed;
@@ -258,7 +249,7 @@ class DartPadBlock extends ContentBlock with DartPadBlockMappable {
     return DartPadBlockMapper.fromMap(map);
   }
 
-  static final schema = ContentBlock.schema.extend({
+  static final schema = ColumnBlock.schema.extend({
     'id': Schema.string.required(),
     'theme': DartPadTheme.schema.optional(),
     'embed': Schema.boolean.optional(),

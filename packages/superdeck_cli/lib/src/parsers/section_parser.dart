@@ -27,6 +27,7 @@ List<SectionBlock> parseSections(String markdown) {
 
       // Process the tagContent
       final tagData = extractTagsFromLine(tagContent);
+
       final blocks = tagData.map(
         (data) => Block.parse(data.blockType, data.options),
       );
@@ -39,7 +40,7 @@ List<SectionBlock> parseSections(String markdown) {
           }
           // Start a new section
           currentSection = block;
-        } else if (block is ContentBlock) {
+        } else if (block is ColumnBlock) {
           // Add a new subsection to the current section
           currentSection ??= SectionBlock();
           currentSection = currentSection.appendContent(block);
@@ -78,6 +79,7 @@ List<SyntaxTagData> extractTagsFromLine(String tagContent) {
   return matches.map((match) {
     final blockTypeStr = match.group(1);
     var rawOptions = match.group(2) ?? '';
+
     var blockType = _getBlockType(blockTypeStr!);
 
     var options = convertYamlToMap(rawOptions);
@@ -85,6 +87,11 @@ List<SyntaxTagData> extractTagsFromLine(String tagContent) {
     // If there is no block treat it as a widget
     if (blockType == null) {
       blockType = BlockType.widget;
+      if (options['type'] != null) {
+        throw Exception(
+          '$blockTypeStr cannot have a property named "type", as it is reserved property.',
+        );
+      }
       options = {...options, 'name': blockTypeStr};
     }
 

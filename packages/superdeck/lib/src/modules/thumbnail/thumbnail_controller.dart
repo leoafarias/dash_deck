@@ -22,7 +22,7 @@ class ThumbnailController with ChangeNotifier {
     try {
       final result = kCanRunProcess
           ? await _generateThumbnail(slide)
-          : repository.getSlideThumbnail(slide.data);
+          : repository.getSlideThumbnail(slide.data.key);
       _asyncData = AsyncValue.data(result);
     } catch (e, stackTrace) {
       _asyncData = AsyncValue.error(e, stackTrace);
@@ -77,7 +77,7 @@ Future<File> _generateThumbnail(
   bool force = false,
 }) async {
   final repository = DeckRepository();
-  final thumbnailFile = repository.getSlideThumbnail(slide.data);
+  final thumbnailFile = repository.getSlideThumbnail(slide.data.key);
 
   if (await thumbnailFile.exists() && !force) {
     return thumbnailFile;

@@ -225,6 +225,7 @@ class ImageElementBuilder extends MarkdownElementBuilder {
           constraints: BoxConstraints.tight(interpolatedSize),
           child: CachedImage(
             uri: animation.value < 0.5 ? fromBlock.uri : toBlock.uri,
+            targetSize: interpolatedSize,
             spec: fromBlock.spec.lerp(toBlock.spec, animation.value),
           ),
         );
@@ -367,10 +368,47 @@ class CodeElementBuilder extends MarkdownElementBuilder {
     BuildContext toHeroContext,
   ) {
     final fromBlock = Provider.maybeOf<_CodeElementData>(fromHeroContext);
-    final toBlock = Provider.maybeOf<_CodeElementData>(toHeroContext);
+    final toBlock =
+        Provider.maybeOf<_CodeElementData>(toHeroContext) ?? fromBlock;
 
-    if (fromBlock == null || toBlock == null) {
-      return const SizedBox();
+    Widget buildCodeWidget(
+        Size size, MarkdownCodeblockSpec spec, List<TextSpan> spans) {
+      return Wrap(
+        clipBehavior: Clip.hardEdge,
+        children: [
+          SizedBox.fromSize(
+            size: size,
+            child: BoxSpecWidget(
+              spec: spec.container,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: spans.map((span) {
+                  return RichText(
+                    text: TextSpan(
+                      style: spec.textStyle,
+                      children: [span],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    if (toBlock == null || fromBlock == null) {
+      return toBlock == null
+          ? buildCodeWidget(
+              fromBlock!.size,
+              fromBlock.spec,
+              SyntaxHighlight.render(fromBlock.text, fromBlock.language),
+            )
+          : buildCodeWidget(
+              toBlock.size,
+              toBlock.spec,
+              SyntaxHighlight.render(toBlock.text, toBlock.language),
+            );
     }
 
     return AnimatedBuilder(
@@ -397,28 +435,7 @@ class CodeElementBuilder extends MarkdownElementBuilder {
           toBlock.language,
         );
 
-        return Wrap(
-          clipBehavior: Clip.hardEdge,
-          children: [
-            SizedBox.fromSize(
-              size: interpolatedSize,
-              child: BoxSpecWidget(
-                spec: interpolatedSpec.container,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: spans.map((span) {
-                    return RichText(
-                      text: TextSpan(
-                        style: interpolatedSpec.textStyle,
-                        children: [span],
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-          ],
-        );
+        return buildCodeWidget(interpolatedSize, interpolatedSpec, spans);
       },
     );
   }

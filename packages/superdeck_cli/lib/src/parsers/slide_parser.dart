@@ -1,63 +1,180 @@
 // lib/slide_parser.dart
 
-import 'dart:convert';
-
-import 'package:superdeck_cli/src/helpers/exceptions.dart';
-import 'package:superdeck_cli/src/parsers/base_parser.dart';
-import 'package:superdeck_cli/src/parsers/front_matter_parser.dart';
+import 'package:collection/collection.dart';
+import 'package:image/image.dart' as img;
+import 'package:path/path.dart' as p;
+import 'package:superdeck_cli/src/parsers/section_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
-List<String> _splitSlides(String content) {
-  content = content.trim();
-  final lines = LineSplitter().convert(content);
-  final slides = <String>[];
-  final buffer = StringBuffer();
-  bool insideFrontMatter = false;
+enum AssetType {
+  png,
+  jpeg,
+  gif,
+  webp,
+  svg;
 
-  var isCodeBlock = false;
+  static AssetType? tryParse(String value) {
+    final extension = value.toLowerCase();
 
-  for (var line in lines) {
-    final trimmed = line.trim();
-    if (trimmed.startsWith('```')) {
-      isCodeBlock = !isCodeBlock;
+    if (extension == 'jpg') {
+      return AssetType.jpeg;
     }
-    if (isCodeBlock) {
-      buffer.writeln(line);
-      continue;
-    }
-
-    if (insideFrontMatter && trimmed.isEmpty) {
-      insideFrontMatter = false;
-    }
-
-    if (trimmed == '---') {
-      if (!insideFrontMatter) {
-        if (buffer.isNotEmpty) {
-          slides.add(buffer.toString().trim());
-          buffer.clear();
-        }
-      }
-      insideFrontMatter = !insideFrontMatter;
-    }
-    buffer.writeln(line);
+    return AssetType.values.firstWhereOrNull((e) => e.name == extension);
   }
 
-  if (buffer.isNotEmpty) {
-    slides.add(buffer.toString());
+  static AssetType parse(String value) {
+    final assetType = tryParse(value);
+    if (assetType == null) {
+      throw Exception('Invalid asset type: $value');
+    }
+    return assetType;
   }
-
-  return slides;
 }
 
-class SlideParser extends Parser<Slide> {
-  @override
-  Slide parse(String input) {
-    final extracted = FrontMatterParser().parse(input);
+sealed class AssetRaw {
+  final String key;
+  final String _fileName;
+  final AssetType _extension;
 
+  AssetRaw({
+    required this.key,
+    required String fileName,
+    required AssetType extension,
+  })  : _fileName = fileName,
+        _extension = extension;
+
+  String get path =>
+      p.join(kGeneratedAssetsDir.path, '$_fileName.${_extension.name}');
+
+  Future<Asset> decode() async {
+    final image = await img.decodeImageFile(path);
+
+    if (image == null) {
+      throw Exception('Image could not be decoded');
+    }
+
+    return Asset(
+      path: path,
+      width: image.width,
+      height: image.height,
+      reference: key,
+    );
+  }
+}
+
+class SlideThumbnailAssetRaw extends AssetRaw {
+  SlideThumbnailAssetRaw._({
+    required super.key,
+    required super.fileName,
+    required super.extension,
+  });
+
+  factory SlideThumbnailAssetRaw.fromSlideKey(String slideKey) {
+    return SlideThumbnailAssetRaw._(
+      key: slideKey,
+      fileName: 'thumbnail_$slideKey',
+      extension: AssetType.png,
+    );
+  }
+}
+
+class CachedRemoteAssetRaw extends AssetRaw {
+  CachedRemoteAssetRaw._({
+    required super.key,
+    required super.fileName,
+    required super.extension,
+  });
+
+  factory CachedRemoteAssetRaw.fromUrl(String url) {
+    return CachedRemoteAssetRaw._(
+      key: url,
+      fileName: assetHash(url),
+      extension: AssetType.png,
+    );
+  }
+}
+
+sealed class MermaidAssetRaw extends AssetRaw {
+  MermaidAssetRaw({
+    required super.key,
+    required super.fileName,
+    required super.extension,
+  });
+}
+
+class MermaidImageAssetRaw extends MermaidAssetRaw {
+  MermaidImageAssetRaw._({
+    required super.key,
+    required super.fileName,
+    required super.extension,
+  });
+
+  factory MermaidImageAssetRaw.fromSyntax(String mermaidSyntax) {
+    final key = assetHash(mermaidSyntax);
+    return MermaidImageAssetRaw._(
+      key: key,
+      fileName: key,
+      extension: AssetType.png,
+    );
+  }
+}
+
+class MermaidSvgAssetRaw extends MermaidAssetRaw {
+  MermaidSvgAssetRaw._({
+    required super.key,
+    required super.fileName,
+    required super.extension,
+  });
+
+  factory MermaidSvgAssetRaw.fromSyntax(String mermaidSyntax) {
+    final key = assetHash(mermaidSyntax);
+    return MermaidSvgAssetRaw._(
+      key: key,
+      fileName: key,
+      extension: AssetType.svg,
+    );
+  }
+}
+
+class SlideRaw {
+  final String key;
+  final String markdown;
+  final Map<String, dynamic> frontMatter;
+
+  SlideRaw({
+    required this.key,
+    required this.markdown,
+    required this.frontMatter,
+  });
+
+  SlideRaw updateMarkdown(
+    String markdown,
+  ) {
+    return SlideRaw(
+      key: key,
+      markdown: markdown,
+      frontMatter: frontMatter,
+    );
+  }
+}
+
+class SlideConverter {
+  static Future<Slide> convert(
+    SlideRaw slideRaw,
+    List<AssetRaw> assetsRaw,
+  ) async {
     final regexComments = RegExp(r'<!--(.*?)-->', dotAll: true);
 
     final notes = <Note>[];
-    final comments = regexComments.allMatches(extracted.contents);
+    final comments = regexComments.allMatches(slideRaw.markdown);
+
+    final assetsDecodingFuture = <Future<Asset>>[];
+
+    for (final assetRaw in assetsRaw) {
+      assetsDecodingFuture.add(assetRaw.decode());
+    }
+
+    final assets = await Future.wait(assetsDecodingFuture);
 
     for (final comment in comments) {
       final note = {
@@ -69,21 +186,13 @@ class SlideParser extends Parser<Slide> {
 
     // Whole content of the match
     return Slide.parse({
-      'options': extracted.frontMatter,
-      'markdown': extracted.contents,
-      'key': extracted.key
-    }).copyWith(notes: notes);
-  }
-}
-
-List<Slide> parseSlides(String markdown) {
-  try {
-    final slidesRaws = _splitSlides(markdown);
-
-    return slidesRaws.map((raw) => SlideParser().parse(raw)).toList();
-  } on FormatException catch (e) {
-    throw SdFormatException(e.message, markdown, e.offset);
-  } on SchemaValidationException catch (e) {
-    throw SdMarkdownParsingException(e, 0);
+      'options': slideRaw.frontMatter,
+      'markdown': slideRaw.markdown,
+      'key': slideRaw.key,
+    }).copyWith(
+      notes: notes,
+      assets: assets,
+      sections: parseSections(slideRaw.markdown),
+    );
   }
 }

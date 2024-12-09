@@ -2,16 +2,18 @@
   {
     "key": "w2wlREdN",
     "options": {},
-    "markdown": "{@column}\n\n## Another image Another image Another image Another image Another image Another image Another image Another image Another image Another image {.here}\n\n{@column}\n\n\n\n![mermaid](.superdeck/generated/mermaid_wgsvOvJJ.png) {.code}",
+    "markdown": "{@column}\n\n## Another image Another image Another image Another image Another image Another image Another image Another image Another image Another image {.here}\n\n{@column}\n\n\n\n![mermaid](.superdeck/generated/wgsvOvJJ.png) {.code}",
     "sections": [
       {
         "blocks": [
           {
             "content": "## Another image Another image Another image Another image Another image Another image Another image Another image Another image Another image {.here}\n",
+            "type": "column",
             "scrollable": false
           },
           {
-            "content": "![mermaid](.superdeck/generated/mermaid_wgsvOvJJ.png) {.code}",
+            "content": "![mermaid](.superdeck/generated/wgsvOvJJ.png) {.code}",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -21,9 +23,10 @@
     "notes": [],
     "assets": [
       {
-        "path": ".superdeck/generated/mermaid_wgsvOvJJ.png",
+        "path": ".superdeck/generated/wgsvOvJJ.png",
         "width": 168,
-        "height": 768
+        "height": 772,
+        "reference": "wgsvOvJJ"
       }
     ]
   },
@@ -32,17 +35,22 @@
     "options": {},
     "markdown": "{@section}\n{@section flex: 2}\n{@column\n  align: center\n  flex: 2\n}\n\n\n```dart\nColumn(\n  crossAxisAlignment: CrossAxisAlignment.start,\n  children: spans.map((span) {\n    return RichText(\n      text: TextSpan(\n        style: interpolatedSpec.textStyle,\n        children: [span],\n      ),\n    );\n  }).toList(),\n)\n```{.code}\n\n{@column}\n\n![structured_output](https://picsum.photos/800/1400) {.cover}",
     "sections": [
-      { "blocks": [], "type": "section" },
+      {
+        "blocks": [],
+        "type": "section"
+      },
       {
         "blocks": [
           {
+            "content": "```dart\nColumn(\n  crossAxisAlignment: CrossAxisAlignment.start,\n  children: spans.map((span) {\n    return RichText(\n      text: TextSpan(\n        style: interpolatedSpec.textStyle,\n        children: [span],\n      ),\n    );\n  }).toList(),\n)\n```{.code}\n",
             "flex": 2,
             "align": "center",
-            "content": "```dart\nColumn(\n  crossAxisAlignment: CrossAxisAlignment.start,\n  children: spans.map((span) {\n    return RichText(\n      text: TextSpan(\n        style: interpolatedSpec.textStyle,\n        children: [span],\n      ),\n    );\n  }).toList(),\n)\n```{.code}\n",
+            "type": "column",
             "scrollable": false
           },
           {
             "content": "![structured_output](https://picsum.photos/800/1400) {.cover}",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -55,13 +63,8 @@
       {
         "path": ".superdeck/generated/thumbnail_4OPpCLpy.png",
         "width": 512,
-        "height": 288
-      },
-      {
-        "path": ".superdeck/generated/image_caching_lNEW6843.jpeg",
-        "width": 800,
-        "height": 1400,
-        "reference": "https://picsum.photos/800/1400"
+        "height": 288,
+        "reference": "4OPpCLpy"
       }
     ]
   },
@@ -72,9 +75,14 @@
     "sections": [
       {
         "blocks": [
-          { "content": "## Another image{.here}\n", "scrollable": false },
+          {
+            "content": "## Another image{.here}\n",
+            "type": "column",
+            "scrollable": false
+          },
           {
             "content": "![structured_output](https://picsum.photos/800/1400) {.cover}",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -86,7 +94,8 @@
       {
         "path": ".superdeck/generated/thumbnail_rPTQlMdP.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "rPTQlMdP"
       }
     ]
   },
@@ -99,9 +108,14 @@
         "blocks": [
           {
             "content": "![structured_output](https://picsum.photos/800/1400) {.cover}\n",
+            "type": "column",
             "scrollable": false
           },
-          { "content": "## Another image{.here}", "scrollable": false }
+          {
+            "content": "## Another image{.here}",
+            "type": "column",
+            "scrollable": false
+          }
         ],
         "type": "section"
       }
@@ -111,7 +125,8 @@
       {
         "path": ".superdeck/generated/thumbnail_ECisD4gC.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "ECisD4gC"
       }
     ]
   },
@@ -123,13 +138,15 @@
       {
         "blocks": [
           {
-            "align": "center_right",
             "content": "#### Leo Farias\n@leoafarias{.here}\n\n",
+            "align": "center_right",
+            "type": "column",
             "scrollable": false
           },
           {
-            "align": "center_left",
             "content": "- Founder/CEO/CTO\n- Open Source Contributor\n- Flutter & Dart GDE\n- Passionate about UI/UX/DX",
+            "align": "center_left",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -141,7 +158,8 @@
       {
         "path": ".superdeck/generated/thumbnail_P6nguqAy.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "P6nguqAy"
       }
     ]
   },
@@ -152,14 +170,22 @@
     "sections": [
       {
         "blocks": [
-          { "content": "", "scrollable": false },
           {
-            "flex": 2,
-            "align": "center_left",
-            "content": "> [!WARNING]  \n> This presentation contains live AI-generated content. Unexpected things may occur during the demonstration. \n",
+            "content": "",
+            "type": "column",
             "scrollable": false
           },
-          { "scrollable": false }
+          {
+            "content": "> [!WARNING]  \n> This presentation contains live AI-generated content. Unexpected things may occur during the demonstration. \n",
+            "flex": 2,
+            "align": "center_left",
+            "type": "column",
+            "scrollable": false
+          },
+          {
+            "type": "column",
+            "scrollable": false
+          }
         ],
         "type": "section"
       }
@@ -169,7 +195,8 @@
       {
         "path": ".superdeck/generated/thumbnail_htEZFxsa.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "htEZFxsa"
       }
     ]
   },
@@ -181,15 +208,21 @@
       {
         "blocks": [
           {
+            "content": "### Generative UI",
             "flex": 2,
             "align": "center_right",
-            "content": "### Generative UI",
+            "type": "column",
             "scrollable": false
           },
-          { "content": "## VS", "scrollable": false },
           {
-            "flex": 2,
+            "content": "## VS",
+            "type": "column",
+            "scrollable": false
+          },
+          {
             "content": "### AI Assisted Code Generation",
+            "flex": 2,
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -201,7 +234,8 @@
       {
         "path": ".superdeck/generated/thumbnail_D4etKl0J.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "D4etKl0J"
       }
     ]
   },
@@ -214,10 +248,12 @@
         "blocks": [
           {
             "content": "### What is Generative UI?{.animate}\n",
+            "type": "column",
             "scrollable": false
           },
           {
             "content": "- LLMs are great at generating content based on context\n- GUIs are great at providing structured, interactive interfaces for user input and navigation",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -229,7 +265,8 @@
       {
         "path": ".superdeck/generated/thumbnail_A8nJ3H8k.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "A8nJ3H8k"
       }
     ]
   },
@@ -240,7 +277,11 @@
     "sections": [
       {
         "blocks": [
-          { "content": "# LLM ❤️ GUI{.animate}", "scrollable": false }
+          {
+            "content": "# LLM ❤️ GUI{.animate}",
+            "type": "column",
+            "scrollable": false
+          }
         ],
         "type": "section"
       }
@@ -250,7 +291,8 @@
       {
         "path": ".superdeck/generated/thumbnail_9mHDFwa9.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "9mHDFwa9"
       }
     ]
   },
@@ -261,14 +303,21 @@
     "sections": [
       {
         "blocks": [
-          { "scrollable": false },
           {
-            "flex": 2,
-            "align": "center",
-            "content": "Creates dynamic, context-aware UIs by interpreting actions and maintaining state with LLMs for fluid, interactive responses.{.animate}\n",
+            "type": "column",
             "scrollable": false
           },
-          { "scrollable": false }
+          {
+            "content": "Creates dynamic, context-aware UIs by interpreting actions and maintaining state with LLMs for fluid, interactive responses.{.animate}\n",
+            "flex": 2,
+            "align": "center",
+            "type": "column",
+            "scrollable": false
+          },
+          {
+            "type": "column",
+            "scrollable": false
+          }
         ],
         "type": "section"
       }
@@ -278,7 +327,8 @@
       {
         "path": ".superdeck/generated/thumbnail_bsXHyPoa.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "bsXHyPoa"
       }
     ]
   },
@@ -291,6 +341,7 @@
         "blocks": [
           {
             "content": "### Benefits of UI over Chat{.animate}\n\n- More intuitive and user-friendly, especially for complex tasks\n- Faster feedback loop between users and LLMs\n- Enhances efficiency and interaction",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -302,7 +353,8 @@
       {
         "path": ".superdeck/generated/thumbnail_3sLdrfsM.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "3sLdrfsM"
       }
     ]
   },
@@ -314,39 +366,14 @@
       {
         "blocks": [
           {
+            "content": "### Flutter is Well-Suited <br>for Generative UI\nBuilt for any screen: Ideal for generating<br>adaptive UIs across devices and platforms.",
             "flex": 3,
             "align": "center",
-            "content": "### Flutter is Well-Suited <br>for Generative UI\nBuilt for any screen: Ideal for generating<br>adaptive UIs across devices and platforms.",
+            "type": "column",
             "scrollable": false
           },
-          { "scrollable": false }
-        ],
-        "type": "section"
-      }
-    ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_CsyEcFYH.png",
-        "width": 512,
-        "height": 288
-      }
-    ]
-  },
-  {
-    "key": "rHHS9FIs",
-    "options": {},
-    "markdown": "## How can LLMs Understtand Your UI?\n\n{@colum}\n![structured_output](assets/structured_output.png)",
-    "sections": [
-      {
-        "blocks": [
           {
-            "content": "## How can LLMs Understtand Your UI?\n",
-            "scrollable": false
-          },
-          { "name": "colum", "scrollable": false, "type": "widget" },
-          {
-            "content": "![structured_output](assets/structured_output.png)",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -356,11 +383,36 @@
     "notes": [],
     "assets": [
       {
-        "path": ".superdeck/generated/thumbnail_rHHS9FIs.png",
+        "path": ".superdeck/generated/thumbnail_CsyEcFYH.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "CsyEcFYH"
       }
     ]
+  },
+  {
+    "key": "zB26rHOq",
+    "options": {},
+    "markdown": "## How can LLMs Understtand Your UI?\n\n{@column}\n![structured_output](assets/structured_output.png)",
+    "sections": [
+      {
+        "blocks": [
+          {
+            "content": "## How can LLMs Understtand Your UI?\n",
+            "type": "column",
+            "scrollable": false
+          },
+          {
+            "content": "![structured_output](assets/structured_output.png)",
+            "type": "column",
+            "scrollable": false
+          }
+        ],
+        "type": "section"
+      }
+    ],
+    "notes": [],
+    "assets": []
   },
   {
     "key": "9jtc9i8W",
@@ -369,9 +421,14 @@
     "sections": [
       {
         "blocks": [
-          { "content": "### Structured Output\n", "scrollable": false },
+          {
+            "content": "### Structured Output\n",
+            "type": "column",
+            "scrollable": false
+          },
           {
             "content": "```dart\nfinal schema = Schema.array(\n  description: 'List of recipes',\n  items: Schema.object(\n    properties: {\n      'recipeName': Schema.string(\n        description: 'Name of the recipe.',\n        nullable: false,\n      ),\n    },\n    requiredProperties: ['recipeName'],\n  ),\n);\n```",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -383,7 +440,8 @@
       {
         "path": ".superdeck/generated/thumbnail_9jtc9i8W.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "9jtc9i8W"
       }
     ]
   },
@@ -396,6 +454,7 @@
         "blocks": [
           {
             "content": "```dart\n\nfinal model = GenerativeModel(\n  model: 'gemini-1.5-pro',\n  apiKey: apiKey,\n  generationConfig: GenerationConfig(\n    responseMimeType: 'application/json',\n    responseSchema: schema,\n  ),\n);\n\nfinal prompt = 'List a few popular cookie recipes.';\nfinal response = await model.generateContent([Content.text(prompt)]);\n\n```",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -407,7 +466,8 @@
       {
         "path": ".superdeck/generated/thumbnail_CtLOsx2s.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "CtLOsx2s"
       }
     ]
   },
@@ -420,6 +480,7 @@
         "blocks": [
           {
             "content": "### Color Palette Generator\n\nGenerate a color palette based on a given text.\n\n- Name of the palette\n- Font family\n- Font color\n- Color for each corner of the palette",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -431,7 +492,8 @@
       {
         "path": ".superdeck/generated/thumbnail_6EU2Xxrf.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "6EU2Xxrf"
       }
     ]
   },
@@ -444,6 +506,7 @@
         "blocks": [
           {
             "content": "```dart\nfinal schema = Schema.object(properties: {\n  'name': Schema.string(\n    description:\n        'The text content to display on color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'font': Schema.enumString(\n    enumValues: ColorPaletteFontFamily.enumString,\n    description: 'The font to use for the poster text.',\n    nullable: false,\n  ),\n  'fontColor': Schema.string(\n    description: 'The hex color value of the poster text. Format: #FF0000',\n    nullable: false,\n  ),\n  'topLeftColor': Schema.string(\n    description:\n        'The hex color value top left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'topRightColor': Schema.string(\n    description:\n        'The hex color value top right corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomLeftColor': Schema.string(\n    description:\n        'The hex color value bottom left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomRightColor': Schema.string(\n    description:\n        'The hex color value bottom right corner of color palette. Format: #FF0000',\n    nullable: false,\n  )\n}, requiredProperties: [\n  'name',\n  'font',\n  'fontColor',\n  'topLeftColor',\n  'topRightColor',\n  'bottomLeftColor',\n  'bottomRightColor',\n]);\n\n```",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -455,46 +518,17 @@
       {
         "path": ".superdeck/generated/thumbnail_qek7UrZY.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "qek7UrZY"
       }
     ]
   },
   {
-    "key": "8DDlBdti",
-    "options": { "style": "demo" },
-    "markdown": "{@colorPalette\n  type: schema\n  prompts:\n    - tropical\n    - vibrant\n    - pastel\n    - chocolatey pink unicorn\n    - cyberpunk\n}",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "name": "colorPalette",
-            "scrollable": false,
-            "type": "schema",
-            "prompts": [
-              "tropical",
-              "vibrant",
-              "pastel",
-              "chocolatey pink unicorn",
-              "cyberpunk"
-            ]
-          }
-        ],
-        "type": "section"
-      }
-    ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_8DDlBdti.png",
-        "width": 512,
-        "height": 288
-      }
-    ]
-  },
-  {
-    "key": "m7QWZujG",
-    "options": { "style": "demo" },
-    "markdown": "{@colorPalette\n  type: widget\n  prompts:\n    - tropical\n    - vibrant\n    - pastel\n    - chocolatey pink unicorn\n    - cyberpunk\n}",
+    "key": "Gh3bTZb2",
+    "options": {
+      "style": "demo"
+    },
+    "markdown": "{@colorPalette\n  schema: true\n  prompts:\n    - tropical\n    - vibrant\n    - pastel\n    - chocolatey pink unicorn\n    - cyberpunk\n}",
     "sections": [
       {
         "blocks": [
@@ -502,6 +536,7 @@
             "name": "colorPalette",
             "scrollable": false,
             "type": "widget",
+            "schema": true,
             "prompts": [
               "tropical",
               "vibrant",
@@ -515,13 +550,36 @@
       }
     ],
     "notes": [],
-    "assets": [
+    "assets": []
+  },
+  {
+    "key": "u905Mj3Z",
+    "options": {
+      "style": "demo"
+    },
+    "markdown": "{@colorPalette\n  schema: false\n  prompts:\n    - tropical\n    - vibrant\n    - pastel\n    - chocolatey pink unicorn\n    - cyberpunk\n}",
+    "sections": [
       {
-        "path": ".superdeck/generated/thumbnail_m7QWZujG.png",
-        "width": 512,
-        "height": 288
+        "blocks": [
+          {
+            "name": "colorPalette",
+            "scrollable": false,
+            "type": "widget",
+            "schema": false,
+            "prompts": [
+              "tropical",
+              "vibrant",
+              "pastel",
+              "chocolatey pink unicorn",
+              "cyberpunk"
+            ]
+          }
+        ],
+        "type": "section"
       }
-    ]
+    ],
+    "notes": [],
+    "assets": []
   },
   {
     "key": "H0jUl8Aj",
@@ -530,7 +588,11 @@
     "sections": [
       {
         "blocks": [
-          { "content": "## LLMs Orchestrate APIs", "scrollable": false }
+          {
+            "content": "## LLMs Orchestrate APIs",
+            "type": "column",
+            "scrollable": false
+          }
         ],
         "type": "section"
       }
@@ -540,7 +602,8 @@
       {
         "path": ".superdeck/generated/thumbnail_H0jUl8Aj.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "H0jUl8Aj"
       }
     ]
   },
@@ -553,6 +616,7 @@
         "blocks": [
           {
             "content": "### Gemini Function Calling\nThe Function Calling feature is in Beta release\n",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -564,6 +628,7 @@
         "blocks": [
           {
             "content": "![llm tools](assets/llm_tools.png)",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -576,21 +641,25 @@
       {
         "path": ".superdeck/generated/thumbnail_5rmJo1pB.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "5rmJo1pB"
       }
     ]
   },
   {
-    "key": "85oPyLzH",
-    "options": { "style": "demo" },
-    "markdown": "{@lightControl \n  type: schema\n  prompts:\n    - Dim the lights by 20\n    - Increase by 35\n    - Turn off the lights\n    - Set it to 80\n    - Lower by half\n    - Max brightness\n}",
+    "key": "1n3nxlhk",
+    "options": {
+      "style": "demo"
+    },
+    "markdown": "{@lightControl \n  schema: true\n  prompts:\n    - Dim the lights by 20\n    - Increase by 35\n    - Turn off the lights\n    - Set it to 80\n    - Lower by half\n    - Max brightness\n}",
     "sections": [
       {
         "blocks": [
           {
             "name": "lightControl",
             "scrollable": false,
-            "type": "schema",
+            "type": "widget",
+            "schema": true,
             "prompts": [
               "Dim the lights by 20",
               "Increase by 35",
@@ -605,13 +674,7 @@
       }
     ],
     "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_85oPyLzH.png",
-        "width": 512,
-        "height": 288
-      }
-    ]
+    "assets": []
   },
   {
     "key": "Zn801w4G",
@@ -621,14 +684,16 @@
       {
         "blocks": [
           {
+            "content": "### User Interaction{.heading}\nNatural Language way to interact with an LLM\n",
             "flex": 2,
             "align": "bottom_right",
-            "content": "### User Interaction{.heading}\nNatural Language way to interact with an LLM\n",
+            "type": "column",
             "scrollable": false
           },
           {
-            "flex": 4,
             "content": "![llm response](assets/llm_interaction.png)",
+            "flex": 4,
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -640,7 +705,8 @@
       {
         "path": ".superdeck/generated/thumbnail_Zn801w4G.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "Zn801w4G"
       }
     ]
   },
@@ -652,13 +718,15 @@
       {
         "blocks": [
           {
-            "align": "center_left",
             "content": "### Widget Response{.heading}\n",
+            "align": "center_left",
+            "type": "column",
             "scrollable": false
           },
           {
-            "flex": 3,
             "content": "![widget_response](assets/widget_response.png)",
+            "flex": 3,
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -670,14 +738,17 @@
       {
         "path": ".superdeck/generated/thumbnail_aY8Y9HBu.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "aY8Y9HBu"
       }
     ]
   },
   {
-    "key": "3eFdrtdl",
-    "options": { "style": "demo" },
-    "markdown": "{@lightControl\n  type: widget\n  prompts:\n    - Dim the lights by 20\n    - Increase by 35\n    - Turn off the lights\n    - Set it to 80\n    - Lower by half\n    - Max brightness\n}",
+    "key": "g8ZxHmlw",
+    "options": {
+      "style": "demo"
+    },
+    "markdown": "{@lightControl\n  schema: false\n  prompts:\n    - Dim the lights by 20\n    - Increase by 35\n    - Turn off the lights\n    - Set it to 80\n    - Lower by half\n    - Max brightness\n}",
     "sections": [
       {
         "blocks": [
@@ -685,6 +756,7 @@
             "name": "lightControl",
             "scrollable": false,
             "type": "widget",
+            "schema": false,
             "prompts": [
               "Dim the lights by 20",
               "Increase by 35",
@@ -699,13 +771,7 @@
       }
     ],
     "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_3eFdrtdl.png",
-        "width": 512,
-        "height": 288
-      }
-    ]
+    "assets": []
   },
   {
     "key": "pNxPyfLK",
@@ -716,6 +782,7 @@
         "blocks": [
           {
             "content": "## What if the tool to use is a widget schema?",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -727,7 +794,8 @@
       {
         "path": ".superdeck/generated/thumbnail_pNxPyfLK.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "pNxPyfLK"
       }
     ]
   },
@@ -740,6 +808,7 @@
         "blocks": [
           {
             "content": "### Experimental\n\n```dart\nfinal schema = Schema.object(properties: {\n  'textFields': Schema.array(\n    description: 'A list of text fields',\n    items: TextFieldSchemaDto.schema,\n    nullable: true,\n  ),\n  'dropdowns': Schema.array(\n    description: 'A list of dropdowns',\n    items: DropdownSchemaDto.schema,\n    nullable: true,\n  ),\n  'colorPickers': Schema.array(\n    description: 'A list of colors pickers',\n    items: ColorPickerDtoSchema.schema,\n    nullable: true,\n  ),\n});\n\n```",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -751,14 +820,17 @@
       {
         "path": ".superdeck/generated/thumbnail_5cGNbsJx.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "5cGNbsJx"
       }
     ]
   },
   {
-    "key": "J6DNhZau",
-    "options": { "style": "demo" },
-    "markdown": "{@widgetSchema\n  type: widget\n  prompts:\n    - Change top colors\n    - Change font\n    - Change all colors\n    - Change everything\n}",
+    "key": "sas6s4nZ",
+    "options": {
+      "style": "demo"
+    },
+    "markdown": "{@widgetSchema\n  schema: false\n  prompts:\n    - Change top colors\n    - Change font\n    - Change all colors\n    - Change everything\n}",
     "sections": [
       {
         "blocks": [
@@ -766,6 +838,7 @@
             "name": "widgetSchema",
             "scrollable": false,
             "type": "widget",
+            "schema": false,
             "prompts": [
               "Change top colors",
               "Change font",
@@ -778,13 +851,7 @@
       }
     ],
     "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_J6DNhZau.png",
-        "width": 512,
-        "height": 288
-      }
-    ]
+    "assets": []
   },
   {
     "key": "3kW1wOHd",
@@ -795,6 +862,7 @@
         "blocks": [
           {
             "content": "## The future of UI might be orchestrating user experiences rather than creating it.",
+            "type": "column",
             "scrollable": false
           }
         ],
@@ -806,7 +874,8 @@
       {
         "path": ".superdeck/generated/thumbnail_3kW1wOHd.png",
         "width": 512,
-        "height": 288
+        "height": 288,
+        "reference": "3kW1wOHd"
       }
     ]
   },
@@ -819,6 +888,7 @@
         "blocks": [
           {
             "content": "### Thank you\n\nLeo Farias\n@leoafarias\n(GitHub, Twitter/X)",
+            "type": "column",
             "scrollable": false
           }
         ],

@@ -4,9 +4,7 @@ import 'dart:io';
 import 'package:superdeck_cli/src/helpers/exceptions.dart';
 import 'package:superdeck_cli/src/helpers/logger.dart';
 import 'package:superdeck_cli/src/helpers/update_pubspec.dart';
-import 'package:superdeck_cli/src/tasks/build_sections_task.dart';
 import 'package:superdeck_cli/src/tasks/dart_formatter_task.dart';
-import 'package:superdeck_cli/src/tasks/image_cache_task.dart';
 import 'package:superdeck_cli/src/tasks/mermaid_task.dart';
 import 'package:superdeck_cli/src/tasks/slide_thumbnail_task.dart';
 import 'package:superdeck_core/superdeck_core.dart';
@@ -56,8 +54,6 @@ class SuperdeckRunner {
       MermaidConverterTask(),
       DartFormatterTask(),
       SlideThumbnailTask(),
-      ImageCachingTask(),
-      BuildSectionsTask(),
     ]);
     try {
       final slides = await pipeline.run();
@@ -80,7 +76,7 @@ class SuperdeckRunner {
 void _handleException(Exception e) {
   if (e is SdTaskException) {
     logger
-      ..err('slide: ${e.controller.index}')
+      ..err('slide: ${e.slideIndex}')
       ..err('Task error: ${e.taskName}');
 
     _handleException(e.exception);

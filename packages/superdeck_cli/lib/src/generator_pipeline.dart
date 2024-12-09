@@ -2,69 +2,36 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:collection/collection.dart';
-import 'package:image/image.dart' as img;
 import 'package:logging/logging.dart';
-import 'package:path/path.dart' as p;
 import 'package:superdeck_cli/src/helpers/exceptions.dart';
+import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
 import 'package:superdeck_cli/src/parsers/slide_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
-typedef PipelineResult = ({
-  List<Slide> slides,
-  List<Asset> neededAssets,
-});
-
 class TaskContext {
-  final int index;
-  Slide slide;
-  List<Asset> assets;
+  SlideRaw slide;
 
-  TaskContext({
-    required this.slide,
-    required this.index,
-    required this.assets,
-  });
+  TaskContext(
+    this.slide,
+  );
 
-  final List<Asset> _neededAssets = [];
+  final List<AssetRaw> _assetsUsed = [];
 
-  bool assetExists(String assetName) {
-    for (var element in assets) {
-      print('Checking asset: ${element.path}');
-    }
-    final asset = assets.firstWhereOrNull(
-      (element) => element.path.contains(assetName),
-    );
-
-    if (asset == null) {
-      return false;
-    }
-
-    _neededAssets.add(asset);
-
-    return true;
+  Future<void> writeAsset(AssetRaw asset, List<int> bytes) async {
+    await File(asset.path).writeAsBytes(bytes);
+    _assetsUsed.add(asset);
   }
 
-  Future<void> saveAsAsset(File file, [String? reference]) async {
-    final image = await img.decodeImageFile(file.path);
-
-    if (image == null) {
-      throw Exception('Image could not be decoded');
+  Future<bool> checkAssetExists(AssetRaw asset) async {
+    if (await File(asset.path).exists()) {
+      _assetsUsed.add(asset);
+      return true;
     }
-
-    final asset = Asset(
-      path: file.path,
-      width: image.width,
-      height: image.height,
-      reference: reference,
-    );
-    _neededAssets.add(asset);
+    return false;
   }
 
-  Slide finalize() {
-    return slide.copyWith(
-      assets: _neededAssets,
-    );
+  Future<Slide> buildSlide() async {
+    return SlideConverter.convert(slide, _assetsUsed);
   }
 }
 
@@ -72,18 +39,17 @@ class TaskPipeline {
   final List<Task> tasks;
   final repository = DeckRepository(canRunLocal: true);
 
-  TaskPipeline(
-    this.tasks,
-  );
+  TaskPipeline(this.tasks);
 
   Future<TaskContext> _runEachSlide(
+    int slideIndex,
     TaskContext context,
   ) async {
     for (var task in tasks) {
       try {
         await task.run(context);
       } on Exception catch (e) {
-        throw SdTaskException(task.name, context, e);
+        throw SdTaskException(task.name, context, e, slideIndex);
       }
     }
 
@@ -93,31 +59,22 @@ class TaskPipeline {
   Future<List<Slide>> run() async {
     final markdownRaw = await repository.loadMarkdown();
 
-    // final loadedReference = SuperDeckReference.loadYaml(kReferenceFileYaml);
-    final savedSlides = await repository.loadSlides();
-
-    final slides = parseSlides(markdownRaw);
-    final assets = savedSlides
-        .map((e) => e.assets)
-        .expand((e) => e)
-        .toList()
-        .where((element) => File(element.path).existsSync())
-        .toList();
+    final slides = MarkdownParser.parse(markdownRaw);
 
     final futures = <Future<TaskContext>>[];
 
     for (var i = 0; i < slides.length; i++) {
-      final controller = TaskContext(
-        index: i,
-        slide: slides[i],
-        assets: assets,
-      );
-      futures.add(_runEachSlide(controller));
+      futures.add(_runEachSlide(
+        i,
+        TaskContext(slides[i]),
+      ));
     }
 
     final contexts = await Future.wait(futures);
 
-    final finalizedSlides = contexts.map((context) => context.finalize());
+    final finalizedSlides = await Future.wait(contexts.map(
+      (context) => context.buildSlide(),
+    ));
 
     final neededAssets = finalizedSlides.expand((slide) => slide.assets);
 
@@ -150,7 +107,7 @@ Future<void> _cleanupGeneratedFiles(Iterable<Asset> assets) async {
 
 abstract class Task {
   final String name;
-  final repository = DeckRepository(canRunLocal: true);
+  final repository = DeckRepository();
   Task(this.name);
 
   FutureOr<void> run(TaskContext context);
@@ -172,18 +129,6 @@ abstract class Task {
     }
 
     return output;
-  }
-
-  File buildAssetFile(String assetName, String extension) {
-    if (p.extension(assetName).isNotEmpty) {
-      throw Exception('Asset name should not have an extension');
-    }
-
-    if (!extension.startsWith('.')) {
-      extension = '.$extension';
-    }
-    final updatedFileName = ('${name}_$assetName$extension');
-    return File(p.join(kGeneratedAssetsDir.path, updatedFileName));
   }
 
   // Dispose or anything here

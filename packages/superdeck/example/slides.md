@@ -159,7 +159,7 @@ Built for any screen: Ideal for generating<br>adaptive UIs across devices and pl
 
 ## How can LLMs Understtand Your UI?
 
-{@colum}
+{@column}
 ![structured_output](assets/structured_output.png)
 
 
@@ -270,7 +270,7 @@ style: demo
 ---
 
 {@colorPalette
-  type: schema
+  schema: true
   prompts:
     - tropical
     - vibrant
@@ -284,7 +284,7 @@ style: demo
 ---
 
 {@colorPalette
-  type: widget
+  schema: false
   prompts:
     - tropical
     - vibrant
@@ -318,7 +318,7 @@ style: demo
 ---
 
 {@lightControl 
-  type: schema
+  schema: true
   prompts:
     - Dim the lights by 20
     - Increase by 35
@@ -364,7 +364,7 @@ style: demo
 ---
 
 {@lightControl
-  type: widget
+  schema: false
   prompts:
     - Dim the lights by 20
     - Increase by 35
@@ -408,7 +408,7 @@ style: demo
 ---
 
 {@widgetSchema
-  type: widget
+  schema: false
   prompts:
     - Change top colors
     - Change font

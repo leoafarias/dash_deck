@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:superdeck_cli/src/generator_pipeline.dart';
 import 'package:superdeck_cli/src/helpers/logger.dart';
-import 'package:superdeck_core/superdeck_core.dart';
+import 'package:superdeck_cli/src/parsers/slide_parser.dart';
 
 Future<String> _generateMermaidGraph(
   Browser browser,
@@ -188,29 +188,21 @@ class MermaidConverterTask extends Task {
 
       if (mermaidSyntax == null) continue;
 
-      final mermaidFile = buildAssetFile(
-        assetHash(mermaidSyntax),
-        'png',
-      );
+      final asset = MermaidImageAssetRaw.fromSyntax(mermaidSyntax);
 
-      if (!await mermaidFile.exists()) {
+      if (!await context.checkAssetExists(asset)) {
         final browser = await _getBrowser();
 
         final imageData =
             await generateRoughMermaidGraph(browser, mermaidSyntax);
 
-        await mermaidFile.writeAsBytes(imageData);
+        await context.writeAsset(asset, imageData);
       }
 
-      // If file existeed or was create it then replace it
-      if (await mermaidFile.exists()) {
-        await context.saveAsAsset(mermaidFile);
-      }
+      final imageMarkdown = '![mermaid](${asset.path})';
 
-      final imageMarkdown = '![mermaid](${mermaidFile.path})';
-
-      context.slide = context.slide.copyWith(
-        markdown: context.slide.markdown.replaceAll(
+      context.slide = context.slide.updateMarkdown(
+        context.slide.markdown.replaceAll(
           match.group(0)!,
           imageMarkdown,
         ),

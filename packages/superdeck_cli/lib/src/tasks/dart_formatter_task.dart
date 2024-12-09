@@ -10,7 +10,7 @@ class DartFormatterTask extends Task {
   FutureOr<void> run(context) async {
     final formattedMarkdown = _formatDartCodeBlocks(context);
 
-    context.slide = context.slide.copyWith(markdown: formattedMarkdown);
+    context.slide = context.slide.updateMarkdown(formattedMarkdown);
   }
 
   String _formatDartCodeBlocks(
