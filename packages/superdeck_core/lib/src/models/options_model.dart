@@ -3,30 +3,17 @@ import 'package:superdeck_core/superdeck_core.dart';
 
 part 'options_model.mapper.dart';
 
-sealed class Options {
-  final String? style;
-
-  const Options({
-    this.style,
-  });
-
-  static final schema = Schema.object(
-    {
-      "style": Schema.string.optional(),
-    },
-  );
-}
-
 @MappableClass(
   hook: UnmappedPropertiesHook('args'),
 )
-class SlideOptions extends Options with SlideOptionsMappable {
+class SlideOptions with SlideOptionsMappable {
   final String? title;
+  final String? style;
   final Map<String, Object?> args;
 
   const SlideOptions({
     this.title,
-    super.style,
+    this.style,
     this.args = const {},
   });
 
@@ -35,31 +22,11 @@ class SlideOptions extends Options with SlideOptionsMappable {
     return SlideOptionsMapper.fromMap(map);
   }
 
-  static final schema = Options.schema.extend(
+  static final schema = Schema.object(
     {
-      "title": Schema.string,
+      "title": Schema.string(),
+      "style": Schema.string(),
     },
-    additionalProperties: true,
+    additionalProperties: false,
   );
 }
-
-// @MappableClass()
-// class DeckOptions extends Options with DeckOptionsMappable {
-//   final bool cacheRemoteAssets;
-
-//   const DeckOptions({
-//     required super.style,
-//     this.cacheRemoteAssets = false,
-//   });
-
-//   static DeckOptions fromMap(Map<String, dynamic> map) {
-//     schema.validateOrThrow(map);
-//     return DeckOptionsMapper.fromMap(map);
-//   }
-
-//   static final schema = Options.schema.extend(
-//     {
-//       "cache_remote_assets": Schema.boolean.optional(),
-//     },
-//   );
-// }

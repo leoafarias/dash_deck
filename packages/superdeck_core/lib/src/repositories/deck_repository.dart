@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
-import 'package:superdeck_core/src/helpers/watcher.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 typedef CustomJsonDecoder = FutureOr<dynamic> Function(String);
@@ -20,11 +19,11 @@ class DeckRepository {
   late final File slidesFile;
   late final Directory generatedDir;
   late final File markdownFile;
-
   late final CustomJsonDecoder _jsonDecoder;
   late final CustomAssetLoader _assetLoader;
-  final bool canRunLocal;
-  late final FileWatcher _watcher;
+
+  // late final FileWatcher _watcher;
+  StreamController<List<Slide>>? _controller;
 
   DeckRepository({
     Directory? assetDir,
@@ -33,7 +32,6 @@ class DeckRepository {
     File? markdownFile,
     CustomJsonDecoder? decoder,
     CustomAssetLoader? assetLoader,
-    this.canRunLocal = false,
   }) {
     this.assetDir = assetDir ?? Directory(p.join('.superdeck'));
     this.slidesFile =
@@ -42,8 +40,7 @@ class DeckRepository {
         generatedDir ?? Directory(p.join(this.assetDir.path, 'generated'));
     this.markdownFile = markdownFile ?? File('slides.md');
 
-    _watcher = FileWatcher(
-        slidesFile ?? File(p.join(this.assetDir.path, 'slides.json')));
+    // _watcher = FileWatcher(this.slidesFile);
 
     _jsonDecoder = decoder ?? jsonDecode;
     _assetLoader = assetLoader ?? _loadString;
@@ -94,12 +91,17 @@ class DeckRepository {
   }
 
   Stream<List<Slide>> watch() {
-    if (!canRunLocal) {
-      // If not running locally, you might return an empty stream or throw
-      return const Stream.empty();
+    if (_controller != null) {
+      _controller!.close();
     }
 
     final controller = StreamController<List<Slide>>();
+
+    _controller = controller;
+
+    loadSlides().then((slides) {
+      controller.add(slides);
+    });
 
     // Listen for file modifications
     final subscription =
@@ -117,7 +119,7 @@ class DeckRepository {
       },
     );
 
-    controller.onCancel = () async {
+    _controller!.onCancel = () async {
       await subscription.cancel();
       await controller.close();
     };
@@ -143,8 +145,8 @@ class DeckRepository {
     }
   }
 
-  File getAssetFile(String fileName) {
-    return File(p.join(generatedDir.path, fileName));
+  File getAssetFile(LocalAsset asset) {
+    return File(p.join(generatedDir.path, asset.path));
   }
 
   File getSlideThumbnail(String slideKey) {
@@ -153,11 +155,5 @@ class DeckRepository {
     );
   }
 
-  void startListening(FutureOr<void> Function() callback) {
-    if (canRunLocal && !_watcher.isWatching) {
-      _watcher.start(callback);
-    }
-  }
-
-  void stopListening() => _watcher.stop();
+  void stopWatch() => _controller?.close();
 }

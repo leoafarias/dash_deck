@@ -1,24 +1,24 @@
 part of 'schema.dart';
 
-sealed class SchemaValue<T> {
-  const SchemaValue({
-    bool required = false,
+sealed class Schema<T> {
+  const Schema({
     this.validators = const [],
-  }) : isRequired = required;
+  });
 
-  SchemaValue<T> copyWith({
-    bool? required,
+  Schema<T> copyWith({
     List<Validator<T>>? validators,
   });
-  SchemaValue<T> required() => copyWith(required: true);
-
-  SchemaValue<T> optional() => copyWith(required: false);
 
   final List<Validator<T>> validators;
 
-  final bool isRequired;
-
-  bool get isOptional => !isRequired;
+  static const string = StringSchema.new;
+  static const object = ObjectSchema.new;
+  static const double = DoubleSchema.new;
+  static const int = IntSchema.new;
+  static const boolean = BooleanSchema.new;
+  static const any = ObjectSchema({}, additionalProperties: true);
+  static const list = SchemaList.new;
+  static final enumValue = StringSchema.enumString;
 
   @protected
   T? parseValue(Object? value, T? Function(String) fromString) {
@@ -36,20 +36,7 @@ sealed class SchemaValue<T> {
     }
   }
 
-  ValidationResult validate(List<String> path, Object? value) {
-    // Check null and required
-    if (value == null) {
-      return isOptional
-          ? ValidationResult.valid(path)
-          : ValidationResult(
-              path,
-              errors: [
-                RequiredPropMissingValidationError(
-                    property: path.lastOrNull ?? '')
-              ],
-            );
-    }
-
+  ValidationResult validate(List<String> path, Object value) {
     // Attempt parsing
     final typedValue = tryParse(value);
     if (typedValue == null) {
@@ -82,16 +69,14 @@ sealed class SchemaValue<T> {
   }
 }
 
-class BooleanSchema extends SchemaValue<bool> {
-  const BooleanSchema({super.required, super.validators = const []});
+class BooleanSchema extends Schema<bool> {
+  const BooleanSchema({super.validators = const []});
 
   @override
   BooleanSchema copyWith({
-    bool? required,
     List<Validator<bool>>? validators,
   }) {
     return BooleanSchema(
-      required: required ?? isRequired,
       validators: validators ?? this.validators,
     );
   }
@@ -110,18 +95,22 @@ class BooleanSchema extends SchemaValue<bool> {
   }
 }
 
-final class StringSchema extends SchemaValue<String> {
-  const StringSchema({super.required = false, super.validators = const []});
+final class StringSchema extends Schema<String> {
+  const StringSchema({super.validators = const []});
 
   @override
   StringSchema copyWith({
-    bool? required,
     List<Validator<String>>? validators,
   }) {
     return StringSchema(
-      required: required ?? isRequired,
       validators: validators ?? this.validators,
     );
+  }
+
+  static StringSchema enumString<E extends Enum>(List<E> values) {
+    return StringSchema(validators: [
+      ArrayValidator(values.map((e) => e.name.snakeCase()).toList()),
+    ]);
   }
 
   @override
@@ -130,49 +119,49 @@ final class StringSchema extends SchemaValue<String> {
     return parseValue(value, (value) => value);
   }
 
-  SchemaValue<String> isPosixPath() {
+  Schema<String> isPosixPath() {
     return copyWith(validators: [
       ...validators,
       const PosixPathValidator(),
     ]);
   }
 
-  SchemaValue<String> isEmail() {
+  Schema<String> isEmail() {
     return copyWith(validators: [
       ...validators,
       const EmailValidator(),
     ]);
   }
 
-  SchemaValue<String> isHexColor() {
+  Schema<String> isHexColor() {
     return copyWith(validators: [
       ...validators,
       const HexColorValidator(),
     ]);
   }
 
-  SchemaValue<String> isArray(List<String> values) {
+  Schema<String> isArray(List<String> values) {
     return copyWith(validators: [
       ...validators,
       ArrayValidator(values),
     ]);
   }
 
-  SchemaValue<String> isEmpty() {
+  Schema<String> isEmpty() {
     return copyWith(validators: [
       ...validators,
       const IsEmptyValidator(),
     ]);
   }
 
-  SchemaValue<String> minLength(int min) {
+  Schema<String> minLength(int min) {
     return copyWith(validators: [
       ...validators,
       MinLengthValidator(min),
     ]);
   }
 
-  SchemaValue<String> maxLength(int max) {
+  Schema<String> maxLength(int max) {
     return copyWith(validators: [
       ...validators,
       MaxLengthValidator(max),
@@ -180,16 +169,14 @@ final class StringSchema extends SchemaValue<String> {
   }
 }
 
-final class IntSchema extends SchemaValue<int> {
-  const IntSchema({super.required, super.validators = const []});
+final class IntSchema extends Schema<int> {
+  const IntSchema({super.validators = const []});
 
   @override
   IntSchema copyWith({
-    bool? required,
     List<Validator<int>>? validators,
   }) {
     return IntSchema(
-      required: required ?? isRequired,
       validators: validators ?? this.validators,
     );
   }
@@ -200,17 +187,14 @@ final class IntSchema extends SchemaValue<int> {
   }
 }
 
-final class DoubleSchema extends SchemaValue<double> {
-  const DoubleSchema({super.required, super.validators = const []});
+final class DoubleSchema extends Schema<double> {
+  const DoubleSchema({super.validators = const []});
 
   @override
   DoubleSchema copyWith({
-    bool? required,
     List<Validator<double>>? validators,
   }) {
-    return DoubleSchema(
-        required: required ?? isRequired,
-        validators: validators ?? this.validators);
+    return DoubleSchema(validators: validators ?? this.validators);
   }
 
   @override
@@ -219,26 +203,23 @@ final class DoubleSchema extends SchemaValue<double> {
   }
 }
 
-class DiscriminatedObjectSchema extends SchemaValue<Map<String, dynamic>> {
+class DiscriminatedObjectSchema extends Schema<Map<String, dynamic>> {
   final String discriminatorKey;
-  final Map<String, SchemaValue> schemas;
+  final Map<String, Schema> schemas;
 
   DiscriminatedObjectSchema({
     required this.discriminatorKey,
     required this.schemas,
-    super.required,
     super.validators,
   });
 
   @override
   DiscriminatedObjectSchema copyWith({
-    bool? required,
     List<Validator<Map<String, dynamic>>>? validators,
   }) {
     return DiscriminatedObjectSchema(
       discriminatorKey: discriminatorKey,
       schemas: schemas,
-      required: required ?? isRequired,
       validators: validators ?? this.validators,
     );
   }
@@ -248,7 +229,7 @@ class DiscriminatedObjectSchema extends SchemaValue<Map<String, dynamic>> {
     return value is Map<String, dynamic> ? value : null;
   }
 
-  SchemaValue? getDiscriminatedKeyValue(Map<String, dynamic> value) {
+  Schema? getDiscriminatedKeyValue(Map<String, dynamic> value) {
     final discriminatorValue = value[discriminatorKey];
     return discriminatorValue != null ? schemas[discriminatorValue] : null;
   }
@@ -275,28 +256,29 @@ class DiscriminatedObjectSchema extends SchemaValue<Map<String, dynamic>> {
   }
 }
 
-class ObjectSchema extends SchemaValue<Map<String, dynamic>> {
-  final Map<String, SchemaValue> properties;
+class ObjectSchema extends Schema<Map<String, dynamic>> {
+  final Map<String, Schema> properties;
   final bool additionalProperties;
+  final List<String> required;
 
   const ObjectSchema(
     this.properties, {
-    super.required = false,
     this.additionalProperties = false,
     super.validators = const [],
+    this.required = const [],
   });
 
   @override
   ObjectSchema copyWith({
-    bool? required,
     bool? additionalProperties,
-    Map<String, SchemaValue>? properties,
+    List<String>? required,
+    Map<String, Schema>? properties,
     List<Validator<Map<String, dynamic>>>? validators,
   }) {
     return ObjectSchema(
       properties ?? this.properties,
       additionalProperties: additionalProperties ?? this.additionalProperties,
-      required: required ?? isRequired,
+      required: required ?? this.required,
       validators: validators ?? this.validators,
     );
   }
@@ -306,14 +288,14 @@ class ObjectSchema extends SchemaValue<Map<String, dynamic>> {
     return value is Map<String, dynamic> ? value : null;
   }
 
-  T? getSchemaValue<T extends SchemaValue>(String key) {
+  T? getSchemaValue<T extends Schema>(String key) {
     return properties[key] as T?;
   }
 
   ObjectSchema extend(
-    Map<String, SchemaValue> properties, {
+    Map<String, Schema> properties, {
     bool? additionalProperties,
-    bool? required,
+    List<String>? required,
     List<Validator<Map<String, dynamic>>>? validators,
   }) {
     // if property SchemaValue is of SchemaMap, we need to merge them
@@ -329,8 +311,8 @@ class ObjectSchema extends SchemaValue<Map<String, dynamic>> {
         mergedProperties[key] = existingProp.extend(
           prop.properties,
           additionalProperties: additionalProperties,
-          required: required,
           validators: validators,
+          required: required,
         );
       } else {
         mergedProperties[key] = prop;
@@ -339,58 +321,101 @@ class ObjectSchema extends SchemaValue<Map<String, dynamic>> {
 
     return copyWith(
       properties: mergedProperties,
-      required: required,
       additionalProperties: additionalProperties,
       validators: validators,
+      required: required,
     );
   }
 
   @override
   ValidationResult validateValue(
-      List<String> path, Map<String, dynamic> value) {
-    // At this point, we are guaranteed `parsedValue` is a Map<String,dynamic> due to tryParse.
-
+    List<String> path,
+    Map<String, dynamic> value,
+  ) {
     final keys = value.keys.toSet();
-    final requiredKeys = properties.entries
-        .where((entry) => entry.value.isRequired)
-        .map((entry) => entry.key)
-        .toSet();
-
-    // Check missing required keys
-    final missingKeys = requiredKeys.difference(keys);
-    if (missingKeys.isNotEmpty) {
-      // Collect all errors for missing keys
-      return ValidationResult(
-        path,
-        errors: missingKeys
-            .map((key) => RequiredPropMissingValidationError(property: key))
-            .toList(),
-      );
-    }
 
     final validationErrors = <ValidationError>[];
 
-    // Check additional properties
-    if (!additionalProperties) {
-      final extraKeys = keys.difference(properties.keys.toSet());
-      for (final key in extraKeys) {
-        validationErrors
-            .add(UnalowedAdditionalPropertyValidationError(propertyKey: key));
-      }
-      if (validationErrors.isNotEmpty) {
-        return ValidationResult(path, errors: validationErrors);
-      }
-    }
+    final requiredKeys = properties.entries
+        .where((entry) => required.contains(entry.key))
+        .map((entry) => entry.key)
+        .toSet();
 
     // Validate each property
     for (final entry in properties.entries) {
       final key = entry.key;
+
+      if (!keys.contains(key) && !additionalProperties) {
+        validationErrors.add(
+          UnalowedAdditionalPropertyValidationError(propertyKey: key),
+        );
+        continue;
+      }
+
       final schema = entry.value;
       final prop = value[key];
+      if (prop == null) {
+        if (requiredKeys.contains(key)) {
+          validationErrors.add(
+            RequiredPropMissingValidationError(property: key),
+          );
+        }
+        continue;
+      }
       final result = schema.validate([...path, key], prop);
       if (!result.isValid) {
         return result;
       }
+    }
+
+    return ValidationResult.valid(path);
+  }
+}
+
+class SchemaList<T extends Schema<V>, V> extends Schema<List<V>> {
+  final T itemSchema;
+  const SchemaList(
+    this.itemSchema, {
+    super.validators = const [],
+  });
+
+  @override
+  SchemaList<T, V> copyWith({
+    bool? required,
+    List<Validator<List<V>>>? validators,
+  }) {
+    return SchemaList(
+      itemSchema,
+      validators: validators ?? this.validators,
+    );
+  }
+
+  @override
+  List<V>? tryParse(Object? value) {
+    if (value is List) {
+      if (value is List<V>) return value;
+      final isInvalid = value.any((v) => itemSchema.tryParse(v) == null);
+
+      if (isInvalid) {
+        return null;
+      }
+      return value as List<V>;
+    }
+    return null;
+  }
+
+  @override
+  ValidationResult validateValue(List<String> path, List<V> value) {
+    final errors = <ValidationError>[];
+    for (var i = 0; i < value.length; i++) {
+      final result = itemSchema.validate([...path, i.toString()], value[i]!);
+      if (!result.isValid) {
+        errors.addAll(result.errors);
+      }
+    }
+
+    if (errors.isNotEmpty) {
+      return ValidationResult(path, errors: errors);
     }
 
     return ValidationResult.valid(path);

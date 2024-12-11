@@ -1,31 +1,17 @@
-import 'package:superdeck_cli/src/generator_pipeline.dart';
-import 'package:superdeck_core/superdeck_core.dart';
+// ignore_for_file: avoid-duplicate-cascades
 
-class SdMarkdownParsingException implements Exception {
-  final SchemaValidationException exception;
-  final int slideLocation;
+import 'package:source_span/source_span.dart';
+import 'package:superdeck_cli/src/helpers/logger.dart';
 
-  SdMarkdownParsingException(this.exception, this.slideLocation);
+sealed class SDException implements Exception {}
 
-  String get location => exception.result.path.join(' | ');
-
-  List<String> get messages {
-    return exception.result.errors.map((e) => e.message).toList();
-  }
-}
-
-class SdTaskException implements Exception {
+class SDTaskException implements SDException {
   final int slideIndex;
   final String taskName;
-  final TaskContext controller;
+
   final Exception exception;
 
-  SdTaskException(
-    this.taskName,
-    this.controller,
-    this.exception,
-    this.slideIndex,
-  );
+  const SDTaskException(this.taskName, this.exception, this.slideIndex);
 
   String get message {
     return 'Error running task on slide $slideIndex';
@@ -35,40 +21,20 @@ class SdTaskException implements Exception {
   String toString() => message;
 }
 
-class SdFormatException implements Exception {
-  final String message;
-  final int? offset;
-  final String source;
+class SDFormatException extends SourceSpanFormatException {
+  SDFormatException(super.message, super.span, [super.source]);
+}
 
-  SdFormatException(
-    this.message, [
-    this.source = '',
-    this.offset,
-  ]);
+void printException(Exception e) {
+  if (e is SDTaskException) {
+    logger
+      ..err('slide: ${e.slideIndex}')
+      ..err('Task error: ${e.taskName}');
 
-  int? get lineNumber {
-    return source.substring(0, offset).split('\n').length;
-  }
-
-  String? get lineContent {
-    return source.split('\n')[lineNumber! - 1];
-  }
-
-  int? get columnNumber {
-    final lines = source.split('\n');
-    int totalOffset = 0;
-
-    for (int i = 0; i < lineNumber! - 1; i++) {
-      // +1 for the newline character
-      totalOffset += lines[i].length + 1;
-    }
-
-    // Convert zero-based index to one-based
-    return offset! - totalOffset + 1;
-  }
-
-  @override
-  String toString() {
-    return message;
+    printException(e.exception);
+  } else if (e is SDFormatException) {
+    logger.formatError(e);
+  } else {
+    logger.err(e.toString());
   }
 }

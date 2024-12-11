@@ -23,7 +23,6 @@ class PresentationLoaderBuilder extends StatefulWidget {
 
 class _PresentationLoaderBuilderState extends State<PresentationLoaderBuilder> {
   final _deckRepository = DeckRepository(
-    canRunLocal: kCanRunProcess,
     decoder: (String contents) => compute(jsonDecode, contents),
     assetLoader: (String path) {
       return kCanRunProcess
@@ -34,37 +33,47 @@ class _PresentationLoaderBuilderState extends State<PresentationLoaderBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _deckRepository.loadSlides(),
-        builder: (context, snapshot) {
-          return Stack(
-            children: [
-              if (snapshot.hasData) widget.builder(snapshot.requireData),
-              if (snapshot.hasError)
-                Center(
-                  child: Text('Error loading presentation ${snapshot.error}'),
-                ),
-              LoadingOverlay(
-                isLoading: snapshot.connectionState == ConnectionState.waiting,
-              ),
-            ],
-          );
-        });
-    // return StreamBuilder(
-    //     stream: _deckRepository.watch(),
-    //     builder: (context, snapshot) {
-    //       return Stack(
-    //         children: [
-    //           if (snapshot.hasData) widget.builder(snapshot.requireData),
-    //           if (snapshot.hasError)
-    //             Center(
-    //               child: Text('Error loading presentation ${snapshot.error}'),
-    //             ),
-    //           LoadingOverlay(
-    //             isLoading: snapshot.connectionState == ConnectionState.waiting,
-    //           ),
-    //         ],
-    //       );
-    //     });
+    Widget buildSnapshot(
+        BuildContext context, AsyncSnapshot<List<Slide>> snapshot) {
+      return Stack(
+        children: [
+          if (snapshot.hasData) widget.builder(snapshot.requireData),
+          if (snapshot.hasError)
+            Center(
+              child: Text('Error loading presentation ${snapshot.error}'),
+            ),
+          LoadingOverlay(
+            isLoading: snapshot.connectionState == ConnectionState.waiting,
+          ),
+        ],
+      );
+    }
+
+    if (kCanRunProcess) {
+      return StreamBuilder(
+        stream: _deckRepository.watch(),
+        builder: buildSnapshot,
+      );
+    } else {
+      return FutureBuilder(
+          future: _deckRepository.loadSlides(), builder: buildSnapshot);
+    }
   }
+
+  // return StreamBuilder(
+  //     stream: _deckRepository.watch(),
+  //     builder: (context, snapshot) {
+  //       return Stack(
+  //         children: [
+  //           if (snapshot.hasData) widget.builder(snapshot.requireData),
+  //           if (snapshot.hasError)
+  //             Center(
+  //               child: Text('Error loading presentation ${snapshot.error}'),
+  //             ),
+  //           LoadingOverlay(
+  //             isLoading: snapshot.connectionState == ConnectionState.waiting,
+  //           ),
+  //         ],
+  //       );
+  //     });
 }

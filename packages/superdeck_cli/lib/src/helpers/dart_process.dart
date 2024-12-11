@@ -1,42 +1,43 @@
-import 'dart:convert';
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
+import 'package:source_span/source_span.dart';
 import 'package:superdeck_cli/src/helpers/exceptions.dart';
-import 'package:superdeck_core/superdeck_core.dart';
 
 class DartProcess {
-  // static Future<Process> _run(List<String> args) async {
-  //   return Process.start('dart', args, mode: ProcessStartMode.inheritStdio);
-  // }
-
-  // runSync
-  static ProcessResult _runSync(List<String> args) {
-    return Process.runSync('dart', args);
+  static Future<ProcessResult> _run(List<String> args) {
+    return Process.run('dart', args);
   }
 
-  static String format(String code) {
-    final hash = assetHash(code); // Generate a hash for the code
-    final tempFile = File('${Directory.systemTemp.path}/$hash.dart');
+  static Future<String> format(String code) async {
+    // create a temp file with the code
+    final tempFile = File(
+      p.join(
+        Directory.systemTemp.path,
+        'temp_${DateTime.now().millisecondsSinceEpoch}.dart',
+      ),
+    );
     try {
-      tempFile.createSync(recursive: true);
+      await tempFile.create(recursive: true);
 
-      tempFile.writeAsStringSync(code);
+      await tempFile.writeAsString(code);
 
-      final result = _runSync(['format', '--fix', tempFile.path]);
+      final result = await _run(['format', '--fix', tempFile.path]);
 
       if (result.exitCode != 0) {
         throw _handleFormattingError(result.stderr as String, code);
       }
-      return tempFile.readAsStringSync();
+
+      return await tempFile.readAsString();
     } finally {
-      if (tempFile.existsSync()) {
-        tempFile.deleteSync();
+      if (await tempFile.exists()) {
+        await tempFile.delete();
       }
     }
   }
 }
 
-SdFormatException _handleFormattingError(String stderr, String source) {
+SDFormatException _handleFormattingError(String stderr, String source) {
   final match =
       RegExp(r'line (\d+), column (\d+) of .*: (.+)').firstMatch(stderr);
 
@@ -45,22 +46,23 @@ SdFormatException _handleFormattingError(String stderr, String source) {
     final column = int.parse(match.group(2)!);
     final message = match.group(3)!;
 
-    // Calculate the zero-based offset
-    final lines = LineSplitter().convert(source);
-    int offset = 0;
+    // Create a SourceFile from the source code
+    final sourceFile = SourceFile.fromString(source);
 
-    // Calculate the offset by summing the lengths of all preceding lines
-    for (int i = 0; i < line - 1; i++) {
-      offset += lines[i].length + 1; // +1 for the newline character
-    }
-    offset += column - 1; // Add the column offset within the line
-
-    return SdFormatException(
-      'Dart code formatting error: $message',
-      source,
-      offset,
+    // Get the location using line and column (converting to 0-based indices)
+    final location = sourceFile.location(
+      sourceFile.getOffset(line - 1, column - 1),
     );
-  } else {
-    return SdFormatException('Error formatting dart code: $stderr');
+
+    // Create a point span at the error location
+    final span = location.pointSpan();
+
+    return SDFormatException(
+      'Dart code formatting error: $message',
+      span,
+      source,
+    );
   }
+
+  return SDFormatException('Error formatting dart code: $stderr', null, source);
 }

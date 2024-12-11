@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:superdeck_core/superdeck_core.dart';
 
 import '../../modules/presentation/presentation_hooks.dart';
 
@@ -13,10 +12,9 @@ class NotePanel extends HookWidget {
   Widget build(BuildContext context) {
     final slide = useDeck.activeSlide();
 
-    final notes =
-        slide.notes.isEmpty ? [Note(content: 'No notes')] : slide.notes;
+    final notes = slide.comments.isEmpty ? ['No notes'] : slide.comments;
 
-    if (slide.notes.isEmpty) return const SizedBox.shrink();
+    if (slide.comments.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -37,7 +35,7 @@ class NotePanel extends HookWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: notes
                     .map(
-                      (note) => Text(note.content),
+                      (note) => Text(note),
                     )
                     .toList(),
               ),

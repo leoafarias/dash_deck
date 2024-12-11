@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mix/mix.dart';
@@ -35,14 +34,14 @@ class SlideData with SlideDataMappable {
         _background = background,
         _widgets = widgets;
 
-  Asset? getAssetByReference(String contents) {
-    final reference = assetHash(contents);
+  // LocalAsset? getAssetByReference(String contents) {
+  //   final reference = assetHash(contents);
 
-    return _slide.assets.firstWhereOrNull((asset) =>
-        asset.path == contents ||
-        asset.reference == contents ||
-        asset.reference == reference);
-  }
+  //   return _slide.assets.firstWhereOrNull((asset) =>
+  //       asset.path == contents ||
+  //       asset.key == contents ||
+  //       asset.key == reference);
+  // }
 
   SlideOptions get options => _slide.options ?? const SlideOptions();
 
@@ -52,7 +51,7 @@ class SlideData with SlideDataMappable {
 
   List<SectionBlock> get sections => _slide.sections;
 
-  List<Note> get notes => _slide.notes;
+  List<String> get comments => _slide.comments;
 
   String get markdown => _slide.markdown;
 

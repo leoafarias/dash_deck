@@ -1,54 +1,52 @@
 import 'package:mason_logger/mason_logger.dart';
+import 'package:source_span/source_span.dart';
 import 'package:superdeck_cli/src/helpers/exceptions.dart';
 
 final logger = Logger(
-  // Optionally, specify a log level (defaults to Level.info).
-  level: Level.info,
   // Optionally, specify a custom `LogTheme` to override log styles.
   theme: LogTheme(),
+  // Optionally, specify a log level (defaults to Level.info).
+  level: Level.info,
 );
 
 extension LoggerX on Logger {
-  void formatError(SdFormatException exception) {
+  void formatError(SDFormatException exception) {
     final message = exception.message;
-    final source = exception.source;
+    final sourceSpan = exception.source as SourceSpan;
+    final source = sourceSpan.text;
+    final start = sourceSpan.start;
 
-    final arrow = _createArrow(exception.columnNumber ?? 0);
+    final arrow = _createArrow(start.column);
 
     final splitLines = source.split('\n');
 
-    // Get the longes line
+    // Get the longest line
     final longestLine = splitLines.fold<int>(0, (prev, element) {
       return element.length > prev ? element.length : prev;
     });
 
     String padline(String line, [int? index]) {
       final pageNumber = index != null ? '${index + 1}' : ' ';
-      return ' $pageNumber | ' + line.padRight(longestLine + 2);
+
+      return ' $pageNumber | ${line.padRight(longestLine + 2)}';
     }
 
     // Print the error message with the source code
     newLine();
     err('Formatting Error:');
     newLine();
-    info(
-        '$message on line ${exception.lineNumber}, column ${exception.columnNumber}');
+    info('$message on line ${start.line + 1}, column ${start.column + 1}');
     newLine();
 
-    final exceptionLineNumber = exception.lineNumber ?? 0;
+    final exceptionLineNumber = start.line;
 
     // Calculate only 4 lines before and after the error line
-    final start = (exceptionLineNumber - 5).clamp(0, splitLines.length);
-    final end = (exceptionLineNumber + 5).clamp(0, splitLines.length);
+    final startLine = (exceptionLineNumber - 5).clamp(0, splitLines.length);
+    final endLine = (exceptionLineNumber + 5).clamp(0, splitLines.length);
 
-    for (int i = 0; i < splitLines.length; i++) {
-      final lineNumber = i + 1;
+    for (int i = startLine; i <= endLine; i++) {
       final currentLineContent = splitLines[i];
-      final isErrorLine = lineNumber == exception.lineNumber;
-
-      if (lineNumber < start || lineNumber > end) {
-        continue;
-      }
+      final isErrorLine = i == exceptionLineNumber;
 
       if (isErrorLine) {
         info(padline(currentLineContent, i), style: _highlightLine);
@@ -67,7 +65,7 @@ extension LoggerX on Logger {
 }
 
 String _createArrow(int column) {
-  return ' ' * (column - 1) + '^';
+  return '${' ' * column}^';
 }
 
 String? _formatErrorStyle(String? m) {

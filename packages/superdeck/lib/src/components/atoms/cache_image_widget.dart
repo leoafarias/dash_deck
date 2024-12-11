@@ -1,10 +1,8 @@
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
-import 'package:superdeck_core/superdeck_core.dart';
 
 import '../../modules/common/helpers/constants.dart';
 
@@ -67,34 +65,4 @@ class CachedImage extends StatelessWidget {
       },
     );
   }
-}
-
-Size _calculateImageSize(Size size, Asset? asset) {
-  int? cacheWidth;
-  int? cacheHeight;
-  //  check if height or asset is larger
-  if (asset != null) {
-    // cache the smallest dimension of the image
-    // So set the other dimension to null
-    if (asset.isPortrait) {
-      cacheHeight = math.min(size.height, asset.height).toInt();
-    } else {
-      cacheWidth = math.min(size.width, asset.width).toInt();
-    }
-  } else {
-    // If no asset is available, set both cacheWidth and cacheHeight
-    final ifHeightIsBigger = size.height > size.width;
-
-// cache the smallest
-    if (ifHeightIsBigger) {
-      cacheWidth = size.width.toInt();
-    } else {
-      cacheHeight = size.height.toInt();
-    }
-  }
-
-  return Size(
-    cacheWidth?.toDouble() ?? size.width,
-    cacheHeight?.toDouble() ?? size.height,
-  );
 }

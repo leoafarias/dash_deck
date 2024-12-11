@@ -211,23 +211,38 @@ class ImageElementBuilder extends MarkdownElementBuilder {
     final fromBlock = Provider.maybeOf<_ImageElementData>(fromHeroContext);
     final toBlock = Provider.maybeOf<_ImageElementData>(toHeroContext);
 
-    if (fromBlock == null || toBlock == null) {
-      return const SizedBox();
+    Widget buildImageWidget(Size size, ImageSpec spec, Uri uri) {
+      return Container(
+        constraints: BoxConstraints.tight(size),
+        child: CachedImage(
+          uri: uri,
+          spec: spec,
+        ),
+      );
     }
 
-    final interpolatedSize =
-        Size.lerp(fromBlock.size, toBlock.size, animation.value)!;
+    if (fromBlock == null || toBlock == null) {
+      final block = fromBlock ?? toBlock;
+      return buildImageWidget(
+        block!.size,
+        block.spec,
+        block.uri,
+      );
+    }
+
+    final interpolatedSize = Size.lerp(
+      fromBlock.size,
+      toBlock.size,
+      animation.value,
+    )!;
 
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {
-        return Container(
-          constraints: BoxConstraints.tight(interpolatedSize),
-          child: CachedImage(
-            uri: animation.value < 0.5 ? fromBlock.uri : toBlock.uri,
-            targetSize: interpolatedSize,
-            spec: fromBlock.spec.lerp(toBlock.spec, animation.value),
-          ),
+        return buildImageWidget(
+          interpolatedSize,
+          fromBlock.spec.lerp(toBlock.spec, animation.value),
+          animation.value < 0.5 ? fromBlock.uri : toBlock.uri,
         );
       },
     );
@@ -372,7 +387,10 @@ class CodeElementBuilder extends MarkdownElementBuilder {
         Provider.maybeOf<_CodeElementData>(toHeroContext) ?? fromBlock;
 
     Widget buildCodeWidget(
-        Size size, MarkdownCodeblockSpec spec, List<TextSpan> spans) {
+      Size size,
+      MarkdownCodeblockSpec spec,
+      List<TextSpan> spans,
+    ) {
       return Wrap(
         clipBehavior: Clip.hardEdge,
         children: [
@@ -398,17 +416,12 @@ class CodeElementBuilder extends MarkdownElementBuilder {
     }
 
     if (toBlock == null || fromBlock == null) {
-      return toBlock == null
-          ? buildCodeWidget(
-              fromBlock!.size,
-              fromBlock.spec,
-              SyntaxHighlight.render(fromBlock.text, fromBlock.language),
-            )
-          : buildCodeWidget(
-              toBlock.size,
-              toBlock.spec,
-              SyntaxHighlight.render(toBlock.text, toBlock.language),
-            );
+      final block = fromBlock ?? toBlock;
+      return buildCodeWidget(
+        block!.size,
+        block.spec,
+        SyntaxHighlight.render(block.text, block.language),
+      );
     }
 
     return AnimatedBuilder(

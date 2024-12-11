@@ -525,7 +525,7 @@ class ColumnBlockMapper extends SubClassMapperBase<ColumnBlock> {
   @override
   final String discriminatorKey = 'type';
   @override
-  final dynamic discriminatorValue = MappableClass.useAsDefault;
+  final dynamic discriminatorValue = 'column';
   @override
   late final ClassMapperBase superMapper = BlockMapper.ensureInitialized();
 

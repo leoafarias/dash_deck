@@ -1,8 +1,8 @@
 [
   {
-    "key": "w2wlREdN",
+    "key": "docUTq6Q",
     "options": {},
-    "markdown": "{@column}\n\n## Another image Another image Another image Another image Another image Another image Another image Another image Another image Another image {.here}\n\n{@column}\n\n\n\n![mermaid](.superdeck/generated/wgsvOvJJ.png) {.code}",
+    "markdown": "{@column}\n\n## Another image Another image Another image Another image Another image Another image Another image Another image Another image Another image {.here}\n\n{@column}\n\n\n\n![mermaid](mermaid_wgsvOvJJ.png) {.code}",
     "sections": [
       {
         "blocks": [
@@ -12,7 +12,7 @@
             "scrollable": false
           },
           {
-            "content": "![mermaid](.superdeck/generated/wgsvOvJJ.png) {.code}",
+            "content": "![mermaid](mermaid_wgsvOvJJ.png) {.code}",
             "type": "column",
             "scrollable": false
           }
@@ -20,18 +20,18 @@
         "type": "section"
       }
     ],
-    "notes": [],
+    "comments": [],
     "assets": [
       {
-        "path": ".superdeck/generated/wgsvOvJJ.png",
-        "width": 168,
-        "height": 772,
-        "reference": "wgsvOvJJ"
+        "key": "wgsvOvJJ",
+        "file_name": "wgsvOvJJ",
+        "extension": "png",
+        "type": "mermaid"
       }
     ]
   },
   {
-    "key": "4OPpCLpy",
+    "key": "s6rAq9Gn",
     "options": {},
     "markdown": "{@section}\n{@section flex: 2}\n{@column\n  align: center\n  flex: 2\n}\n\n\n```dart\nColumn(\n  crossAxisAlignment: CrossAxisAlignment.start,\n  children: spans.map((span) {\n    return RichText(\n      text: TextSpan(\n        style: interpolatedSpec.textStyle,\n        children: [span],\n      ),\n    );\n  }).toList(),\n)\n```{.code}\n\n{@column}\n\n![structured_output](https://picsum.photos/800/1400) {.cover}",
     "sections": [
@@ -58,15 +58,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_4OPpCLpy.png",
-        "width": 512,
-        "height": 288,
-        "reference": "4OPpCLpy"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "rPTQlMdP",
@@ -89,15 +82,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_rPTQlMdP.png",
-        "width": 512,
-        "height": 288,
-        "reference": "rPTQlMdP"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "ECisD4gC",
@@ -120,15 +106,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_ECisD4gC.png",
-        "width": 512,
-        "height": 288,
-        "reference": "ECisD4gC"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "P6nguqAy",
@@ -153,18 +132,11 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_P6nguqAy.png",
-        "width": 512,
-        "height": 288,
-        "reference": "P6nguqAy"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
-    "key": "htEZFxsa",
+    "key": "kYWa7y5P",
     "options": {},
     "markdown": "{@column}\n\n{@column \n  align: center_left \n  flex: 2\n}\n> [!WARNING]  \n> This presentation contains live AI-generated content. Unexpected things may occur during the demonstration. \n\n{@column}",
     "sections": [
@@ -190,15 +162,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_htEZFxsa.png",
-        "width": 512,
-        "height": 288,
-        "reference": "htEZFxsa"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "D4etKl0J",
@@ -229,15 +194,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_D4etKl0J.png",
-        "width": 512,
-        "height": 288,
-        "reference": "D4etKl0J"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "A8nJ3H8k",
@@ -260,15 +218,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_A8nJ3H8k.png",
-        "width": 512,
-        "height": 288,
-        "reference": "A8nJ3H8k"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "9mHDFwa9",
@@ -286,18 +237,11 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_9mHDFwa9.png",
-        "width": 512,
-        "height": 288,
-        "reference": "9mHDFwa9"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
-    "key": "bsXHyPoa",
+    "key": "DH56wp0H",
     "options": {},
     "markdown": "{@column}\n{@column\n  flex: 2\n  align: center\n}\nCreates dynamic, context-aware UIs by interpreting actions and maintaining state with LLMs for fluid, interactive responses.{.animate}\n\n{@column}",
     "sections": [
@@ -322,15 +266,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_bsXHyPoa.png",
-        "width": 512,
-        "height": 288,
-        "reference": "bsXHyPoa"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "3sLdrfsM",
@@ -348,15 +285,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_3sLdrfsM.png",
-        "width": 512,
-        "height": 288,
-        "reference": "3sLdrfsM"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "CsyEcFYH",
@@ -380,15 +310,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_CsyEcFYH.png",
-        "width": 512,
-        "height": 288,
-        "reference": "CsyEcFYH"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "zB26rHOq",
@@ -411,11 +334,11 @@
         "type": "section"
       }
     ],
-    "notes": [],
+    "comments": [],
     "assets": []
   },
   {
-    "key": "9jtc9i8W",
+    "key": "E91UAp8B",
     "options": {},
     "markdown": "{@column}\n\n### Structured Output\n\n{@column}\n```dart\nfinal schema = Schema.array(\n  description: 'List of recipes',\n  items: Schema.object(\n    properties: {\n      'recipeName': Schema.string(\n        description: 'Name of the recipe.',\n        nullable: false,\n      ),\n    },\n    requiredProperties: ['recipeName'],\n  ),\n);\n```",
     "sections": [
@@ -435,18 +358,11 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_9jtc9i8W.png",
-        "width": 512,
-        "height": 288,
-        "reference": "9jtc9i8W"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
-    "key": "CtLOsx2s",
+    "key": "wvZOvQz1",
     "options": {},
     "markdown": "{@section}\n```dart\n\nfinal model = GenerativeModel(\n  model: 'gemini-1.5-pro',\n  apiKey: apiKey,\n  generationConfig: GenerationConfig(\n    responseMimeType: 'application/json',\n    responseSchema: schema,\n  ),\n);\n\nfinal prompt = 'List a few popular cookie recipes.';\nfinal response = await model.generateContent([Content.text(prompt)]);\n\n```",
     "sections": [
@@ -461,15 +377,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_CtLOsx2s.png",
-        "width": 512,
-        "height": 288,
-        "reference": "CtLOsx2s"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "6EU2Xxrf",
@@ -487,15 +396,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_6EU2Xxrf.png",
-        "width": 512,
-        "height": 288,
-        "reference": "6EU2Xxrf"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "qek7UrZY",
@@ -513,15 +415,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_qek7UrZY.png",
-        "width": 512,
-        "height": 288,
-        "reference": "qek7UrZY"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "Gh3bTZb2",
@@ -549,7 +444,7 @@
         "type": "section"
       }
     ],
-    "notes": [],
+    "comments": [],
     "assets": []
   },
   {
@@ -578,7 +473,7 @@
         "type": "section"
       }
     ],
-    "notes": [],
+    "comments": [],
     "assets": []
   },
   {
@@ -597,15 +492,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_H0jUl8Aj.png",
-        "width": 512,
-        "height": 288,
-        "reference": "H0jUl8Aj"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "5rmJo1pB",
@@ -636,15 +524,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_5rmJo1pB.png",
-        "width": 512,
-        "height": 288,
-        "reference": "5rmJo1pB"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "1n3nxlhk",
@@ -673,7 +554,7 @@
         "type": "section"
       }
     ],
-    "notes": [],
+    "comments": [],
     "assets": []
   },
   {
@@ -700,15 +581,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_Zn801w4G.png",
-        "width": 512,
-        "height": 288,
-        "reference": "Zn801w4G"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "aY8Y9HBu",
@@ -733,15 +607,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_aY8Y9HBu.png",
-        "width": 512,
-        "height": 288,
-        "reference": "aY8Y9HBu"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "g8ZxHmlw",
@@ -770,7 +637,7 @@
         "type": "section"
       }
     ],
-    "notes": [],
+    "comments": [],
     "assets": []
   },
   {
@@ -789,15 +656,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_pNxPyfLK.png",
-        "width": 512,
-        "height": 288,
-        "reference": "pNxPyfLK"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "5cGNbsJx",
@@ -815,15 +675,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_5cGNbsJx.png",
-        "width": 512,
-        "height": 288,
-        "reference": "5cGNbsJx"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "sas6s4nZ",
@@ -850,7 +703,7 @@
         "type": "section"
       }
     ],
-    "notes": [],
+    "comments": [],
     "assets": []
   },
   {
@@ -869,15 +722,8 @@
         "type": "section"
       }
     ],
-    "notes": [],
-    "assets": [
-      {
-        "path": ".superdeck/generated/thumbnail_3kW1wOHd.png",
-        "width": 512,
-        "height": 288,
-        "reference": "3kW1wOHd"
-      }
-    ]
+    "comments": [],
+    "assets": []
   },
   {
     "key": "UqCN11cB",
@@ -895,7 +741,7 @@
         "type": "section"
       }
     ],
-    "notes": [],
+    "comments": [],
     "assets": []
   }
 ]

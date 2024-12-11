@@ -6,24 +6,28 @@ import 'package:superdeck_cli/src/helpers/dart_process.dart';
 class DartFormatterTask extends Task {
   DartFormatterTask() : super('dart_formatter');
 
-  @override
-  FutureOr<void> run(context) async {
-    final formattedMarkdown = _formatDartCodeBlocks(context);
-
-    context.slide = context.slide.updateMarkdown(formattedMarkdown);
-  }
-
-  String _formatDartCodeBlocks(
-    TaskContext controller,
-  ) {
+  Future<String> _formatDartCodeBlocks(TaskContext controller) async {
     final codeBlockRegex = RegExp('```dart\n(.*?)\n```');
-    final markdown = controller.slide.markdown;
-    return markdown.replaceAllMapped(codeBlockRegex, (match) {
+    var markdown = controller.slide.markdown;
+
+    final matches = codeBlockRegex.allMatches(markdown);
+
+    for (final match in matches) {
       final code = match.group(1)!;
 
-      final formattedCode = DartProcess.format(code);
+      final formattedCode = await DartProcess.format(code);
 
-      return '```dart\n$formattedCode\n```';
-    });
+      markdown =
+          markdown.replaceAll(match.group(0)!, '```dart\n$formattedCode\n```');
+    }
+
+    return markdown;
+  }
+
+  @override
+  FutureOr<void> run(TaskContext context) async {
+    final formattedMarkdown = await _formatDartCodeBlocks(context);
+
+    context.slide.markdown = formattedMarkdown;
   }
 }

@@ -11,7 +11,9 @@ enum BlockType {
   column,
   image,
   widget,
-  dartpad,
+  dartpad;
+
+  static final schema = Schema.enumValue(values);
 }
 
 @MappableClass(discriminatorKey: 'type')
@@ -33,7 +35,7 @@ abstract class Block with BlockMappable {
     return copyWith.$merge(other);
   }
 
-  static parse(BlockType blockType, Map<String, dynamic> map) {
+  static Block parse(BlockType blockType, Map<String, dynamic> map) {
     return switch (blockType) {
       BlockType.column => ColumnBlock.parse(map),
       BlockType.image => ImageBlock.parse(map),
@@ -45,10 +47,10 @@ abstract class Block with BlockMappable {
 
   static final schema = Schema.object(
     {
-      "type": Schema.string.isEnum(BlockType.values),
-      "align": ContentAlignment.schema.optional(),
-      "flex": Schema.int.optional(),
-      "scrollable": Schema.boolean.optional(),
+      "type": BlockType.schema,
+      "align": ContentAlignment.schema,
+      "flex": Schema.int(),
+      "scrollable": Schema.boolean(),
     },
   );
 }
@@ -113,7 +115,7 @@ class SectionBlock extends Block with SectionBlockMappable {
   }
 
   static final schema = Block.schema.extend({
-    'blocks': Schema.list(ColumnBlock.typeSchema).optional(),
+    'blocks': Schema.list(ColumnBlock.typeSchema),
   });
 
   SectionBlock appendContent(ColumnBlock part) {
@@ -137,8 +139,8 @@ class ColumnBlock extends Block with ColumnBlockMappable {
   String get content => _content ?? '';
 
   static final schema = Block.schema.extend({
-    'content': Schema.string.optional(),
-    'scrollable': Schema.boolean.optional(),
+    'content': Schema.string(),
+    'scrollable': Schema.boolean(),
   });
 
   static ColumnBlock parse(Map<String, dynamic> map) {
@@ -181,12 +183,17 @@ class ImageBlock extends ColumnBlock with ImageBlockMappable {
     return ImageBlockMapper.fromMap(map);
   }
 
-  static final schema = ColumnBlock.schema.extend({
-    "fit": ImageFit.schema,
-    "src": Schema.string.required(),
-    "width": Schema.double.optional(),
-    "height": Schema.double.optional(),
-  });
+  static final schema = ColumnBlock.schema.extend(
+    {
+      "fit": ImageFit.schema,
+      "src": Schema.string(),
+      "width": Schema.double(),
+      "height": Schema.double(),
+    },
+    required: [
+      "src",
+    ],
+  );
 }
 
 @MappableClass(
@@ -214,8 +221,11 @@ class WidgetBlock extends ColumnBlock with WidgetBlockMappable {
 
   static final schema = ColumnBlock.schema.extend(
     {
-      "name": Schema.string.required(),
+      "name": Schema.string(),
     },
+    required: [
+      "name",
+    ],
     additionalProperties: true,
   );
 }
@@ -225,7 +235,7 @@ enum DartPadTheme {
   dark,
   light;
 
-  static final schema = Schema.string.isEnum(values);
+  static final schema = Schema.enumValue(values);
 }
 
 @MappableClass()
@@ -249,11 +259,16 @@ class DartPadBlock extends ColumnBlock with DartPadBlockMappable {
     return DartPadBlockMapper.fromMap(map);
   }
 
-  static final schema = ColumnBlock.schema.extend({
-    'id': Schema.string.required(),
-    'theme': DartPadTheme.schema.optional(),
-    'embed': Schema.boolean.optional(),
-  });
+  static final schema = ColumnBlock.schema.extend(
+    {
+      'id': Schema.string(),
+      'theme': DartPadTheme.schema,
+      'embed': Schema.boolean(),
+    },
+    required: [
+      "id",
+    ],
+  );
 }
 
 typedef Decoder<T> = T Function(Map<String, dynamic>);
@@ -272,7 +287,7 @@ enum ImageFit {
   none,
   scaleDown;
 
-  static final schema = Schema.string.isEnum(values);
+  static final schema = Schema.enumValue(values);
 }
 
 @MappableEnum()
@@ -287,14 +302,5 @@ enum ContentAlignment {
   bottomCenter,
   bottomRight;
 
-  static final schema = Schema.string.isEnum(values);
-}
-
-extension on SchemaValue<String> {
-  SchemaValue<String> isEnum<T extends Enum>(List<T> values) {
-    return copyWith(validators: [
-      ...validators,
-      ArrayValidator(values.map((e) => e.name.snakeCase()).toList()),
-    ]);
-  }
+  static final schema = Schema.enumValue(values);
 }

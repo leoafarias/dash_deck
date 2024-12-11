@@ -3,6 +3,8 @@ description: A starting point for Dart libraries or applications.
 version: 0.0.1
 # repository: https://github.com/my_org/my_repo
 
+executables:
+  superdeck: main
 environment:
   sdk: ">=3.3.0 <4.0.0"
 
@@ -12,7 +14,6 @@ dependencies:
   path: ^1.9.0
   collection: ^1.18.0
   image: ^4.3.0
-  watcher: ^1.1.0
   dart_style: ^2.3.7
   yaml_writer: ^2.0.1
   http: ^1.2.2
@@ -22,7 +23,10 @@ dependencies:
   yaml_edit: ^2.2.1
   markdown: ^7.2.2
   logging: ^1.3.0
+  scope: ^5.1.0
+  source_span: ^1.10.0
 
 dev_dependencies:
+  dart_code_metrics_presets: ^2.19.0
   lints: ^5.0.0
   test: ^1.25.8

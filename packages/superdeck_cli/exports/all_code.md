@@ -649,7 +649,7 @@ class MermaidConverterTask extends Task {
   }
 
   @override
-  Future<void> run(context) async {
+  Future<void> run(TaskContext context) async {
     final mermaidBlockRegex = RegExp(r'```mermaid.*?([\s\S]*?)```');
     final slide = context.slide;
 

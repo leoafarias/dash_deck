@@ -1,1 +1,1 @@
-export 'package:superdeck_cli/src/runner.dart' show SuperdeckRunner;
+export 'package:superdeck_cli/src/runner.dart';

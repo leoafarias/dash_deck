@@ -1,14 +1,14 @@
-import 'package:superdeck_core/src/helpers/asset_hash.dart';
+import 'package:superdeck_core/src/helpers/generate_hash.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('shortHashId', () {
+  group('generateValueHash', () {
     test('generates unique hash for different input strings', () {
       String input1 = 'hello world';
       String input2 = 'hello world!';
 
-      String hash1 = assetHash(input1);
-      String hash2 = assetHash(input2);
+      String hash1 = generateValueHash(input1);
+      String hash2 = generateValueHash(input2);
 
       expect(hash1, isNot(equals(hash2)));
     });
@@ -16,8 +16,8 @@ void main() {
     test('generates same hash for same input string', () {
       String input = 'test input';
 
-      String hash1 = assetHash(input);
-      String hash2 = assetHash(input);
+      String hash1 = generateValueHash(input);
+      String hash2 = generateValueHash(input);
 
       expect(hash1, equals(hash2));
     });
@@ -25,7 +25,7 @@ void main() {
     test('generates 8-character hash', () {
       String input = 'some long input string';
 
-      String hash = assetHash(input);
+      String hash = generateValueHash(input);
 
       expect(hash.length, equals(8));
     });
@@ -33,7 +33,7 @@ void main() {
     test('generates hash with valid characters', () {
       String input = 'another input';
 
-      String hash = assetHash(input);
+      String hash = generateValueHash(input);
 
       expect(hash, matches(RegExp(r'^[a-zA-Z0-9]{8}$')));
     });
@@ -41,7 +41,7 @@ void main() {
     test('handles empty input string', () {
       String input = '';
 
-      String hash = assetHash(input);
+      String hash = generateValueHash(input);
 
       expect(hash.length, equals(8));
     });
@@ -49,7 +49,7 @@ void main() {
     test('handles input string with unsupported characters', () {
       String input = 'input with spaces and !@#\$%^&*()';
 
-      String hash = assetHash(input);
+      String hash = generateValueHash(input);
 
       expect(hash.length, equals(8));
       expect(hash, matches(RegExp(r'^[a-zA-Z0-9]{8}$')));

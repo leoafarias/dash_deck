@@ -15,6 +15,7 @@ String updatePubspecAssets(String yamlContent) {
 
   // Get the 'flutter' section from the parsed YAML, or an empty map if it doesn't exist
   final flutterSection =
+      // ignore: avoid-dynamic
       {...(parsedYaml['flutter'] ?? {}) as Map}.cast<String, dynamic>();
 
   // Get the 'assets' list from the 'flutter' section, or an empty list if it doesn't exist

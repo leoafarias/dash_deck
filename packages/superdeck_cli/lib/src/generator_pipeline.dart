@@ -1,43 +1,49 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:logging/logging.dart';
 import 'package:superdeck_cli/src/helpers/exceptions.dart';
 import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
-import 'package:superdeck_cli/src/parsers/slide_parser.dart';
+import 'package:superdeck_cli/src/parsers/section_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 class TaskContext {
-  SlideRaw slide;
+  RawSlide slide;
 
-  TaskContext(
-    this.slide,
-  );
+  final List<LocalAsset> _assetsUsed = [];
 
-  final List<AssetRaw> _assetsUsed = [];
+  TaskContext(this.slide);
 
-  Future<void> writeAsset(AssetRaw asset, List<int> bytes) async {
+  Future<void> writeAsset(LocalAsset asset, List<int> bytes) async {
     await File(asset.path).writeAsBytes(bytes);
     _assetsUsed.add(asset);
   }
 
-  Future<bool> checkAssetExists(AssetRaw asset) async {
+  Future<bool> checkAssetExists(LocalAsset asset) async {
     if (await File(asset.path).exists()) {
       _assetsUsed.add(asset);
+
       return true;
     }
+
     return false;
   }
 
-  Future<Slide> buildSlide() async {
-    return SlideConverter.convert(slide, _assetsUsed);
+  Slide buildSlide() {
+    return Slide(
+      key: slide.key,
+      options: SlideOptions.fromMap(slide.options),
+      markdown: slide.markdown,
+      sections: parseSections(slide.markdown),
+      comments: slide.comments,
+      assets: _assetsUsed,
+    );
   }
 }
 
 class TaskPipeline {
   final List<Task> tasks;
-  final repository = DeckRepository(canRunLocal: true);
+  final repository = DeckRepository();
 
   TaskPipeline(this.tasks);
 
@@ -48,8 +54,11 @@ class TaskPipeline {
     for (var task in tasks) {
       try {
         await task.run(context);
-      } on Exception catch (e) {
-        throw SdTaskException(task.name, context, e, slideIndex);
+      } on Exception catch (e, stackTrace) {
+        Error.throwWithStackTrace(
+          SDTaskException(task.name, e, slideIndex),
+          stackTrace,
+        );
       }
     }
 
@@ -64,21 +73,16 @@ class TaskPipeline {
     final futures = <Future<TaskContext>>[];
 
     for (var i = 0; i < slides.length; i++) {
-      futures.add(_runEachSlide(
-        i,
-        TaskContext(slides[i]),
-      ));
+      futures.add(_runEachSlide(i, TaskContext(slides[i])));
     }
 
     final contexts = await Future.wait(futures);
 
-    final finalizedSlides = await Future.wait(contexts.map(
-      (context) => context.buildSlide(),
-    ));
+    final finalizedSlides = contexts.map((context) => context.buildSlide());
 
     final neededAssets = finalizedSlides.expand((slide) => slide.assets);
 
-    await _cleanupGeneratedFiles(neededAssets);
+    await _cleanupGeneratedFiles(repository.generatedDir, neededAssets);
 
     for (var task in tasks) {
       await task.dispose();
@@ -92,8 +96,11 @@ class TaskPipeline {
   }
 }
 
-Future<void> _cleanupGeneratedFiles(Iterable<Asset> assets) async {
-  final files = await _loadGeneratedFiles();
+Future<void> _cleanupGeneratedFiles(
+  Directory generatedDir,
+  Iterable<LocalAsset> assets,
+) async {
+  final files = await _loadGeneratedFiles(generatedDir);
   final neededPaths = assets.map((asset) => asset.path).toSet();
 
   for (var file in files) {
@@ -107,38 +114,23 @@ Future<void> _cleanupGeneratedFiles(Iterable<Asset> assets) async {
 
 abstract class Task {
   final String name;
-  final repository = DeckRepository();
+
+  late final logger = Logger('Task: $name');
+
   Task(this.name);
 
   FutureOr<void> run(TaskContext context);
 
-  late final logger = Logger('Task: $name');
-
-  Future<String> dartProcess(String code) async {
-    final process = await Process.start('dart', ['format', '--fix'],
-        mode: ProcessStartMode.inheritStdio);
-
-    process.stdin.writeln(code);
-    process.stdin.close();
-
-    final output = await process.stdout.transform(utf8.decoder).join();
-    final error = await process.stderr.transform(utf8.decoder).join();
-
-    if (error.isNotEmpty) {
-      throw Exception('Error formatting dart code: $error');
-    }
-
-    return output;
-  }
-
   // Dispose or anything here
-  FutureOr<void> dispose() {}
+  FutureOr<void> dispose() {
+    return Future.value();
+  }
 }
 
-Future<List<File>> _loadGeneratedFiles() async {
+Future<List<File>> _loadGeneratedFiles(Directory generatedDir) async {
   final files = <File>[];
 
-  await for (var entity in kGeneratedAssetsDir.list()) {
+  await for (var entity in generatedDir.list()) {
     if (entity is File) {
       files.add(entity);
     }
