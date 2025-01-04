@@ -68,8 +68,6 @@ class DeckController extends Controller {
           : '0';
       final slideIndex = int.tryParse(pathParam) ?? 0;
 
-      print('Slide index: $slideIndex');
-
       if (slideIndex != _currentSlideIndex) {
         _currentSlideIndex = slideIndex;
       }
