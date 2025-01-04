@@ -332,7 +332,8 @@ class ObjectSchema extends Schema<Map<String, dynamic>> {
     List<String> path,
     Map<String, dynamic> value,
   ) {
-    final keys = value.keys.toSet();
+    final valueKeys = value.keys.toSet();
+    final schemaKeys = properties.keys.toSet();
 
     final validationErrors = <ValidationError>[];
 
@@ -341,18 +342,23 @@ class ObjectSchema extends Schema<Map<String, dynamic>> {
         .map((entry) => entry.key)
         .toSet();
 
-    // Validate each property
-    for (final entry in properties.entries) {
-      final key = entry.key;
+    final allKeys = valueKeys.union(schemaKeys);
 
-      if (!keys.contains(key) && !additionalProperties) {
+    // Validate each property
+    for (final key in allKeys) {
+      if (!schemaKeys.contains(key) && !additionalProperties) {
         validationErrors.add(
           UnalowedAdditionalPropertyValidationError(propertyKey: key),
         );
         continue;
       }
 
-      final schema = entry.value;
+      final schema = properties[key];
+
+      if (schema == null) {
+        continue;
+      }
+
       final prop = value[key];
       if (prop == null) {
         if (requiredKeys.contains(key)) {
@@ -366,6 +372,10 @@ class ObjectSchema extends Schema<Map<String, dynamic>> {
       if (!result.isValid) {
         return result;
       }
+    }
+
+    if (validationErrors.isNotEmpty) {
+      return ValidationResult(path, errors: validationErrors);
     }
 
     return ValidationResult.valid(path);

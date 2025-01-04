@@ -37,7 +37,7 @@ class SuperDeckApp extends StatelessWidget {
     return PresentationLoaderBuilder(
       builder: (data) {
         return SuperDeckProvider(
-          slides: data,
+          slides: data.isEmpty ? [Slide.noSlides()] : data,
           config: DeckConfiguration(
             baseStyle: baseStyle ?? const DeckStyle(),
             styles: styles,

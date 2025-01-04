@@ -23,13 +23,13 @@ sealed class LocalAsset with LocalAssetMappable {
 
   static final schema = Schema.object(
     {
-      "fileName": Schema.string(),
+      "file_name": Schema.string(),
       "extension": LocalAssetExtension.schema,
       "key": Schema.string(),
       "type": Schema.string(),
     },
     required: [
-      "fileName",
+      "file_name",
       "extension",
       "key",
       "type",

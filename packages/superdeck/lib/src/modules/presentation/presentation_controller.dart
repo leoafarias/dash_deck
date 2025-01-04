@@ -278,27 +278,6 @@ GoRouter _buildRouter(List<SlideData> slides) {
       ]);
 }
 
-class SlideRoute extends GoRoute {
-  SlideRoute({
-    required Widget Function(BuildContext, GoRouterState) builder,
-  }) : super(
-          path: SDPaths.slides.goRoute,
-          pageBuilder: (context, state) => getPageTransition(
-            builder(context, state),
-            state,
-          ),
-          routes: [
-            GoRoute(
-              path: SDPaths.slides.slide.goRoute,
-              pageBuilder: (context, state) => getPageTransition(
-                builder(context, state),
-                state,
-              ),
-            ),
-          ],
-        );
-}
-
 CustomTransitionPage<void> getPageTransition(
   Widget child,
   GoRouterState state,

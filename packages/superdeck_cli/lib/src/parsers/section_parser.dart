@@ -20,8 +20,6 @@ List<SectionBlock> parseSections(String markdown) {
   // Use a for loop instead of a while loop with manual index increments
   // This reduces complexity and off-by-one error risks.
   for (var i = 0; i < lines.length; i++) {
-    final line = lines[i];
-
     final blockContent = _readBlockContent(lines, i);
 
     if (blockContent != null) {
@@ -44,6 +42,7 @@ List<SectionBlock> parseSections(String markdown) {
         }
       }
     } else {
+      final line = lines[i];
       // Normal text line, just append to the current section.
       currentSection ??= SectionBlock();
       currentSection = currentSection.appendLine(line);
@@ -128,9 +127,12 @@ List<SyntaxTagData> extractTagContents(String tagContent) {
     Map<String, dynamic> options;
     try {
       options = convertYamlToMap(rawOptions);
-    } catch (e) {
-      throw FormatException(
-        'Cannot parse options for "$blockTypeStr": $rawOptions',
+    } catch (e, stackTrace) {
+      Error.throwWithStackTrace(
+        FormatException(
+          'Cannot parse options for "$blockTypeStr": $rawOptions',
+        ),
+        stackTrace,
       );
     }
 

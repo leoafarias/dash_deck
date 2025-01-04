@@ -27,6 +27,6 @@ class SlideOptions with SlideOptionsMappable {
       "title": Schema.string(),
       "style": Schema.string(),
     },
-    additionalProperties: false,
+    additionalProperties: true,
   );
 }

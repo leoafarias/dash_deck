@@ -56,7 +56,9 @@ class _PresentationLoaderBuilderState extends State<PresentationLoaderBuilder> {
       );
     } else {
       return FutureBuilder(
-          future: _deckRepository.loadSlides(), builder: buildSnapshot);
+        future: _deckRepository.loadSlides(),
+        builder: buildSnapshot,
+      );
     }
   }
 

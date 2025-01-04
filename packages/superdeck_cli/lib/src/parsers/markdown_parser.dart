@@ -133,6 +133,8 @@ class MarkdownParser {
         final parsed = loadYaml(yamlString);
         if (parsed is YamlMap) {
           yamlMap = jsonDecode(jsonEncode(parsed)) as Map<String, dynamic>?;
+        } else if (parsed is String) {
+          yamlMap = {'$parsed': null} as Map<String, dynamic>?;
         }
       } catch (e) {
         logger.err('Cannot parse yaml frontmatter: $e');

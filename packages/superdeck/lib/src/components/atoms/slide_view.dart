@@ -14,9 +14,9 @@ class SlideView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final totalFlex = slide.sections
-        .map((e) => e.flex ?? 1)
-        .reduce((value, element) => value + element);
+    final totalFlex = slide.sections.fold(0, (sum, e) => sum + (e.flex ?? 1));
+    final normalizedFlex = totalFlex == 0 ? 1 : totalFlex;
+    final hasSections = slide.sections.isNotEmpty;
     return Provider(
       data: slide,
       child: SpecBuilder(
@@ -30,17 +30,20 @@ class SlideView extends StatelessWidget {
                     Positioned.fill(
                       child: slide.buildBackground(),
                     ),
-                    Column(
-                      children: slide.sections
-                          .map(
-                            (e) => Expanded(
-                              flex: e.flex ?? 1,
-                              child: SectionBlockWidget(e,
-                                  heightPercentage: (e.flex ?? 1) / totalFlex),
-                            ),
+                    hasSections
+                        ? Column(
+                            children: slide.sections
+                                .map(
+                                  (e) => Expanded(
+                                    flex: e.flex ?? 1,
+                                    child: SectionBlockWidget(e,
+                                        heightPercentage:
+                                            (e.flex ?? 1) / normalizedFlex),
+                                  ),
+                                )
+                                .toList(),
                           )
-                          .toList(),
-                    ),
+                        : Container(),
                   ],
                 ),
               ),

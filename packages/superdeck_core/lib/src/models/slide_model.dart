@@ -39,4 +39,18 @@ class Slide with SlideMappable {
     schema.validateOrThrow(map);
     return SlideMapper.fromMap(map);
   }
+
+  factory Slide.noSlides() => Slide(
+        key: 'empty',
+        markdown: 'No slides found',
+        sections: [
+          SectionBlock(
+            blocks: [
+              ColumnBlock(
+                content: 'No slides found',
+              ),
+            ],
+          ),
+        ],
+      );
 }

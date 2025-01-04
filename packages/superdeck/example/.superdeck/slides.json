@@ -31,7 +31,15 @@
     ]
   },
   {
-    "key": "s6rAq9Gn",
+    "key": "ToUV8xcA",
+    "options": {},
+    "markdown": "",
+    "sections": [],
+    "comments": [],
+    "assets": []
+  },
+  {
+    "key": "4OPpCLpy",
     "options": {},
     "markdown": "{@section}\n{@section flex: 2}\n{@column\n  align: center\n  flex: 2\n}\n\n\n```dart\nColumn(\n  crossAxisAlignment: CrossAxisAlignment.start,\n  children: spans.map((span) {\n    return RichText(\n      text: TextSpan(\n        style: interpolatedSpec.textStyle,\n        children: [span],\n      ),\n    );\n  }).toList(),\n)\n```{.code}\n\n{@column}\n\n![structured_output](https://picsum.photos/800/1400) {.cover}",
     "sections": [
@@ -86,9 +94,9 @@
     "assets": []
   },
   {
-    "key": "ECisD4gC",
+    "key": "1fa2WWM3",
     "options": {},
-    "markdown": "{@column}\n\n![structured_output](https://picsum.photos/800/1400) {.cover}\n\n{@column}\n\n## Another image{.here}",
+    "markdown": "{@column}\n\n![structured_output](https://picsum.photos/800/1400) {.cover}\n\n{@column}\n\n## Yes different image{.here}",
     "sections": [
       {
         "blocks": [
@@ -98,7 +106,7 @@
             "scrollable": false
           },
           {
-            "content": "## Another image{.here}",
+            "content": "## Yes different image{.here}",
             "type": "column",
             "scrollable": false
           }
