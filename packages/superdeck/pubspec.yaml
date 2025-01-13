@@ -43,6 +43,7 @@ dependencies:
   google_fonts: ^6.2.1
   dart_mappable: ^4.3.0
   meta: ^1.15.0
+  signals: ^6.0.2
   
 dev_dependencies:
   flutter_test:

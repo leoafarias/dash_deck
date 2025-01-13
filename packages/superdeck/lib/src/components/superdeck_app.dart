@@ -104,7 +104,7 @@ class _SuperDeckProviderState extends State<SuperDeckProvider> {
 
   @override
   Widget build(BuildContext context) {
-    return Provider(
+    return Data(
       data: _presentation,
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

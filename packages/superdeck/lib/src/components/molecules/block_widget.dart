@@ -50,7 +50,7 @@ class SectionBlockWidget extends StatelessWidget {
 
   @override
   Widget build(context) {
-    final slide = Provider.of<SlideData>(context);
+    final slide = Data.of<SlideData>(context);
 
     final children = section.blocks.map((block) {
       final flex = block.flex ?? 1;
@@ -77,7 +77,7 @@ class SectionBlockWidget extends StatelessWidget {
             final sizeOffset = getSizeWithoutSpacing(spec.blockContainer);
 
             return spec.blockContainer(
-              child: Provider(
+              child: Data(
                 data: BlockData(
                   block: block,
                   spec: spec,
@@ -141,9 +141,8 @@ class ColumnBlockWidget extends _BlockWidget<ColumnBlock> {
   Widget build(context) {
     final content = block.content;
 
-    final blockData = Provider.of<BlockData>(context);
-    final capturing =
-        Provider.maybeOf<CapturingData>(context)?.isCapturing == true;
+    final blockData = Data.of<BlockData>(context);
+    final capturing = Data.maybeOf<CapturingData>(context)?.isCapturing == true;
 
     Widget current = MarkdownViewer(
       content: content,
@@ -196,8 +195,8 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetBlock> {
 
   @override
   Widget build(context) {
-    final slide = Provider.of<SlideData>(context);
-    final blockData = Provider.of<BlockData>(context);
+    final slide = Data.of<SlideData>(context);
+    final blockData = Data.of<BlockData>(context);
 
     final widgetBuilder = slide.getWidget(block.name);
 

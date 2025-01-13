@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
+import 'package:signals/signals_flutter.dart';
+import 'package:superdeck/src/modules/thumbnail/slide_capture_service.dart';
+import 'package:superdeck_core/superdeck_core.dart';
 
 import '../../modules/common/helpers/constants.dart';
 import '../../modules/presentation/slide_data.dart';
-import '../../modules/thumbnail/thumbnail_controller.dart';
 import 'cache_image_widget.dart';
 import 'loading_indicator.dart';
 
@@ -38,91 +42,87 @@ class SlideThumbnail extends StatefulWidget {
 }
 
 class _SlideThumbnailState extends State<SlideThumbnail> {
-  late ThumbnailController _thumbnailController;
+  final _deckRepository = DeckRepository();
+  final _slideCaptureService = SlideCaptureService();
+  late final _thumbnailGeneration = futureSignal(_load);
 
+  @override
   @override
   void initState() {
     super.initState();
-    _thumbnailController = ThumbnailController()..load(widget.slide);
   }
 
   @override
   void dispose() {
-    _thumbnailController.dispose();
+    _thumbnailGeneration.dispose();
     super.dispose();
   }
 
-  void _handleAction(_PopMenuAction action) {
+  /// Generates the thumbnail for the given [slide].
+  ///
+  /// If [force] is true, it regenerates the thumbnail even if it already exists.
+  Future<File> _generateThumbnail(
+    SlideData slide, {
+    bool force = false,
+  }) async {
+    final thumbnailFile = _deckRepository.getSlideThumbnail(slide.data.key);
+
+    if (await thumbnailFile.exists() && !force) {
+      return thumbnailFile;
+    }
+
+    final imageData = await _slideCaptureService.generate(slide: slide);
+
+    return await thumbnailFile.writeAsBytes(imageData, flush: true);
+  }
+
+  Future<void> _handleAction(_PopMenuAction action) async {
     switch (action) {
       case _PopMenuAction.refreshThumbnail:
-        _thumbnailController.refresh(widget.slide);
-        break;
+        final thumbnailFile =
+            _deckRepository.getSlideThumbnail(widget.slide.data.key);
+        if (await thumbnailFile.exists()) {
+          await thumbnailFile.delete();
+        }
+        await _thumbnailGeneration.refresh();
     }
+  }
+
+  Future<File> _load() async {
+    return kCanRunProcess
+        ? await _generateThumbnail(widget.slide)
+        : _deckRepository.getSlideThumbnail(widget.slide.data.key);
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-        listenable: _thumbnailController,
-        builder: (context, _) {
-          return GestureDetector(
-            onTap: widget.onTap,
-            onSecondaryTapDown: (details) {
-              _showOverlayMenu(context, details, _handleAction);
-            },
-            child: _PreviewContainer(
-              selected: widget.selected,
-              child: Stack(
-                children: [
-                  AspectRatio(
-                    aspectRatio: kAspectRatio,
-                    child: _thumbnailController.when(
-                        data: (file) {
-                          return Image(
-                            gaplessPlayback: true,
-                            image: getImageProvider(file.uri),
-                          );
-                        },
-                        loading: () => const IsometricLoading(),
-                        error: (error) {
-                          return const Center(
-                            child: Text('Error loading image'),
-                          );
-                        }),
-                  ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    left: 0,
-                    child: SizedBox(
-                      child: _thumbnailController.isRefreshing
-                          ? const LinearProgressIndicator(
-                              minHeight: 3,
-                              backgroundColor: Colors.transparent,
-                            )
-                          : null,
+    return GestureDetector(
+      onTap: widget.onTap,
+      onSecondaryTapDown: (details) {
+        _showOverlayMenu(context, details, _handleAction);
+      },
+      child: _PreviewContainer(
+        selected: widget.selected,
+        child: Stack(
+          children: [
+            AspectRatio(
+                aspectRatio: kAspectRatio,
+                child: Watch.builder(builder: (context) {
+                  return _thumbnailGeneration.value.map(
+                    data: (file) => Image(
+                      gaplessPlayback: true,
+                      image: getImageProvider(file.uri),
                     ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
-                      color: Colors.black.withOpacity(0.9),
-                      child: Text(
-                        '${widget.page}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                    loading: () => const IsometricLoading(),
+                    error: (error) => const Center(
+                      child: Text('Error loading image'),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        });
+                  );
+                })),
+          ],
+        ),
+      ),
+    );
   }
 }
 

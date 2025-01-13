@@ -17,7 +17,7 @@ class SlideView extends StatelessWidget {
     final totalFlex = slide.sections.fold(0, (sum, e) => sum + (e.flex ?? 1));
     final normalizedFlex = totalFlex == 0 ? 1 : totalFlex;
     final hasSections = slide.sections.isNotEmpty;
-    return Provider(
+    return Data(
       data: slide,
       child: SpecBuilder(
         style: slide.style,

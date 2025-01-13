@@ -1,36 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals/signals_flutter.dart';
+import 'package:superdeck/src/modules/presentation/slide_data.dart';
 
 import '../modules/common/helpers/extensions.dart';
 import '../modules/pdf_export/pdf_export_controller.dart';
 import '../modules/presentation/presentation_hooks.dart';
 
-class ExportScreen extends HookWidget {
+class ExportScreen extends StatefulWidget {
   const ExportScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final slides = useDeck.slides();
-    final currentSlideIndex = useDeck.currentPage() - 1;
+  State<ExportScreen> createState() => _ExportScreenState();
+}
 
-    final export = usePdfExportController(
+class _ExportScreenState extends State<ExportScreen> {
+  late final PdfExportController exportController;
+  late final List<SlideData> slides;
+  late final int currentSlideIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    slides = useDeck.slides();
+    currentSlideIndex = useDeck.currentPage() - 1;
+    exportController = PdfExportController(
       slides: slides,
-      slideIndex: currentSlideIndex,
+      initialIndex: currentSlideIndex,
     );
+  }
 
-    final inProgress = export.inProgress;
+  @override
+  void dispose() {
+    exportController.dispose();
+    super.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Stack(
       children: [
         Dialog.fullscreen(
-          child: export.render(),
+          child: exportController.render(),
         ),
         Positioned.fill(
           child: Container(
             color: const Color.fromARGB(255, 14, 14, 14).withOpacity(0.9),
           ),
         ),
-        inProgress ? PdfExportBar(export) : ExportDialog(export),
+        Watch.builder(builder: (context) {
+          final inProgress = exportController.inProgress.value;
+          return inProgress
+              ? PdfExportBar(exportController)
+              : ExportDialog(exportController);
+        }),
       ],
     );
   }
@@ -51,22 +74,35 @@ class PdfExportBar extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          controller.isComplete
-              ? Icon(
-                  Icons.check_circle,
-                  color: context.colorScheme.primary,
-                  size: 32,
-                )
-              : SizedBox(
-                  height: 32,
-                  width: 32,
-                  child: CircularProgressIndicator(
-                    color: context.colorScheme.primary,
-                    value: controller.isBuilding ? null : controller.progress,
-                  ),
-                ),
+          Watch.builder(
+            builder: (context) {
+              final isComplete = controller.isComplete.value;
+              return isComplete
+                  ? Icon(
+                      Icons.check_circle,
+                      color: context.colorScheme.primary,
+                      size: 32,
+                    )
+                  : SizedBox(
+                      height: 32,
+                      width: 32,
+                      child: Watch.builder(
+                        builder: (context) {
+                          final isBuilding = controller.isBuilding.value;
+                          final progress = controller.progress.value;
+                          return CircularProgressIndicator(
+                            color: context.colorScheme.primary,
+                            value: isBuilding ? null : progress,
+                          );
+                        },
+                      ),
+                    );
+            },
+          ),
           const SizedBox(width: 16.0),
-          Text(controller.progressText),
+          Watch.builder(
+            builder: (context) => Text(controller.progressText),
+          ),
         ],
       ),
     );

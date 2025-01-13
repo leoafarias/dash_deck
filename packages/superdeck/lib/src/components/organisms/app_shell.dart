@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:superdeck/src/components/organisms/thumbnail_panel.dart';
 
 import '../../modules/common/helpers/hooks.dart';
 import '../../modules/presentation/presentation_hooks.dart';
@@ -106,10 +107,10 @@ class SplitView extends HookWidget {
             ),
             child: SizedBox(
               width: _thumbnailWidth,
-              child: Column(
+              child: const Column(
                 children: [
-                  Expanded(flex: 3, child: Container()),
-                  const IntrinsicHeight(
+                  Expanded(flex: 3, child: ThumbnailPanel()),
+                  IntrinsicHeight(
                     child: NotePanel(),
                   ),
                 ],

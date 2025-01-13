@@ -8,31 +8,16 @@ UseDeckController get useDeck {
   return UseDeckController();
 }
 
-SlideData useSlide() {
-  final slideData = useProvider<SlideData>();
-  return useMemoized(() => slideData, [slideData]);
-}
-
 class UseDeckController extends UseController<DeckController> {
   UseDeckController();
 
   UseDeckActions actions() {
     final context = useContext();
-    return UseDeckActions(Provider.of<DeckController>(context));
+    return UseDeckActions(Data.of<DeckController>(context));
   }
 
   List<SlideData> slides() => select((controller) => controller.slides);
   DeckConfiguration configuration() => select((c) => c.configuration);
-  SlideData selectSlide(int index) {
-    final allSlides = slides();
-    if (index < 0 || index >= allSlides.length) {
-      throw Exception('Invalid slide index: $index');
-    }
-
-    final selectedSlide = allSlides[index];
-
-    return useMemoized(() => selectedSlide, [selectedSlide]);
-  }
 
   int slideCount() => select((controller) => controller.slides.length);
   bool isMenuOpen() => select((c) => c.isMenuOpen);

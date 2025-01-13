@@ -29,9 +29,7 @@ enum SlideCaptureQuality {
 }
 
 class SlideCaptureService {
-  SlideCaptureService._();
-
-  static final instance = SlideCaptureService._();
+  SlideCaptureService();
 
   static final _generationQueue = <String>{};
   static const _maxConcurrentGenerations = 3;
@@ -95,13 +93,13 @@ class SlideCaptureService {
     Size? targetSize,
   }) async {
     try {
-      final controller = Provider.of<DeckController>(context);
+      final controller = Data.of<DeckController>(context);
 
       final child = InheritedTheme.captureAll(
           context,
-          Provider(
+          Data(
             data: controller,
-            child: Provider(
+            child: Data(
               data: CapturingData(true),
               child: MediaQuery(
                 data: MediaQuery.of(context),
@@ -202,56 +200,4 @@ class SlideCaptureService {
       rethrow;
     }
   }
-}
-
-Future<void> waitForImageProviders(BuildContext context) async {
-  final List<Future<void>> futures = [];
-
-  void visit(Element element) {
-    if (element.widget is Image) {
-      final image = element.widget as Image;
-      final provider = image.image;
-
-      final stream = provider.resolve(ImageConfiguration.empty);
-      final completer = stream.completer;
-      if (completer != null) {
-        futures.add(_waitForImageCompleter(completer));
-      }
-    }
-    if (element.widget is Container) {
-      final container = element.widget as Container;
-      if (container.decoration is BoxDecoration) {
-        final boxDecoration = container.decoration as BoxDecoration;
-        if (boxDecoration.image != null) {
-          final provider = boxDecoration.image!.image;
-          final stream = provider.resolve(ImageConfiguration.empty);
-          final completer = stream.completer;
-
-          if (completer != null) {
-            futures.add(_waitForImageCompleter(completer));
-          }
-        }
-      }
-    }
-    element.visitChildren(visit);
-  }
-
-  context.visitChildElements(visit);
-
-  await Future.wait(futures);
-}
-
-Future<void> _waitForImageCompleter(ImageStreamCompleter completer) {
-  final Completer<void> imageCompleter = Completer<void>();
-
-  void listener(ImageInfo image, bool synchronousCall) {
-    // completer.removeListener(imageListener);
-    imageCompleter.complete();
-  }
-
-  final imageListener = ImageStreamListener(listener);
-
-  completer.addListener(imageListener);
-
-  return imageCompleter.future;
 }

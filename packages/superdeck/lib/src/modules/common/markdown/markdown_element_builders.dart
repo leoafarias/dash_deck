@@ -92,9 +92,9 @@ class TextBuilder extends MarkdownElementBuilder {
     }
 
     return Builder(builder: (context) {
-      final block = Provider.of<BlockData>(context);
+      final block = Data.of<BlockData>(context);
       final contentOffset = getTotalModifierSpacing(spec ?? const TextSpec());
-      return Provider(
+      return Data(
         data: _TextElementData(
           text: _transformLineBreaks(content),
           spec: spec ?? const TextSpec(),
@@ -112,8 +112,8 @@ class TextBuilder extends MarkdownElementBuilder {
     BuildContext fromHeroContext,
     BuildContext toHeroContext,
   ) {
-    final fromBlock = Provider.of<_TextElementData>(fromHeroContext);
-    final toBlock = Provider.of<_TextElementData>(toHeroContext);
+    final fromBlock = Data.of<_TextElementData>(fromHeroContext);
+    final toBlock = Data.of<_TextElementData>(toHeroContext);
 
     return AnimatedBuilder(
       animation: animation,
@@ -165,7 +165,7 @@ class ImageElementBuilder extends MarkdownElementBuilder {
     final uri = Uri.parse(src);
 
     return Builder(builder: (context) {
-      final block = Provider.of<BlockData>(context);
+      final block = Data.of<BlockData>(context);
 
       final contentOffset = getTotalModifierSpacing(spec);
 
@@ -190,7 +190,7 @@ class ImageElementBuilder extends MarkdownElementBuilder {
         );
       }
 
-      return Provider(
+      return Data(
         data: _ImageElementData(
           size: totalSize,
           spec: spec,
@@ -208,8 +208,8 @@ class ImageElementBuilder extends MarkdownElementBuilder {
     BuildContext fromHeroContext,
     BuildContext toHeroContext,
   ) {
-    final fromBlock = Provider.maybeOf<_ImageElementData>(fromHeroContext);
-    final toBlock = Provider.maybeOf<_ImageElementData>(toHeroContext);
+    final fromBlock = Data.maybeOf<_ImageElementData>(fromHeroContext);
+    final toBlock = Data.maybeOf<_ImageElementData>(toHeroContext);
 
     Widget buildImageWidget(Size size, ImageSpec spec, Uri uri) {
       return Container(
@@ -354,7 +354,7 @@ class CodeElementBuilder extends MarkdownElementBuilder {
 
     // Provide _CodeElementData for Hero animations
     return Builder(builder: (context) {
-      final block = Provider.of<BlockData>(context);
+      final block = Data.of<BlockData>(context);
 
       final codeOffset = getTotalModifierSpacing(spec);
 
@@ -363,7 +363,7 @@ class CodeElementBuilder extends MarkdownElementBuilder {
         block.size.height - codeOffset.dy,
       );
 
-      return Provider(
+      return Data(
         data: _CodeElementData(
           text: tagAndContent.content.trim(),
           language: language,
@@ -382,9 +382,8 @@ class CodeElementBuilder extends MarkdownElementBuilder {
     BuildContext fromHeroContext,
     BuildContext toHeroContext,
   ) {
-    final fromBlock = Provider.maybeOf<_CodeElementData>(fromHeroContext);
-    final toBlock =
-        Provider.maybeOf<_CodeElementData>(toHeroContext) ?? fromBlock;
+    final fromBlock = Data.maybeOf<_CodeElementData>(fromHeroContext);
+    final toBlock = Data.maybeOf<_CodeElementData>(toHeroContext) ?? fromBlock;
 
     Widget buildCodeWidget(
       Size size,
