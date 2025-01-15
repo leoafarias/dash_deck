@@ -11,8 +11,6 @@ class ScaledWidget extends StatelessWidget {
     required this.child,
   });
 
-  static double of(BuildContext context) => ScaledWidgetProvider.of(context);
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -72,12 +70,6 @@ class ScaledWidgetProvider extends InheritedWidget {
   });
 
   final double scale;
-
-  static double of(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<ScaledWidgetProvider>()!
-        .scale;
-  }
 
   @override
   bool updateShouldNotify(ScaledWidgetProvider oldWidget) {

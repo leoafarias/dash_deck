@@ -21,7 +21,7 @@ class BlockData {
   });
 
   final SlideSpec spec;
-  final ColumnBlock block;
+  final ContentBlock block;
   final Size size;
 
   @override
@@ -95,12 +95,14 @@ class SectionBlockWidget extends StatelessWidget {
                               mainAxisAlignment: alignment.$1,
                               children: [
                                 switch (block) {
-                                  ImageBlock block => _ImageBlockWidget(block),
+                                  LocalImageBlock block =>
+                                    _ImageBlockWidget(block),
                                   WidgetBlock block =>
                                     _WidgetBlockWidget(block),
-                                  DartPadBlock block =>
+                                  DartCodeSnippetBlock block =>
                                     _DartPadBlockWidget(block),
-                                  ColumnBlock block => ColumnBlockWidget(block),
+                                  ContentBlock block =>
+                                    ColumnBlockWidget(block),
                                 },
                               ],
                             ),
@@ -125,7 +127,7 @@ class SectionBlockWidget extends StatelessWidget {
   }
 }
 
-abstract class _BlockWidget<T extends ColumnBlock> extends StatelessWidget {
+abstract class _BlockWidget<T extends ContentBlock> extends StatelessWidget {
   const _BlockWidget(
     this.block, {
     super.key,
@@ -134,7 +136,7 @@ abstract class _BlockWidget<T extends ColumnBlock> extends StatelessWidget {
   final T block;
 }
 
-class ColumnBlockWidget extends _BlockWidget<ColumnBlock> {
+class ColumnBlockWidget extends _BlockWidget<ContentBlock> {
   const ColumnBlockWidget(super.block, {super.key});
 
   @override
@@ -169,7 +171,7 @@ class ColumnBlockWidget extends _BlockWidget<ColumnBlock> {
   }
 }
 
-class _ImageBlockWidget extends _BlockWidget<ImageBlock> {
+class _ImageBlockWidget extends _BlockWidget<LocalImageBlock> {
   const _ImageBlockWidget(super.block);
 
   @override
@@ -229,12 +231,12 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetBlock> {
   }
 }
 
-class _DartPadBlockWidget extends _BlockWidget<DartPadBlock> {
+class _DartPadBlockWidget extends _BlockWidget<DartCodeSnippetBlock> {
   const _DartPadBlockWidget(super.block);
 
   @override
   Widget build(context) {
-    final DartPadBlock(:id, :theme, :embed) = block;
+    final DartCodeSnippetBlock(:id, :theme, :embed) = block;
 
     final themeName = theme?.name ?? DartPadTheme.dark.name;
 

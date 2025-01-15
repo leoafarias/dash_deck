@@ -84,44 +84,6 @@ List<TextSpan> splitTextSpansByLines(List<TextSpan> spans) {
   return lines.map((lineSpans) => TextSpan(children: lineSpans)).toList();
 }
 
-// /// Splits a list of TextSpans into separate TextSpans for each line.
-// /// Line breaks are preserved as separate TextSpans.
-// List<TextSpan> splitTextSpansByLines(List<TextSpan> spans) {
-//   List<TextSpan> result = [];
-
-//   /// Recursively processes a TextSpan and splits it into lines.
-//   void processSpan(TextSpan span) {
-//     if (span.children != null && span.children!.isNotEmpty) {
-//       // If the span has children, process each child.
-//       for (var child in span.children!) {
-//         if (child is TextSpan) {
-//           processSpan(child);
-//         }
-//       }
-//     } else if (span.text != null) {
-//       // Split the text by line breaks.
-//       List<String> parts = span.text!.split('\n');
-//       for (int i = 0; i < parts.length; i++) {
-//         // Add the text part if it's not empty.
-//         if (parts[i].isNotEmpty) {
-//           result.add(TextSpan(text: parts[i], style: span.style));
-//         }
-//         // If it's not the last part, add a line break TextSpan.
-//         if (i < parts.length - 1) {
-//           result.add(const TextSpan(text: '\n'));
-//         }
-//       }
-//     }
-//   }
-
-//   // Process each top-level TextSpan.
-//   for (var span in spans) {
-//     processSpan(span);
-//   }
-
-//   return result;
-// }
-
 List<int> parseLineNumbers(String input) {
   // Regular expression to find the content within the curly braces
   final regExp = RegExp(r'\{(.*?)\}');

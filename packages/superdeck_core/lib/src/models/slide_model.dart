@@ -46,7 +46,7 @@ class Slide with SlideMappable {
         sections: [
           SectionBlock(
             blocks: [
-              ColumnBlock(
+              ContentBlock(
                 content: 'No slides found',
               ),
             ],

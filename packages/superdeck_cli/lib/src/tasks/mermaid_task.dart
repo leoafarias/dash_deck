@@ -3,7 +3,19 @@ import 'dart:async';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:superdeck_cli/src/generator_pipeline.dart';
 import 'package:superdeck_cli/src/helpers/logger.dart';
+import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
+
+class MermaidBlockParser implements IBlockParser<MermaidBlock> {
+  const MermaidBlockParser();
+  @override
+  MermaidBlock parse(String markdown) {
+    final mermaidBlockRegex = RegExp(r'```mermaid.*?([\s\S]*?)```');
+    final matches = mermaidBlockRegex.allMatches(markdown);
+
+    if (matches.isEmpty) return null;
+  }
+}
 
 class MermaidConverterTask extends Task {
   Browser? _browser;

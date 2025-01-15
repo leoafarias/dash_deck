@@ -1,0 +1,1302 @@
+# Project: superdeck_cli
+# Generated: 2025-01-14 17:24:53.267869
+
+# Complete Repository Structure:
+# (showing all directories and files with token counts)
+
+#lib/ (~19 tokens)
+#  └── superdeck_cli.dart (~19 tokens)
+#  lib/src/ (~1273 tokens)
+#    └── generator_pipeline.dart (~1038 tokens)
+#    └── runner.dart (~235 tokens)
+#    lib/src/commands/ (~760 tokens)
+#      └── build_command.dart (~760 tokens)
+#    lib/src/helpers/ (~3170 tokens)
+#      └── context.dart (~78 tokens)
+#      └── dart_process.dart (~593 tokens)
+#      └── exceptions.dart (~339 tokens)
+#      └── extensions.dart (~719 tokens)
+#      └── logger.dart (~794 tokens)
+#      └── update_pubspec.dart (~647 tokens)
+#    lib/src/parsers/ (~3245 tokens)
+#      └── markdown_parser.dart (~1336 tokens)
+#      └── section_parser.dart (~1909 tokens)
+#    lib/src/tasks/ (~2834 tokens)
+#      └── dart_formatter_task.dart (~329 tokens)
+#      └── image_cache_task.dart (~954 tokens)
+#      └── mermaid_task.dart (~1354 tokens)
+#      └── slide_thumbnail_task.dart (~197 tokens)
+#
+---
+---
+lib/src/commands/build_command.dart
+---
+import 'dart:io';
+
+import 'package:args/command_runner.dart';
+import 'package:mason_logger/mason_logger.dart';
+import 'package:superdeck_cli/src/generator_pipeline.dart';
+import 'package:superdeck_cli/src/helpers/exceptions.dart';
+import 'package:superdeck_cli/src/helpers/extensions.dart';
+import 'package:superdeck_cli/src/helpers/logger.dart';
+import 'package:superdeck_cli/src/helpers/update_pubspec.dart';
+import 'package:superdeck_cli/src/tasks/dart_formatter_task.dart';
+import 'package:superdeck_cli/src/tasks/mermaid_task.dart';
+import 'package:superdeck_cli/src/tasks/slide_thumbnail_task.dart';
+import 'package:superdeck_core/superdeck_core.dart';
+
+class BuildCommand extends Command<int> {
+  final _pipeline = TaskPipeline([
+    MermaidConverterTask(),
+    DartFormatterTask(),
+    SlideThumbnailTask(),
+  ]);
+
+  bool _isRunning = false;
+
+  BuildCommand() : super() {
+    argParser.addFlag(
+      'watch',
+      abbr: 'w',
+      help: 'Watch for changes and build the deck',
+    );
+  }
+
+  Future<void> _runPipeline() async {
+    // wait wihle _isRunning is true
+    while (_isRunning) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+    _isRunning = true;
+    final progress = logger.progress('Generating slides...');
+    try {
+      final slides = await _pipeline.run();
+      progress.complete('Generated ${slides.length} slides.');
+    } on Exception catch (e, stackTrace) {
+      progress.fail();
+      printException(e);
+
+      logger.detail(stackTrace.toString());
+    } finally {
+      _isRunning = false;
+    }
+  }
+
+  @override
+  Future<int> run() async {
+    // Move this later to config
+    final repository = DeckRepository();
+
+    final watch = boolArg('watch');
+
+    await _runPipeline();
+
+    if (watch) {
+      repository.markdownFile
+          .watch(events: FileSystemEvent.modify)
+          .listen((event) => _runPipeline());
+    }
+
+    return ExitCode.success.code;
+  }
+
+  @override
+  String get description => 'Build the deck';
+
+  @override
+  String get name => 'build';
+}
+
+Future<void> prepareSuperdeck() async {
+  final file = File(kPubpsecFile.path);
+  final yamlContents = await file.readAsString();
+  updatePubspecAssets(yamlContents);
+}
+
+
+---
+lib/src/generator_pipeline.dart
+---
+import 'dart:async';
+import 'dart:io';
+
+import 'package:logging/logging.dart';
+import 'package:superdeck_cli/src/helpers/exceptions.dart';
+import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
+import 'package:superdeck_cli/src/parsers/section_parser.dart';
+import 'package:superdeck_core/superdeck_core.dart';
+
+class TaskContext {
+  RawSlide slide;
+
+  final List<LocalAsset> _assetsUsed = [];
+
+  TaskContext(this.slide);
+
+  Future<void> writeAsset(LocalAsset asset, List<int> bytes) async {
+    await File(asset.path).writeAsBytes(bytes);
+    _assetsUsed.add(asset);
+  }
+
+  Future<bool> checkAssetExists(LocalAsset asset) async {
+    if (await File(asset.path).exists()) {
+      _assetsUsed.add(asset);
+
+      return true;
+    }
+
+    return false;
+  }
+
+  Slide buildSlide() {
+    return Slide(
+      key: slide.key,
+      options: SlideOptions.fromMap(slide.options),
+      markdown: slide.markdown,
+      sections: parseSections(slide.markdown),
+      comments: slide.comments,
+      assets: _assetsUsed,
+    );
+  }
+}
+
+class TaskPipeline {
+  final List<Task> tasks;
+  final repository = DeckRepository();
+
+  TaskPipeline(this.tasks);
+
+  Future<TaskContext> _runEachSlide(
+    int slideIndex,
+    TaskContext context,
+  ) async {
+    for (var task in tasks) {
+      try {
+        await task.run(context);
+      } on Exception catch (e, stackTrace) {
+        Error.throwWithStackTrace(
+          SDTaskException(task.name, e, slideIndex),
+          stackTrace,
+        );
+      }
+    }
+
+    return context;
+  }
+
+  Future<List<Slide>> run() async {
+    final markdownRaw = await repository.loadMarkdown();
+
+    final slides = MarkdownParser.parse(markdownRaw);
+
+    final futures = <Future<TaskContext>>[];
+
+    for (var i = 0; i < slides.length; i++) {
+      futures.add(_runEachSlide(i, TaskContext(slides[i])));
+    }
+
+    final contexts = await Future.wait(futures);
+
+    final finalizedSlides = contexts.map((context) => context.buildSlide());
+
+    final neededAssets = finalizedSlides.expand((slide) => slide.assets);
+
+    await _cleanupGeneratedFiles(repository.generatedDir, neededAssets);
+
+    for (var task in tasks) {
+      await task.dispose();
+    }
+
+    final newSlides = finalizedSlides.toList();
+
+    await repository.saveSlides(newSlides);
+
+    return newSlides;
+  }
+}
+
+Future<void> _cleanupGeneratedFiles(
+  Directory generatedDir,
+  Iterable<LocalAsset> assets,
+) async {
+  final files = await _loadGeneratedFiles(generatedDir);
+  final neededPaths = assets.map((asset) => asset.path).toSet();
+
+  for (var file in files) {
+    if (!neededPaths.contains(file.path)) {
+      if (await file.exists()) {
+        await file.delete();
+      }
+    }
+  }
+}
+
+abstract class Task {
+  final String name;
+
+  late final logger = Logger('Task: $name');
+
+  Task(this.name);
+
+  FutureOr<void> run(TaskContext context);
+
+  // Dispose or anything here
+  FutureOr<void> dispose() {
+    return Future.value();
+  }
+}
+
+Future<List<File>> _loadGeneratedFiles(Directory generatedDir) async {
+  final files = <File>[];
+
+  await for (var entity in generatedDir.list()) {
+    if (entity is File) {
+      files.add(entity);
+    }
+  }
+
+  return files;
+}
+
+
+---
+lib/src/helpers/context.dart
+---
+import 'package:scope/scope.dart';
+
+final contextKey = ScopeKey<SDCliContext>();
+
+SDCliContext get ctx => use(contextKey, withDefault: () => SDCliContext());
+
+class SDCliContext {
+  const SDCliContext();
+}
+
+
+---
+lib/src/helpers/dart_process.dart
+---
+import 'dart:io';
+
+import 'package:path/path.dart' as p;
+import 'package:source_span/source_span.dart';
+import 'package:superdeck_cli/src/helpers/exceptions.dart';
+
+class DartProcess {
+  static Future<ProcessResult> _run(List<String> args) {
+    return Process.run('dart', args);
+  }
+
+  static Future<String> format(String code) async {
+    // create a temp file with the code
+    final tempFile = File(
+      p.join(
+        Directory.systemTemp.path,
+        'temp_${DateTime.now().millisecondsSinceEpoch}.dart',
+      ),
+    );
+    try {
+      await tempFile.create(recursive: true);
+
+      await tempFile.writeAsString(code);
+
+      final result = await _run(['format', '--fix', tempFile.path]);
+
+      if (result.exitCode != 0) {
+        throw _handleFormattingError(result.stderr as String, code);
+      }
+
+      return await tempFile.readAsString();
+    } finally {
+      if (await tempFile.exists()) {
+        await tempFile.delete();
+      }
+    }
+  }
+}
+
+SDFormatException _handleFormattingError(String stderr, String source) {
+  final match =
+      RegExp(r'line (\d+), column (\d+) of .*: (.+)').firstMatch(stderr);
+
+  if (match != null) {
+    final line = int.parse(match.group(1)!);
+    final column = int.parse(match.group(2)!);
+    final message = match.group(3)!;
+
+    // Create a SourceFile from the source code
+    final sourceFile = SourceFile.fromString(source);
+
+    // Get the location using line and column (converting to 0-based indices)
+    final location = sourceFile.location(
+      sourceFile.getOffset(line - 1, column - 1),
+    );
+
+    // Create a point span at the error location
+    final span = location.pointSpan();
+
+    return SDFormatException(
+      'Dart code formatting error: $message',
+      span,
+      source,
+    );
+  }
+
+  return SDFormatException('Error formatting dart code: $stderr', null, source);
+}
+
+
+---
+lib/src/helpers/exceptions.dart
+---
+// ignore_for_file: avoid-duplicate-cascades
+
+import 'package:source_span/source_span.dart';
+import 'package:superdeck_cli/src/helpers/logger.dart';
+
+sealed class SDException implements Exception {}
+
+class SDTaskException implements SDException {
+  final int slideIndex;
+  final String taskName;
+
+  final Exception exception;
+
+  const SDTaskException(this.taskName, this.exception, this.slideIndex);
+
+  String get message {
+    return 'Error running task on slide $slideIndex';
+  }
+
+  @override
+  String toString() => message;
+}
+
+class SDFormatException extends SourceSpanFormatException {
+  SDFormatException(super.message, super.span, [super.source]);
+}
+
+void printException(Exception e) {
+  if (e is SDTaskException) {
+    logger
+      ..err('slide: ${e.slideIndex}')
+      ..err('Task error: ${e.taskName}');
+
+    printException(e.exception);
+  } else if (e is SDFormatException) {
+    logger.formatError(e);
+  } else {
+    logger.err(e.toString());
+  }
+}
+
+
+---
+lib/src/helpers/extensions.dart
+---
+import 'dart:io';
+
+import 'package:args/command_runner.dart';
+import 'package:superdeck_core/superdeck_core.dart';
+import 'package:yaml_writer/yaml_writer.dart';
+
+extension FileExt on File {
+  Future<void> ensureWrite(String content) async {
+    if (!await exists()) {
+      await create(recursive: true);
+    }
+
+    await writeAsString(content);
+  }
+
+  Future<void> ensureExists() async {
+    if (!await exists()) {
+      await create(recursive: true);
+    }
+  }
+}
+
+extension DirectoryExt on Directory {
+  Future<void> ensureExists() async {
+    if (!await exists()) {
+      await create(recursive: true);
+    }
+  }
+}
+
+extension SlideX on Slide {
+  String toMarkdown() {
+    final buffer = StringBuffer();
+
+    final options = this.options?.toMap();
+
+    buffer.writeln('---');
+    if (options != null && options.isNotEmpty) {
+      buffer.write(YamlWriter().write(options));
+    }
+    buffer.writeln('---');
+
+    buffer.writeln(markdown);
+
+    return buffer.toString();
+  }
+}
+
+extension CommandExtension on Command {
+  /// Checks if the command-line option named [name] was parsed,
+  /// safely handling null argResults.
+  bool wasParsed(String name) => argResults?.wasParsed(name) ?? false;
+
+  /// Gets the parsed command-line option named [name] as `bool`.
+  bool boolArg(String name) => argResults?[name] == true;
+
+  /// Gets the parsed command-line option named [name] as `String`,
+  /// handles null and empty strings without relying on a 'null' literal.
+  String? stringArg(String name) {
+    final arg = argResults?[name];
+    if (arg is! String || arg.isEmpty || arg == 'null') {
+      return null;
+    }
+
+    return arg;
+  }
+
+  /// Gets the parsed command-line option named [name] as `int`,
+  /// converting a parsed string if available.
+  int? intArg(String name) {
+    final value = stringArg(name);
+
+    return (value == null) ? null : int.tryParse(value);
+  }
+
+  /// Gets the parsed command-line option named [name] as `List<String>`,
+  /// and ensures a non-null, typed list is returned.
+  List<String> stringsArg(String name) {
+    final arg = argResults?[name];
+    if (arg is List) {
+      return arg.whereType<String>().toList();
+    }
+
+    return [];
+  }
+}
+
+
+---
+lib/src/helpers/logger.dart
+---
+import 'package:mason_logger/mason_logger.dart';
+import 'package:source_span/source_span.dart';
+import 'package:superdeck_cli/src/helpers/exceptions.dart';
+
+final logger = Logger(
+  // Optionally, specify a custom `LogTheme` to override log styles.
+  theme: LogTheme(),
+  // Optionally, specify a log level (defaults to Level.info).
+  level: Level.info,
+);
+
+extension LoggerX on Logger {
+  void formatError(SDFormatException exception) {
+    final message = exception.message;
+    final sourceSpan = exception.source as SourceSpan;
+    final source = sourceSpan.text;
+    final start = sourceSpan.start;
+
+    final arrow = _createArrow(start.column);
+
+    final splitLines = source.split('\n');
+
+    // Get the longest line
+    final longestLine = splitLines.fold<int>(0, (prev, element) {
+      return element.length > prev ? element.length : prev;
+    });
+
+    String padline(String line, [int? index]) {
+      final pageNumber = index != null ? '${index + 1}' : ' ';
+
+      return ' $pageNumber | ${line.padRight(longestLine + 2)}';
+    }
+
+    // Print the error message with the source code
+    newLine();
+    err('Formatting Error:');
+    newLine();
+    info('$message on line ${start.line + 1}, column ${start.column + 1}');
+    newLine();
+
+    final exceptionLineNumber = start.line;
+
+    // Calculate only 4 lines before and after the error line
+    final startLine = (exceptionLineNumber - 5).clamp(0, splitLines.length);
+    final endLine = (exceptionLineNumber + 5).clamp(0, splitLines.length);
+
+    for (int i = startLine; i <= endLine; i++) {
+      final currentLineContent = splitLines[i];
+      final isErrorLine = i == exceptionLineNumber;
+
+      if (isErrorLine) {
+        info(padline(currentLineContent, i), style: _highlightLine);
+        info(padline(arrow), style: _highlightLine);
+      } else {
+        _formatCodeBlock(padline(currentLineContent, i));
+      }
+    }
+  }
+
+  void _formatCodeBlock(String message) {
+    info(message, style: _formatErrorStyle);
+  }
+
+  void newLine() => info('');
+}
+
+String _createArrow(int column) {
+  return '${' ' * column}^';
+}
+
+String? _formatErrorStyle(String? m) {
+  return backgroundDefault.wrap(styleBold.wrap(white.wrap(m)));
+}
+
+String? _highlightLine(String? m) {
+  return backgroundDefault.wrap(styleBold.wrap(yellow.wrap(m)));
+}
+
+
+---
+lib/src/helpers/update_pubspec.dart
+---
+import 'package:yaml/yaml.dart';
+import 'package:yaml_writer/yaml_writer.dart';
+
+/// Updates the 'assets' section of a pubspec.yaml file with superdeck paths.
+///
+/// This function takes a [yamlContent] string representing the contents of a
+/// pubspec.yaml file. It parses the YAML, adds the '.superdeck/' and
+/// '.superdeck/generated/' paths to the 'assets' section under the 'flutter'
+/// key if they don't already exist, and returns the updated YAML as a string.
+///
+/// Returns the updated pubspec YAML content as a string.
+String updatePubspecAssets(String yamlContent) {
+  // Parse the YAML content into a map
+  final parsedYaml = loadYaml(yamlContent);
+
+  // Get the 'flutter' section from the parsed YAML, or an empty map if it doesn't exist
+  final flutterSection =
+      // ignore: avoid-dynamic
+      {...(parsedYaml['flutter'] ?? {}) as Map}.cast<String, dynamic>();
+
+  // Get the 'assets' list from the 'flutter' section, or an empty list if it doesn't exist
+  final assets = flutterSection['assets']?.toList() ?? [];
+
+  // Add the '.superdeck/' path to the assets list if it's not already present
+  if (!assets.contains('.superdeck/')) {
+    assets.add('.superdeck/');
+  }
+
+  // Add the '.superdeck/generated/' path to the assets list if it's not already present
+  if (!assets.contains('.superdeck/generated/')) {
+    assets.add('.superdeck/generated/');
+  }
+
+  // Update the 'assets' key in the 'flutter' section with the modified assets list
+  flutterSection['assets'] = assets;
+
+  // Create a new map from the parsed YAML and update the 'flutter' key with the modified section
+  final updatedYaml = Map<String, dynamic>.from(parsedYaml)
+    ..['flutter'] = flutterSection;
+
+  // Convert the updated YAML map back to a string and return it
+  return YamlWriter(allowUnquotedStrings: true).write(updatedYaml);
+}
+
+
+---
+lib/src/parsers/markdown_parser.dart
+---
+import 'dart:convert';
+
+import 'package:superdeck_cli/src/helpers/logger.dart';
+import 'package:superdeck_core/superdeck_core.dart';
+import 'package:yaml/yaml.dart';
+
+class RawSlide {
+  String key;
+  String markdown;
+  Map<String, dynamic> options;
+  List<String> comments;
+
+  RawSlide({
+    required this.key,
+    required this.markdown,
+    required this.options,
+    required this.comments,
+  });
+}
+
+class MarkdownParser {
+  const MarkdownParser._();
+  static List<RawSlide> parse(String markdown) {
+    final slidesRaw = _splitSlides(markdown);
+
+    final slides = <RawSlide>[];
+
+    for (var slide in slidesRaw) {
+      slides.add(_parseSlide(slide));
+    }
+
+    return slidesRaw.map(_parseSlide).toList();
+  }
+
+  /// Splits the entire markdown into slides.
+  ///
+  /// A "slide" is defined by frontmatter sections delimited with `---`.
+  /// Code blocks (fenced by ```) are respected, so `---` inside a code block
+  /// won't be treated as frontmatter delimiters.
+  static List<String> _splitSlides(String content) {
+    content = content.trim();
+    final lines = LineSplitter().convert(content);
+    final slides = <String>[];
+    final buffer = StringBuffer();
+    bool insideFrontMatter = false;
+
+    var isCodeBlock = false;
+
+    for (var line in lines) {
+      final trimmed = line.trim();
+      if (trimmed.startsWith('```')) {
+        isCodeBlock = !isCodeBlock;
+      }
+      if (isCodeBlock) {
+        buffer.writeln(line);
+        continue;
+      }
+
+      if (insideFrontMatter && trimmed.isEmpty) {
+        insideFrontMatter = false;
+      }
+
+      if (trimmed == '---') {
+        if (!insideFrontMatter) {
+          if (buffer.isNotEmpty) {
+            slides.add(buffer.toString().trim());
+            buffer.clear();
+          }
+        }
+        insideFrontMatter = !insideFrontMatter;
+      }
+      buffer.writeln(line);
+    }
+
+    if (buffer.isNotEmpty) {
+      slides.add(buffer.toString());
+    }
+
+    return slides;
+  }
+
+  static RawSlide _parseSlide(String input) {
+    final key = LocalAsset.buildKey(input);
+
+    final (frontMatter, markdownContent) = _extractFrontmatter(input);
+    final notes = _extractComments(markdownContent);
+
+    return RawSlide(
+      key: key,
+      markdown: markdownContent.trim(),
+      options: frontMatter ?? {},
+      comments: notes,
+    );
+  }
+
+  static List<String> _extractComments(String markdown) {
+    final comments = <String>[];
+    final _commentRegex = RegExp(r'<!--(.*?)-->', dotAll: true);
+    for (final match in _commentRegex.allMatches(markdown)) {
+      final comment = match.group(1)?.trim();
+      if (comment != null) {
+        comments.add(comment);
+      }
+    }
+
+    return comments;
+  }
+
+  /// Extracts frontmatter from the input slide.
+  /// Returns a tuple: (yamlMap, remainingMarkdown).
+  /// If no frontmatter is found, returns (null, entireInputAfterSecondDelimiterIfPresent).
+  static (Map<String, dynamic>?, String) _extractFrontmatter(String input) {
+    final _frontmatterRegex = RegExp(
+      r'^---.*\r?\n([\s\S]*?)\r?\n---',
+      multiLine: true,
+    );
+
+    final match = _frontmatterRegex.firstMatch(input);
+    if (match == null) {
+      // No frontmatter found
+      final contents = input.split('---').last;
+
+      return (null, contents);
+    }
+
+    final yamlString = match.group(1);
+
+    final markdownContent = input.replaceFirst(match.group(0)!, '');
+    Map<String, dynamic>? yamlMap;
+
+    if (yamlString != null) {
+      try {
+        final parsed = loadYaml(yamlString);
+        if (parsed is YamlMap) {
+          yamlMap = jsonDecode(jsonEncode(parsed)) as Map<String, dynamic>?;
+        } else if (parsed is String) {
+          yamlMap = {'$parsed': null} as Map<String, dynamic>?;
+        }
+      } catch (e) {
+        logger.err('Cannot parse yaml frontmatter: $e');
+        yamlMap = {};
+      }
+    }
+
+    return (yamlMap, markdownContent);
+  }
+
+  String serializeYamlFrontmatter(Map<String, dynamic> data) {
+    final yamlString = jsonEncode(data);
+
+    return '---\n$yamlString---\n';
+  }
+}
+
+
+---
+lib/src/parsers/section_parser.dart
+---
+import 'dart:convert';
+
+import 'package:collection/collection.dart';
+import 'package:superdeck_core/superdeck_core.dart';
+
+/// Parses a markdown string into a list of SectionBlocks.
+///
+/// This function reads through each line of the given [markdown]. Normal lines
+/// are appended to the current section. Lines that start with `{@` are treated
+/// as "tag blocks" and can define new sections or nested blocks.
+///
+/// If a tag is found, it reads until a closing `}` is encountered, then converts
+/// the extracted tags into blocks, updating the current section or starting a
+/// new one as needed.
+List<SectionBlock> parseSections(String markdown) {
+  final lines = LineSplitter().convert(markdown);
+  final sections = <SectionBlock>[];
+  SectionBlock? currentSection;
+
+  // Use a for loop instead of a while loop with manual index increments
+  // This reduces complexity and off-by-one error risks.
+  for (var i = 0; i < lines.length; i++) {
+    final blockContent = _readBlockContent(lines, i);
+
+    if (blockContent != null) {
+      final blocks = blockContent.blocks;
+      i = blockContent.endIndex;
+
+      // Process the extracted tag content into blocks
+      // Integrate these blocks into the current section/sections list
+      for (final block in blocks) {
+        if (block is SectionBlock) {
+          // If we encounter a new SectionBlock, close off the previous one first.
+          if (currentSection != null) {
+            sections.add(currentSection);
+          }
+          currentSection = block;
+        } else if (block is ColumnBlock) {
+          // If we have a ColumnBlock, treat it as content in the current section.
+          currentSection ??= SectionBlock();
+          currentSection = currentSection.appendContent(block);
+        }
+      }
+    } else {
+      final line = lines[i];
+      // Normal text line, just append to the current section.
+      currentSection ??= SectionBlock();
+      currentSection = currentSection.appendLine(line);
+    }
+  }
+
+  // If we ended with an open section, add it to the sections list.
+  if (currentSection != null) {
+    sections.add(currentSection);
+  }
+
+  return sections;
+}
+
+/// A record representing the result of reading tag content.
+/// `content` is the full tag content, `newIndex` is the updated line index
+/// after reading the tag content.
+class _ReadBlockTag {
+  final List<Block> blocks;
+  final int endIndex;
+  const _ReadBlockTag(this.blocks, this.endIndex);
+}
+
+/// Reads a tag block starting from [startIndex] in the [lines].
+///
+/// A tag block starts with `{@` and ends when a line's trimmed content ends
+/// with `}`. This function accumulates all relevant lines until the tag is closed.
+///
+/// Throws a [FormatException] if the tag is never properly closed.
+_ReadBlockTag? _readBlockContent(List<String> lines, int startIndex) {
+  final line = lines[startIndex];
+  final trimmedLine = line.trim();
+  if (!trimmedLine.startsWith('{@')) {
+    return null;
+  }
+  var content = line;
+  var i = startIndex;
+
+  // Keep reading until we find a line that ends with '}'
+  while (!content.trim().endsWith('}')) {
+    i++;
+    if (i >= lines.length) {
+      throw FormatException(
+        'Unclosed tag in markdown starting at line $startIndex.',
+      );
+    }
+    content += '\n${lines[i]}';
+  }
+  final tagData = extractTagContents(content);
+
+  final blocks =
+      tagData.map((data) => Block.parse(data.blockType, data.options)).toList();
+
+  return _ReadBlockTag(blocks, i);
+}
+
+typedef SyntaxTagData = ({BlockType blockType, Map<String, dynamic> options});
+
+/// Extracts tag definitions from a single tag content block.
+///
+/// Tags are expected to follow the pattern `{@BlockType options...}`.
+/// This function uses a regex to capture `BlockType` and the raw options,
+/// then converts the raw options from YAML to a map. If the block type is
+/// not recognized, it defaults to a widget block.
+///
+/// Throws a [FormatException] if no tags are found or if the tag format is invalid.
+List<SyntaxTagData> extractTagContents(String tagContent) {
+  final tagRegex = RegExp(r'{@(\w+)(.*?)}', dotAll: true);
+  final matches = tagRegex.allMatches(tagContent);
+
+  if (matches.isEmpty) {
+    throw FormatException(
+      'Invalid tag format: No tags found in "${tagContent.trim()}".',
+    );
+  }
+
+  return matches.map((match) {
+    final blockTypeStr = match.group(1);
+    var rawOptions = match.group(2) ?? '';
+
+    var blockType = _getBlockType(blockTypeStr!);
+    Map<String, dynamic> options;
+    try {
+      options = convertYamlToMap(rawOptions);
+    } catch (e, stackTrace) {
+      Error.throwWithStackTrace(
+        FormatException(
+          'Cannot parse options for "$blockTypeStr": $rawOptions',
+        ),
+        stackTrace,
+      );
+    }
+
+    // If the blockType isn't recognized, treat it as a widget.
+    if (blockType == null) {
+      blockType = BlockType.widget;
+      // Validate that 'type' is not used, as it's reserved.
+      if (options['type'] != null) {
+        throw FormatException(
+          'Invalid options for "$blockTypeStr": "type" is a reserved property.',
+        );
+      }
+      // Add the 'name' property to identify the widget.
+      options = {...options, 'name': blockTypeStr};
+
+      return (blockType: BlockType.widget, options: options);
+    }
+
+    return (blockType: blockType, options: options);
+  }).toList();
+}
+
+/// Attempts to find a [BlockType] enum value matching [blockTypeStr].
+///
+/// If no matching block type is found, returns null. This allows graceful fallback
+/// to a widget block type later.
+BlockType? _getBlockType(String blockTypeStr) {
+  return BlockType.values.firstWhereOrNull((e) => e.name == blockTypeStr);
+}
+
+
+---
+lib/src/runner.dart
+---
+import 'dart:async';
+
+import 'package:args/command_runner.dart';
+import 'package:mason_logger/mason_logger.dart';
+import 'package:superdeck_cli/src/commands/build_command.dart';
+import 'package:superdeck_cli/src/helpers/exceptions.dart';
+
+class SuperDeckRunner extends CommandRunner<int> {
+  SuperDeckRunner() : super('superdeck', 'Superdeck CLI');
+
+  @override
+  Future<int> run(Iterable<String> args) async {
+    addCommand(BuildCommand());
+
+    try {
+      final exitCode = await super.run(args);
+
+      return exitCode ?? ExitCode.software.code;
+    } on Exception catch (e) {
+      printException(e);
+
+      return ExitCode.software.code;
+    }
+  }
+}
+
+
+---
+lib/src/tasks/dart_formatter_task.dart
+---
+import 'dart:async';
+
+import 'package:superdeck_cli/src/generator_pipeline.dart';
+import 'package:superdeck_cli/src/helpers/dart_process.dart';
+
+class DartFormatterTask extends Task {
+  DartFormatterTask() : super('dart_formatter');
+
+  Future<String> _formatDartCodeBlocks(TaskContext controller) async {
+    final codeBlockRegex = RegExp('```dart\n(.*?)\n```');
+    var markdown = controller.slide.markdown;
+
+    final matches = codeBlockRegex.allMatches(markdown);
+
+    for (final match in matches) {
+      final code = match.group(1)!;
+
+      final formattedCode = await DartProcess.format(code);
+
+      markdown =
+          markdown.replaceAll(match.group(0)!, '```dart\n$formattedCode\n```');
+    }
+
+    return markdown;
+  }
+
+  @override
+  FutureOr<void> run(TaskContext context) async {
+    final formattedMarkdown = await _formatDartCodeBlocks(context);
+
+    context.slide.markdown = formattedMarkdown;
+  }
+}
+
+
+---
+lib/src/tasks/image_cache_task.dart
+---
+import 'dart:typed_data';
+
+import 'package:http/http.dart' as http;
+import 'package:markdown/markdown.dart' as md;
+import 'package:superdeck_cli/src/generator_pipeline.dart';
+import 'package:superdeck_core/superdeck_core.dart';
+
+/// A task responsible for caching images referenced in markdown slides.
+class ImageCachingTask extends Task {
+  /// A set to track assets currently being processed to prevent duplicate downloads.
+  static final Set<String> _executingAssets = {};
+
+  /// HTTP client used for downloading images.
+  static final http.Client _httpClient = http.Client();
+
+  /// Constructs an [ImageCachingTask] with the name 'image_caching'.
+  ImageCachingTask() : super('image_caching');
+
+  // Function to download and save a single asset.
+  Future<Uint8List?> _fetchData(String url) async {
+    try {
+      logger.info('Downloading asset: $url');
+      final response = await _httpClient.get(Uri.parse(url));
+
+      // Verify successful response.
+      if (response.statusCode != 200) {
+        logger.warning(
+          'Failed to download $url: Status ${response.statusCode}',
+        );
+
+        return null;
+      }
+
+      final contentType = response.headers['content-type'] ?? '';
+      // Validate content type.
+      if (!contentType.startsWith('image/')) {
+        logger.warning('Invalid content type for $url: $contentType');
+
+        return null;
+      }
+
+      // Define supported image formats.
+
+      final extension = contentType.split('/').last.toLowerCase();
+
+      // Check if the image format is supported.
+      if (LocalAssetExtension.tryParse(extension) == null) {
+        logger.warning('Unsupported image format for $url: $extension');
+
+        return null;
+      }
+
+      return response.bodyBytes;
+    } catch (e, stackTrace) {
+      logger.severe('Error downloading asset $url: $e', e, stackTrace);
+    }
+
+    return null;
+  }
+
+  @override
+  Future<TaskContext> run(TaskContext context) async {
+    final slide = context.slide;
+    final content = slide.markdown;
+
+    // Parse the markdown content to extract image URLs.
+    final document = md.Document();
+    final nodes = document.parseInline(content);
+    final Set<String> urls = {};
+
+    for (final node in nodes) {
+      if (node is md.Element && node.tag == 'img') {
+        final src = node.attributes['src'];
+        if (src != null && src.startsWith('http')) {
+          urls.add(src);
+        }
+      }
+    }
+
+    // Iterate over each asset and process if not already executing.
+    for (final url in urls) {
+      if (_executingAssets.contains(url)) {
+        continue; // Skip if the asset is already being processed.
+      }
+      _executingAssets.add(url);
+      final asset = CacheRemoteAsset.fromUrl(url);
+      if (await context.checkAssetExists(asset)) {
+        continue;
+      }
+      final data = await _fetchData(url);
+
+      if (data == null) {
+        continue;
+      }
+
+      await context.writeAsset(asset, data);
+    }
+
+    return context;
+  }
+}
+
+
+---
+lib/src/tasks/mermaid_task.dart
+---
+import 'dart:async';
+
+import 'package:puppeteer/puppeteer.dart';
+import 'package:superdeck_cli/src/generator_pipeline.dart';
+import 'package:superdeck_cli/src/helpers/logger.dart';
+import 'package:superdeck_core/superdeck_core.dart';
+
+class MermaidConverterTask extends Task {
+  Browser? _browser;
+  MermaidConverterTask() : super('mermaid');
+  Future<Browser> _getBrowser() async {
+    _browser ??= await puppeteer.launch();
+
+    return _browser!;
+  }
+
+  @override
+  void dispose() {
+    _browser?.close();
+    _browser = null;
+  }
+
+  @override
+  Future<void> run(TaskContext context) async {
+    final mermaidBlockRegex = RegExp(r'```mermaid.*?([\s\S]*?)```');
+    final slide = context.slide;
+
+    final matches = mermaidBlockRegex.allMatches(slide.markdown);
+
+    if (matches.isEmpty) return;
+    // final replacements = <({int start, int end, String markdown})>[];
+
+    for (final Match match in matches) {
+      final mermaidSyntax = match.group(1);
+
+      if (mermaidSyntax == null) continue;
+
+      final asset = MermaidAsset.fromSyntax(mermaidSyntax);
+
+      if (!await context.checkAssetExists(asset)) {
+        final browser = await _getBrowser();
+
+        final imageData =
+            await _generateMermaidGraphImage(browser, mermaidSyntax);
+
+        await context.writeAsset(asset, imageData);
+      }
+
+      final imageMarkdown = '![mermaid](${asset.path})';
+
+      context.slide.markdown =
+          context.slide.markdown.replaceAll(match.group(0)!, imageMarkdown);
+    }
+  }
+}
+
+/// A helper function that automates page creation, content setup, and cleanup.
+Future<T> _withPage<T>(
+  Browser browser,
+  Future<T> Function(Page page) action,
+) async {
+  final page = await browser.newPage();
+  try {
+    return await action(page);
+  } finally {
+    await page.close();
+  }
+}
+
+/// Extract large HTML templates to constants for better readability.
+const _mermaidHtmlTemplate = '''
+<html>
+  <body>
+    <pre class="mermaid">__GRAPH_DEFINITION__</pre>
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'dark',
+        flowchart: {},
+      });
+      mermaid.run({ querySelector: 'pre.mermaid' });
+    </script>
+  </body>
+</html>
+''';
+
+Future<String> _generateMermaidGraph(Browser browser, String graphDefinition) {
+  logger.detail('Generating mermaid graph:');
+  logger.detail(graphDefinition);
+
+  final htmlContent =
+      _mermaidHtmlTemplate.replaceAll('__GRAPH_DEFINITION__', graphDefinition);
+
+  return _withPage(browser, (page) async {
+    await page.setContent(htmlContent);
+    await page.waitForSelector(
+      'pre.mermaid > svg',
+      timeout: const Duration(seconds: 5),
+    );
+
+    final element = await page.$('pre.mermaid > svg');
+
+    return await element.evaluate('el => el.outerHTML');
+  });
+}
+
+Future<List<int>> _convertSvgToImage(Browser browser, String svgContent) {
+  return _withPage(browser, (page) async {
+    await page.setViewport(DeviceViewport(
+      width: 1280,
+      height: 780,
+      deviceScaleFactor: 2,
+    ));
+
+    await page.setContent('''
+      <html>
+        <body>
+          <div class="svg-container">$svgContent</div>
+        </body>
+      </html>
+    ''');
+
+    final element = await page.$('.svg-container > svg');
+
+    return await element.screenshot(
+      format: ScreenshotFormat.png,
+      omitBackground: true,
+    );
+  });
+}
+
+Future<List<int>> _generateMermaidGraphImage(
+  Browser browser,
+  String graphDefinition,
+) async {
+  try {
+    final svgContent = await _generateMermaidGraph(browser, graphDefinition);
+
+    return await _convertSvgToImage(browser, svgContent);
+  } catch (e, stackTrace) {
+    logger.err('Failed to generate Mermaid graph image: $e');
+    Error.throwWithStackTrace(
+      Exception(
+        'Mermaid generation timed out or failed. Original error: $e',
+      ),
+      stackTrace,
+    );
+  }
+}
+
+
+---
+lib/src/tasks/slide_thumbnail_task.dart
+---
+import 'dart:async';
+
+import 'package:superdeck_cli/src/generator_pipeline.dart';
+import 'package:superdeck_core/superdeck_core.dart';
+
+/// This task marks the thumbnail file as needed if it exists.
+/// The goal is to ensure that any generated thumbnails are kept.
+class SlideThumbnailTask extends Task {
+  SlideThumbnailTask() : super('thumbnail');
+
+  @override
+  FutureOr<TaskContext> run(context) async {
+    final asset = SlideThumbnailAsset.fromSlideKey(context.slide.key);
+
+    // Basic check just to mark asset as needed
+    await context.checkAssetExists(asset);
+
+    return context;
+  }
+}
+
+
+---
+lib/superdeck_cli.dart
+---
+export 'package:superdeck_cli/src/runner.dart';
+
+
+---

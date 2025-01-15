@@ -1,153 +1,105 @@
 import 'dart:convert';
 
-import 'package:superdeck_cli/src/helpers/logger.dart';
+import 'package:superdeck_cli/src/parsers/extractors/block_extractor.dart';
+import 'package:superdeck_cli/src/parsers/extractors/comment_extractor.dart';
+import 'package:superdeck_cli/src/parsers/extractors/front_matter_extractor.dart';
 import 'package:superdeck_core/superdeck_core.dart';
-import 'package:yaml/yaml.dart';
 
-class RawSlide {
-  String key;
-  String markdown;
-  Map<String, dynamic> options;
-  List<String> comments;
-
-  RawSlide({
-    required this.key,
-    required this.markdown,
-    required this.options,
-    required this.comments,
-  });
-}
-
+/// Responsible for splitting the entire markdown into separate slides,
+/// extracting front matter, and capturing comments.
 class MarkdownParser {
-  const MarkdownParser._();
-  static List<RawSlide> parse(String markdown) {
-    final slidesRaw = _splitSlides(markdown);
+  final IFrontmatterExtractor frontmatterExtractor;
+  final ICommentExtractor commentExtractor;
+  final IBlockExtractor blockExtractor;
 
-    final slides = <RawSlide>[];
+  const MarkdownParser({
+    required this.frontmatterExtractor,
+    required this.commentExtractor,
+    required this.blockExtractor,
+  });
 
-    for (var slide in slidesRaw) {
-      slides.add(_parseSlide(slide));
-    }
-
-    return slidesRaw.map(_parseSlide).toList();
-  }
-
-  /// Splits the entire markdown into slides.
-  ///
-  /// A "slide" is defined by frontmatter sections delimited with `---`.
-  /// Code blocks (fenced by ```) are respected, so `---` inside a code block
-  /// won't be treated as frontmatter delimiters.
-  static List<String> _splitSlides(String content) {
-    content = content.trim();
-    final lines = LineSplitter().convert(content);
+  /// Example logic to split slides on `---` lines, while ignoring code fences.
+  List<String> _splitSlides(List<String> lines) {
     final slides = <String>[];
-    final buffer = StringBuffer();
-    bool insideFrontMatter = false;
+    final buffer = <String>[];
 
-    var isCodeBlock = false;
+    bool insideCodeFence = false;
 
-    for (var line in lines) {
-      final trimmed = line.trim();
-      if (trimmed.startsWith('```')) {
-        isCodeBlock = !isCodeBlock;
+    for (final line in lines) {
+      if (_isCodeFence(line)) {
+        insideCodeFence = !insideCodeFence;
       }
-      if (isCodeBlock) {
-        buffer.writeln(line);
-        continue;
-      }
-
-      if (insideFrontMatter && trimmed.isEmpty) {
-        insideFrontMatter = false;
-      }
-
-      if (trimmed == '---') {
-        if (!insideFrontMatter) {
-          if (buffer.isNotEmpty) {
-            slides.add(buffer.toString().trim());
-            buffer.clear();
-          }
+      // If we see '---' outside a code fence, that might indicate a new slide
+      if (line.trim() == '---' && !insideCodeFence) {
+        if (buffer.isNotEmpty) {
+          slides.add(buffer.join('\n'));
+          buffer.clear();
         }
-        insideFrontMatter = !insideFrontMatter;
+      } else {
+        buffer.add(line);
       }
-      buffer.writeln(line);
     }
 
+    // Add the last slide if any remains
     if (buffer.isNotEmpty) {
-      slides.add(buffer.toString());
+      slides.add(buffer.join('\n'));
     }
 
     return slides;
   }
 
-  static RawSlide _parseSlide(String input) {
-    final key = LocalAsset.buildKey(input);
+  String _removeFrontmatter(String content, String? extracted) {
+    if (extracted == null || extracted.isEmpty) return content;
 
-    final (frontMatter, markdownContent) = _extractFrontmatter(input);
-    final notes = _extractComments(markdownContent);
-
-    return RawSlide(
-      key: key,
-      markdown: markdownContent.trim(),
-      options: frontMatter ?? {},
-      comments: notes,
-    );
+    // A naive example: just replace the extracted front matter portion with ''
+    return content.replaceFirst(extracted, '');
   }
 
-  static List<String> _extractComments(String markdown) {
-    final comments = <String>[];
-    final _commentRegex = RegExp(r'<!--(.*?)-->', dotAll: true);
-    for (final match in _commentRegex.allMatches(markdown)) {
-      final comment = match.group(1)?.trim();
-      if (comment != null) {
-        comments.add(comment);
-      }
+  String _generateKey(String slideContent) {
+    return slideContent.hashCode.toString();
+  }
+
+  List<Slide> parse(String markdown) {
+    final lines = LineSplitter().convert(markdown);
+    final slidesRawContent = _splitSlides(lines);
+
+    final slides = <Slide>[];
+
+    for (final slideContent in slidesRawContent) {
+      // 1) Extract front matter
+      final frontmatter = frontmatterExtractor.parseFrontmatter(slideContent);
+      // 2) Remove the front matter from the raw markdown
+      final stripped =
+          _removeFrontmatter(slideContent, frontmatter.extractedText);
+
+      // 3) Extract comments
+      final comments = commentExtractor.parseComments(stripped);
+
+      // 4) Parse sections
+      final sections = blockExtractor.parse(stripped);
+
+      // 4) Generate a key (this is just a placeholder)
+      final key = _generateKey(slideContent);
+
+      slides.add(
+        Slide(
+          key: key,
+          options: SlideOptions.fromMap(frontmatter.options),
+          markdown: stripped.trim(),
+          sections: sections,
+          comments: comments,
+        ),
+      );
     }
 
-    return comments;
+    return slides;
   }
+}
 
-  /// Extracts frontmatter from the input slide.
-  /// Returns a tuple: (yamlMap, remainingMarkdown).
-  /// If no frontmatter is found, returns (null, entireInputAfterSecondDelimiterIfPresent).
-  static (Map<String, dynamic>?, String) _extractFrontmatter(String input) {
-    final _frontmatterRegex = RegExp(
-      r'^---.*\r?\n([\s\S]*?)\r?\n---',
-      multiLine: true,
-    );
+bool _isCodeFence(String line) {
+  return line.trim().startsWith('```');
+}
 
-    final match = _frontmatterRegex.firstMatch(input);
-    if (match == null) {
-      // No frontmatter found
-      final contents = input.split('---').last;
-
-      return (null, contents);
-    }
-
-    final yamlString = match.group(1);
-
-    final markdownContent = input.replaceFirst(match.group(0)!, '');
-    Map<String, dynamic>? yamlMap;
-
-    if (yamlString != null) {
-      try {
-        final parsed = loadYaml(yamlString);
-        if (parsed is YamlMap) {
-          yamlMap = jsonDecode(jsonEncode(parsed)) as Map<String, dynamic>?;
-        } else if (parsed is String) {
-          yamlMap = {'$parsed': null} as Map<String, dynamic>?;
-        }
-      } catch (e) {
-        logger.err('Cannot parse yaml frontmatter: $e');
-        yamlMap = {};
-      }
-    }
-
-    return (yamlMap, markdownContent);
-  }
-
-  String serializeYamlFrontmatter(Map<String, dynamic> data) {
-    final yamlString = jsonEncode(data);
-
-    return '---\n$yamlString---\n';
-  }
+abstract interface class IBlockParser<T extends Block> {
+  T parse(String markdown);
 }

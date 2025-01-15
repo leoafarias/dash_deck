@@ -2,24 +2,35 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:logging/logging.dart';
-import 'package:superdeck_cli/src/helpers/exceptions.dart';
+import 'package:superdeck_cli/src/parsers/extractors/block_extractor.dart';
+import 'package:superdeck_cli/src/parsers/extractors/comment_extractor.dart';
+import 'package:superdeck_cli/src/parsers/extractors/front_matter_extractor.dart';
 import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
-import 'package:superdeck_cli/src/parsers/section_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
-class TaskContext {
-  RawSlide slide;
+/// Represents the context in which a slide is processed.
+/// It holds the raw slide data and manages associated assets.
+class SlideProcessingContext {
+  /// The index of the slide in the original list.
+  final int slideIndex;
 
+  /// The raw slide being processed.
+  Slide slide;
+
+  /// List of assets used during processing.
   final List<LocalAsset> _assetsUsed = [];
 
-  TaskContext(this.slide);
+  SlideProcessingContext(this.slideIndex, this.slide);
 
+  /// Writes an asset to the specified path and tracks its usage.
   Future<void> writeAsset(LocalAsset asset, List<int> bytes) async {
     await File(asset.path).writeAsBytes(bytes);
     _assetsUsed.add(asset);
   }
 
-  Future<bool> checkAssetExists(LocalAsset asset) async {
+  /// Checks if an asset exists at the specified path.
+  /// If it exists, tracks its usage.
+  Future<bool> assetExists(LocalAsset asset) async {
     if (await File(asset.path).exists()) {
       _assetsUsed.add(asset);
 
@@ -28,33 +39,52 @@ class TaskContext {
 
     return false;
   }
+}
 
-  Slide buildSlide() {
-    return Slide(
-      key: slide.key,
-      options: SlideOptions.fromMap(slide.options),
-      markdown: slide.markdown,
-      sections: parseSections(slide.markdown),
-      comments: slide.comments,
-      assets: _assetsUsed,
-    );
+/// Abstract base class representing a generic task in the pipeline.
+/// Each task should implement the [run] method to perform its specific operation.
+abstract class SlideTask {
+  /// Name of the task, used for logging and identification.
+  final String name;
+
+  /// Logger instance for the task.
+  late final Logger logger = Logger('SlideTask: $name');
+
+  SlideTask(this.name);
+
+  /// Executes the task using the provided [SlideProcessingContext].
+  Future<void> run(SlideProcessingContext context);
+
+  /// Disposes of any resources held by the task.
+  /// Override if the task holds resources that need explicit disposal.
+  Future<void> dispose() async {
+    // Default implementation does nothing.
   }
 }
 
-class TaskPipeline {
-  final List<Task> tasks;
-  final repository = DeckRepository();
+/// Manages the execution of a series of [SlideTask] instances to process slides.
+/// It handles loading markdown content, parsing slides, executing tasks,
+/// cleaning up assets, and saving the processed slides.
+class SlideProcessingPipeline {
+  final int slideIndex;
 
-  TaskPipeline(this.tasks);
+  /// List of tasks to execute for each slide.
+  final List<SlideTask> tasks;
 
-  Future<TaskContext> _runEachSlide(
-    int slideIndex,
-    TaskContext context,
+  /// Repository for loading and saving slides.
+  final DeckRepository repository = DeckRepository();
+
+  SlideProcessingPipeline(this.slideIndex, this.tasks);
+
+  /// Processes an individual slide by executing all tasks sequentially.
+  Future<TaskProcessingResult> _processSlide(
+    SlideProcessingContext context,
   ) async {
     for (var task in tasks) {
       try {
         await task.run(context);
       } on Exception catch (e, stackTrace) {
+        // Wrap and rethrow the exception with additional context.
         Error.throwWithStackTrace(
           SDTaskException(task.name, e, slideIndex),
           stackTrace,
@@ -62,79 +92,138 @@ class TaskPipeline {
       }
     }
 
-    return context;
+    return TaskProcessingResult(context);
   }
 
-  Future<List<Slide>> run() async {
-    final markdownRaw = await repository.loadMarkdown();
+  /// Cleans up generated files in [generatedDir] that are not present in [neededAssets].
+  Future<void> _cleanupGeneratedFiles(
+    Directory generatedDir,
+    Set<LocalAsset> neededAssets,
+  ) async {
+    final files = await _loadGeneratedFiles(generatedDir);
+    final neededPaths = neededAssets.map((asset) => asset.path).toSet();
 
-    final slides = MarkdownParser.parse(markdownRaw);
+    for (var file in files) {
+      if (!neededPaths.contains(file.path)) {
+        if (await file.exists()) {
+          await file.delete();
+        }
+      }
+    }
+  }
 
-    final futures = <Future<TaskContext>>[];
+  /// Loads all generated files from [generatedDir].
+  Future<List<File>> _loadGeneratedFiles(Directory generatedDir) async {
+    final files = <File>[];
 
-    for (var i = 0; i < slides.length; i++) {
-      futures.add(_runEachSlide(i, TaskContext(slides[i])));
+    await for (var entity in generatedDir.list()) {
+      if (entity is File) {
+        files.add(entity);
+      }
     }
 
-    final contexts = await Future.wait(futures);
+    return files;
+  }
 
-    final finalizedSlides = contexts.map((context) => context.buildSlide());
+  /// Runs the entire pipeline:
+  /// 1. Loads raw markdown content.
+  /// 2. Parses it into raw slides.
+  /// 3. Executes each task for every slide.
+  /// 4. Cleans up unneeded generated files.
+  /// 5. Saves the processed slides.
+  Future<List<Slide>> run() async {
+    // Load raw markdown content from the repository.
+    final markdownRaw = await repository.loadMarkdown();
 
-    final neededAssets = finalizedSlides.expand((slide) => slide.assets);
+    // Initialize the markdown parser with necessary extractors.
+    final markdownParser = MarkdownParser(
+      frontmatterExtractor: YamlFrontmatterExtractor(),
+      commentExtractor: HtmlCommentExtractor(),
+      blockExtractor: BlockExtractor(registry: BlockExtractorRegistry()),
+    );
 
+    // Parse the raw markdown into individual raw slides.
+    final rawSlides = markdownParser.parse(markdownRaw);
+
+    // Prepare a list of futures to process each slide concurrently.
+    final futures = <Future<TaskProcessingResult>>[];
+
+    for (var i = 0; i < rawSlides.length; i++) {
+      futures.add(_processSlide(SlideProcessingContext(i, rawSlides[i])));
+    }
+
+    // Await all slide processing tasks to complete.
+    final results = await Future.wait(futures);
+
+    // Extract the processed slides from the results.
+    final finalizedSlides = results.map((result) => result.context.slide);
+
+    // Determine all assets that are still needed after processing.
+    final neededAssets =
+        finalizedSlides.expand((slide) => slide.assets).toSet();
+
+    // Clean up any generated files that are no longer needed.
     await _cleanupGeneratedFiles(repository.generatedDir, neededAssets);
 
+    // Dispose of all tasks after processing.
     for (var task in tasks) {
       await task.dispose();
     }
 
+    // Convert the iterable of slides to a list for saving.
     final newSlides = finalizedSlides.toList();
 
+    // Save the processed slides back to the repository.
     await repository.saveSlides(newSlides);
 
     return newSlides;
   }
 }
 
-Future<void> _cleanupGeneratedFiles(
-  Directory generatedDir,
-  Iterable<LocalAsset> assets,
-) async {
-  final files = await _loadGeneratedFiles(generatedDir);
-  final neededPaths = assets.map((asset) => asset.path).toSet();
+/// Represents the result of processing a single slide.
+class TaskProcessingResult {
+  /// The context after processing the slide.
+  final SlideProcessingContext context;
 
-  for (var file in files) {
-    if (!neededPaths.contains(file.path)) {
-      if (await file.exists()) {
-        await file.delete();
-      }
-    }
+  const TaskProcessingResult(this.context);
+}
+
+/// Custom exception for errors that occur during task execution.
+class SDTaskException implements Exception {
+  /// Name of the task where the error occurred.
+  final String taskName;
+
+  /// The original exception that was thrown.
+  final Exception originalException;
+
+  /// Index of the slide being processed when the error occurred.
+  final int slideIndex;
+
+  const SDTaskException(this.taskName, this.originalException, this.slideIndex);
+
+  @override
+  String toString() {
+    return 'Error in task "$taskName" at slide index $slideIndex: $originalException';
   }
 }
 
+/// Abstract class representing a generic task in the slide processing pipeline.
+/// Each concrete task should implement the [run] method to perform its specific operation.
 abstract class Task {
+  /// Name of the task, used for logging and identification.
   final String name;
 
-  late final logger = Logger('Task: $name');
+  /// Logger instance for the task.
+  late final Logger logger = Logger('Task: $name');
 
   Task(this.name);
 
-  FutureOr<void> run(TaskContext context);
+  /// Executes the task using the provided [TaskContext].
+  FutureOr<void> run(SlideProcessingContext context);
 
-  // Dispose or anything here
+  /// Disposes of any resources held by the task.
+  /// Override if the task holds resources that need explicit disposal.
   FutureOr<void> dispose() {
     return Future.value();
   }
-}
-
-Future<List<File>> _loadGeneratedFiles(Directory generatedDir) async {
-  final files = <File>[];
-
-  await for (var entity in generatedDir.list()) {
-    if (entity is File) {
-      files.add(entity);
-    }
-  }
-
-  return files;
 }

@@ -57,10 +57,7 @@ void main() {
     test('Parse tag with both parts', () {
       final input = '{@column blue: car}';
       final expectedOutput = [
-        (
-          blockType: BlockType.column,
-          options: {'blue': 'car'},
-        ),
+        (blockType: BlockType.column, options: {'blue': 'car'}),
       ];
 
       final result = extractTagContents(input);
@@ -81,10 +78,7 @@ void main() {
     test('Parse tag with extra whitespace', () {
       final input = '{@column   red  :   bike }';
       final expectedOutput = [
-        (
-          blockType: BlockType.column,
-          options: {'red': 'bike'},
-        ),
+        (blockType: BlockType.column, options: {'red': 'bike'}),
       ];
 
       final result = extractTagContents(input);
@@ -96,10 +90,7 @@ void main() {
     test('Parse tag with underscore in part names', () {
       final input = '{@column my_color: my_vehicle}';
       final expectedOutput = [
-        (
-          blockType: BlockType.column,
-          options: {'my_color': 'my_vehicle'},
-        ),
+        (blockType: BlockType.column, options: {'my_color': 'my_vehicle'}),
       ];
 
       final result = extractTagContents(input);
@@ -685,5 +676,5 @@ Header content.
 
 // Extension used by tests to access ColumnBlock
 extension on Block {
-  ColumnBlock get columnOptions => this as ColumnBlock;
+  ContentBlock get columnOptions => this as ContentBlock;
 }
