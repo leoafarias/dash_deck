@@ -6,14 +6,24 @@ import 'package:superdeck_cli/src/helpers/logger.dart';
 import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
-class MermaidBlockParser implements IBlockParser<MermaidBlock> {
-  const MermaidBlockParser();
+class MermaidBlockTransformer implements BlockTransformer {
+  const MermaidBlockTransformer();
   @override
-  MermaidBlock parse(String markdown) {
+  String transform(String markdown) {
     final mermaidBlockRegex = RegExp(r'```mermaid.*?([\s\S]*?)```');
     final matches = mermaidBlockRegex.allMatches(markdown);
 
-    if (matches.isEmpty) return null;
+    if (matches.isEmpty) return markdown;
+
+    final mermaidSyntax = matches.first.group(1);
+
+    if (mermaidSyntax == null) return markdown;
+
+    final asset = MermaidAsset.fromSyntax(mermaidSyntax);
+
+    final mermaidBlock = MermaidBlock(syntax: mermaidSyntax, asset: asset);
+
+    return markdown.replaceAll(matches.first.group(0)!, mermaidBlock.toJson());
   }
 }
 
@@ -34,34 +44,19 @@ class MermaidConverterTask extends Task {
 
   @override
   Future<void> run(TaskContext context) async {
-    final mermaidBlockRegex = RegExp(r'```mermaid.*?([\s\S]*?)```');
-    final slide = context.slide;
+    final mermaidBlocks = context.blocks.whereType<MermaidBlock>();
 
-    final matches = mermaidBlockRegex.allMatches(slide.markdown);
+    for (final mermaidBlock in mermaidBlocks) {
+      final asset = mermaidBlock.asset;
 
-    if (matches.isEmpty) return;
-    // final replacements = <({int start, int end, String markdown})>[];
+      if (await context.dataStore.checkAssetExists(asset)) continue;
 
-    for (final Match match in matches) {
-      final mermaidSyntax = match.group(1);
+      final browser = await _getBrowser();
 
-      if (mermaidSyntax == null) continue;
+      final imageData =
+          await _generateMermaidGraphImage(browser, mermaidBlock.syntax);
 
-      final asset = MermaidAsset.fromSyntax(mermaidSyntax);
-
-      if (!await context.checkAssetExists(asset)) {
-        final browser = await _getBrowser();
-
-        final imageData =
-            await _generateMermaidGraphImage(browser, mermaidSyntax);
-
-        await context.writeAsset(asset, imageData);
-      }
-
-      final imageMarkdown = '![mermaid](${asset.path})';
-
-      context.slide.markdown =
-          context.slide.markdown.replaceAll(match.group(0)!, imageMarkdown);
+      await context.dataStore.writeAsset(asset, imageData);
     }
   }
 }

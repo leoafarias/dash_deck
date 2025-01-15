@@ -1,20 +1,41 @@
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
-import 'package:markdown/markdown.dart' as md;
 import 'package:superdeck_cli/src/generator_pipeline.dart';
+import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
+class RemoteAssetTransformer implements BlockTransformer {
+  final http.Client _httpClient = http.Client();
+  RemoteAssetTransformer();
+
+  @override
+  Future<String> transform(String markdown) async {
+    final imageRegex = RegExp(r'\!\[.*?\]\((.*?)\s*("(?:.*[^"])")?\s*\)');
+    final matches = imageRegex.allMatches(markdown);
+
+    for (final match in matches) {
+      final url = match.group(1)!;
+      final asset = RemoteAsset.fromUrl(url);
+
+      final block = RemoteAssetBlock(asset: asset);
+      markdown = markdown.replaceAll(match.group(0)!, block.toJson());
+    }
+
+    return markdown;
+  }
+}
+
 /// A task responsible for caching images referenced in markdown slides.
-class ImageCachingTask extends Task {
+class RemoteAssetCaching extends Task {
   /// A set to track assets currently being processed to prevent duplicate downloads.
   static final Set<String> _executingAssets = {};
 
   /// HTTP client used for downloading images.
   static final http.Client _httpClient = http.Client();
 
-  /// Constructs an [ImageCachingTask] with the name 'image_caching'.
-  ImageCachingTask() : super('image_caching');
+  /// Constructs an [RemoteAssetCaching] with the name 'image_caching'.
+  RemoteAssetCaching() : super('remote_asset_caching');
 
   // Function to download and save a single asset.
   Future<Uint8List?> _fetchData(String url) async {
@@ -44,7 +65,7 @@ class ImageCachingTask extends Task {
       final extension = contentType.split('/').last.toLowerCase();
 
       // Check if the image format is supported.
-      if (LocalAssetExtension.tryParse(extension) == null) {
+      if (AssetExtension.tryParse(extension) == null) {
         logger.warning('Unsupported image format for $url: $extension');
 
         return null;
@@ -60,31 +81,18 @@ class ImageCachingTask extends Task {
 
   @override
   Future<TaskContext> run(TaskContext context) async {
-    final slide = context.slide;
-    final content = slide.markdown;
+    final assetBlocks = context.blocks.whereType<RemoteAssetBlock>();
 
-    // Parse the markdown content to extract image URLs.
-    final document = md.Document();
-    final nodes = document.parseInline(content);
-    final Set<String> urls = {};
+    for (final block in assetBlocks) {
+      final url = block.asset.src;
 
-    for (final node in nodes) {
-      if (node is md.Element && node.tag == 'img') {
-        final src = node.attributes['src'];
-        if (src != null && src.startsWith('http')) {
-          urls.add(src);
-        }
-      }
-    }
-
-    // Iterate over each asset and process if not already executing.
-    for (final url in urls) {
       if (_executingAssets.contains(url)) {
-        continue; // Skip if the asset is already being processed.
+        continue;
       }
+
       _executingAssets.add(url);
       final asset = CacheRemoteAsset.fromUrl(url);
-      if (await context.checkAssetExists(asset)) {
+      if (await context.dataStore.checkAssetExists(asset)) {
         continue;
       }
       final data = await _fetchData(url);

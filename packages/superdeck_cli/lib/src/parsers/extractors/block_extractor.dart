@@ -4,16 +4,16 @@ import 'package:superdeck_core/superdeck_core.dart';
 import 'package:yaml/yaml.dart';
 
 /// Each block parser should implement how it transforms "options" into a concrete Block.
-abstract interface class IBlockExtractor {
+abstract interface class BlockExtractor {
   List<SectionBlock> parse(String markdown);
 }
 
 /// Parses the body markdown of a RawSlide, detecting lines like `{@BlockType ...}`
 /// to create structured SectionBlocks with nested child blocks.
-class BlockExtractor implements IBlockExtractor {
+class BlockExtractorImpl implements BlockExtractor {
   final BlockExtractorRegistry registry;
 
-  const BlockExtractor({required this.registry});
+  const BlockExtractorImpl({required this.registry});
 
   /// Checks if the line is a block tag starting with '{@' and ending with '}'.
   bool _isBlockTag(String line) {
@@ -75,7 +75,7 @@ class BlockExtractorRegistry {
   BlockExtractorRegistry() {
     register('section', (opts) => SectionBlock.parse(opts));
     register('column', (opts) => ContentBlock.parse(opts));
-    register('image', (opts) => LocalImageBlock.parse(opts));
+    register('image', (opts) => LocalAssetBlock.parse(opts));
     register('widget', (opts) => WidgetBlock.parse(opts));
     register('dart_code', (opts) => DartCodeBlock.parse(opts));
   }

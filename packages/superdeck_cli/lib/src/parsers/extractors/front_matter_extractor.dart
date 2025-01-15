@@ -6,12 +6,12 @@ typedef ExtractedFrontmatter = ({
 });
 
 /// Simple interface for frontmatter extraction
-abstract class IFrontmatterExtractor {
+abstract class FrontmatterExtractor {
   ExtractedFrontmatter parseFrontmatter(String content);
 }
 
-class YamlFrontmatterExtractor implements IFrontmatterExtractor {
-  const YamlFrontmatterExtractor();
+class YamlFrontmatterExtractorImpl implements FrontmatterExtractor {
+  const YamlFrontmatterExtractorImpl();
   @override
   ExtractedFrontmatter parseFrontmatter(String content) {
     // Regex to find '---' then YAML until '---'

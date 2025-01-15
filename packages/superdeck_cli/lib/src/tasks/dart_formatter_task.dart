@@ -1,15 +1,13 @@
 import 'dart:async';
 
-import 'package:superdeck_cli/src/generator_pipeline.dart';
 import 'package:superdeck_cli/src/helpers/dart_process.dart';
+import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
 
-class DartFormatterTask extends Task {
-  DartFormatterTask() : super('dart_formatter');
-
-  Future<String> _formatDartCodeBlocks(TaskContext controller) async {
+class DartCodeTransformer implements BlockTransformer {
+  const DartCodeTransformer();
+  @override
+  Future<String> transform(String markdown) async {
     final codeBlockRegex = RegExp('```dart\n(.*?)\n```');
-    var markdown = controller.slide.markdown;
-
     final matches = codeBlockRegex.allMatches(markdown);
 
     for (final match in matches) {
@@ -22,12 +20,5 @@ class DartFormatterTask extends Task {
     }
 
     return markdown;
-  }
-
-  @override
-  FutureOr<void> run(TaskContext context) async {
-    final formattedMarkdown = await _formatDartCodeBlocks(context);
-
-    context.slide.markdown = formattedMarkdown;
   }
 }

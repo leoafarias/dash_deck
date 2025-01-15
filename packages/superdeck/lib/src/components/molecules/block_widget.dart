@@ -95,11 +95,11 @@ class SectionBlockWidget extends StatelessWidget {
                               mainAxisAlignment: alignment.$1,
                               children: [
                                 switch (block) {
-                                  LocalImageBlock block =>
+                                  LocalAssetBlock block =>
                                     _ImageBlockWidget(block),
                                   WidgetBlock block =>
                                     _WidgetBlockWidget(block),
-                                  DartCodeSnippetBlock block =>
+                                  DartCodeBlock block =>
                                     _DartPadBlockWidget(block),
                                   ContentBlock block =>
                                     ColumnBlockWidget(block),
@@ -171,7 +171,7 @@ class ColumnBlockWidget extends _BlockWidget<ContentBlock> {
   }
 }
 
-class _ImageBlockWidget extends _BlockWidget<LocalImageBlock> {
+class _ImageBlockWidget extends _BlockWidget<LocalAssetBlock> {
   const _ImageBlockWidget(super.block);
 
   @override
@@ -183,7 +183,7 @@ class _ImageBlockWidget extends _BlockWidget<LocalImageBlock> {
     final spec = SlideSpec.of(context);
 
     return CachedImage(
-      uri: Uri.parse(options.src),
+      uri: Uri.parse(options.asset.src),
       spec: spec.image.copyWith(
         fit: ConverterHelper.toBoxFit(imageFit),
         alignment: ConverterHelper.toAlignment(alignment),
@@ -231,12 +231,12 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetBlock> {
   }
 }
 
-class _DartPadBlockWidget extends _BlockWidget<DartCodeSnippetBlock> {
+class _DartPadBlockWidget extends _BlockWidget<DartCodeBlock> {
   const _DartPadBlockWidget(super.block);
 
   @override
   Widget build(context) {
-    final DartCodeSnippetBlock(:id, :theme, :embed) = block;
+    final DartCodeBlock(:id, :theme, :embed) = block;
 
     final themeName = theme?.name ?? DartPadTheme.dark.name;
 

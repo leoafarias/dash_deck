@@ -9,11 +9,9 @@ part 'block_model.mapper.dart';
 enum BlockType {
   section,
   content,
-  local_image,
-  remote_image,
+  asset,
   widget,
-  dartCode,
-  mermaid;
+  dartCode;
 
   static final schema = Schema.enumValue(values);
 }
@@ -145,135 +143,9 @@ class ContentBlock extends Block with ContentBlockMappable {
     schemas: {
       BlockType.content.name: ContentBlock.schema,
       BlockType.widget.name: WidgetBlock.schema,
-      BlockType.local_image.name: LocalImageBlock.schema,
-      BlockType.remote_image.name: RemoteImageBlock.schema,
-      BlockType.mermaid.name: MermaidBlock.schema,
+      BlockType.asset.name: AssetBlock.schema,
       BlockType.dartCode.name: DartCodeBlock.schema,
     },
-  );
-}
-
-@MappableClass()
-abstract class ImageBlock extends ContentBlock with ImageBlockMappable {
-  final String src;
-  final ImageFit? fit;
-  final double? width;
-  final double? height;
-  ImageBlock({
-    required this.src,
-    this.fit,
-    this.width,
-    this.height,
-    super.flex,
-    super.align,
-    super.content,
-    super.scrollable,
-    required super.type,
-  });
-
-  static final schema = ContentBlock.schema.extend(
-    {
-      "fit": ImageFit.schema,
-      "src": Schema.string(),
-      "width": Schema.double(),
-      "height": Schema.double(),
-    },
-    required: [
-      "src",
-    ],
-  );
-}
-
-@MappableClass(discriminatorValue: 'local_image')
-class LocalImageBlock extends ImageBlock with LocalImageBlockMappable {
-  LocalImageBlock({
-    required super.src,
-    super.fit,
-    super.width,
-    super.height,
-    super.flex,
-    super.align,
-    super.content,
-    super.scrollable,
-  }) : super(type: BlockType.local_image);
-
-  static LocalImageBlock parse(Map<String, dynamic> map) {
-    schema.validateOrThrow(map);
-
-    return LocalImageBlockMapper.fromMap(map);
-  }
-
-  static final schema = ImageBlock.schema;
-}
-
-@MappableClass(discriminatorValue: 'remote_image')
-class RemoteImageBlock extends ImageBlock with RemoteImageBlockMappable {
-  RemoteImageBlock({
-    required super.src,
-    super.fit,
-    super.width,
-    super.height,
-    super.flex,
-    super.align,
-    super.content,
-    required super.scrollable,
-  }) : super(type: BlockType.remote_image);
-
-  static final schema = ImageBlock.schema;
-}
-
-@MappableClass(discriminatorValue: 'mermaid')
-class MermaidBlock extends ImageBlock with MermaidBlockMappable {
-  final String syntax;
-
-  MermaidBlock({
-    required this.syntax,
-    required super.src,
-    required super.fit,
-    required super.width,
-    required super.height,
-    required super.flex,
-    required super.align,
-    required super.content,
-    required super.scrollable,
-  }) : super(type: BlockType.mermaid);
-
-  static final schema = ImageBlock.schema.extend({
-    "syntax": Schema.string(),
-  });
-}
-
-@MappableClass(
-  discriminatorValue: 'widget',
-  hook: UnmappedPropertiesHook('args'),
-)
-class WidgetBlock extends ContentBlock with WidgetBlockMappable {
-  final String name;
-  final Map<String, dynamic> args;
-
-  @override
-  WidgetBlock({
-    required this.name,
-    this.args = const {},
-    super.flex,
-    super.align,
-    super.content,
-    super.scrollable,
-  }) : super(type: BlockType.widget);
-
-  static WidgetBlock parse(Map<String, dynamic> map) {
-    schema.validateOrThrow(map);
-    return WidgetBlockMapper.fromMap(map);
-  }
-
-  static final schema = ContentBlock.schema.extend(
-    {
-      "name": Schema.string(),
-    },
-    required: [
-      "name",
-    ],
-    additionalProperties: true,
   );
 }
 
@@ -315,6 +187,152 @@ class DartCodeBlock extends ContentBlock with DartCodeBlockMappable {
     required: [
       "id",
     ],
+  );
+}
+
+@MappableEnum()
+enum AssetExtension {
+  png,
+  jpeg,
+  gif,
+  webp,
+  svg;
+
+  static final schema = Schema.enumValue(values);
+
+  static AssetExtension? tryParse(String value) {
+    final extension = value.toLowerCase();
+
+    if (extension == 'jpg') {
+      return AssetExtension.jpeg;
+    }
+    return AssetExtension.values.firstWhereOrNull((e) => e.name == extension);
+  }
+}
+
+@MappableClass()
+abstract class AssetBlock<T extends Asset> extends ContentBlock
+    with AssetBlockMappable<T> {
+  final T asset;
+  final ImageFit? fit;
+  final double? width;
+  final double? height;
+  AssetBlock({
+    required this.asset,
+    this.fit,
+    this.width,
+    this.height,
+    super.flex,
+    super.align,
+    super.content,
+    super.scrollable,
+  }) : super(type: BlockType.asset);
+
+  static final schema = ContentBlock.schema.extend(
+    {
+      "fit": ImageFit.schema,
+      "asset": Asset.schema,
+      "width": Schema.double(),
+      "height": Schema.double(),
+    },
+    required: [
+      "asset",
+    ],
+  );
+}
+
+@MappableClass()
+class LocalAssetBlock extends AssetBlock<LocalAsset>
+    with LocalAssetBlockMappable {
+  LocalAssetBlock({
+    required super.asset,
+    super.fit,
+    super.width,
+    super.height,
+    super.flex,
+    super.align,
+    super.content,
+    super.scrollable,
+  });
+
+  static LocalAssetBlock parse(Map<String, dynamic> map) {
+    schema.validateOrThrow(map);
+
+    return LocalAssetBlockMapper.fromMap(map);
+  }
+
+  static final schema = AssetBlock.schema;
+}
+
+@MappableClass(discriminatorValue: 'remote_image')
+class RemoteAssetBlock extends AssetBlock<RemoteAsset>
+    with RemoteAssetBlockMappable {
+  RemoteAssetBlock({
+    required super.asset,
+    super.fit,
+    super.width,
+    super.height,
+    super.flex,
+    super.align,
+    super.content,
+    super.scrollable,
+  });
+
+  static final schema = AssetBlock.schema;
+}
+
+@MappableClass(discriminatorValue: 'mermaid')
+class MermaidBlock extends AssetBlock<MermaidAsset> with MermaidBlockMappable {
+  final String syntax;
+
+  MermaidBlock({
+    required this.syntax,
+    required super.asset,
+    super.fit,
+    super.width,
+    super.height,
+    super.flex,
+    super.align,
+    super.content,
+    super.scrollable,
+  });
+
+  static final schema = AssetBlock.schema.extend({
+    "syntax": Schema.string(),
+  });
+}
+
+@MappableClass(
+  discriminatorValue: 'widget',
+  hook: UnmappedPropertiesHook('args'),
+)
+class WidgetBlock extends ContentBlock with WidgetBlockMappable {
+  final String name;
+  final Map<String, dynamic> args;
+
+  @override
+  WidgetBlock({
+    required this.name,
+    this.args = const {},
+    super.flex,
+    super.align,
+    super.content,
+    super.scrollable,
+  }) : super(type: BlockType.widget);
+
+  static WidgetBlock parse(Map<String, dynamic> map) {
+    schema.validateOrThrow(map);
+    return WidgetBlockMapper.fromMap(map);
+  }
+
+  static final schema = ContentBlock.schema.extend(
+    {
+      "name": Schema.string(),
+    },
+    required: [
+      "name",
+    ],
+    additionalProperties: true,
   );
 }
 

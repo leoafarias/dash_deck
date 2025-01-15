@@ -7,21 +7,13 @@ import 'package:superdeck_cli/src/helpers/exceptions.dart';
 import 'package:superdeck_cli/src/helpers/extensions.dart';
 import 'package:superdeck_cli/src/helpers/logger.dart';
 import 'package:superdeck_cli/src/helpers/update_pubspec.dart';
-import 'package:superdeck_cli/src/tasks/dart_formatter_task.dart';
 import 'package:superdeck_cli/src/tasks/mermaid_task.dart';
-import 'package:superdeck_cli/src/tasks/slide_thumbnail_task.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 class BuildCommand extends Command<int> {
-  final _pipeline = TaskPipeline([
-    MermaidConverterTask(),
-    DartFormatterTask(),
-    SlideThumbnailTask(),
-  ]);
-
   bool _isRunning = false;
 
-  BuildCommand() : super() {
+  BuildCommand() {
     argParser.addFlag(
       'watch',
       abbr: 'w',
@@ -29,7 +21,7 @@ class BuildCommand extends Command<int> {
     );
   }
 
-  Future<void> _runPipeline() async {
+  Future<void> _runPipeline(TaskPipeline pipeline) async {
     // wait wihle _isRunning is true
     while (_isRunning) {
       await Future.delayed(const Duration(milliseconds: 100));
@@ -37,7 +29,7 @@ class BuildCommand extends Command<int> {
     _isRunning = true;
     final progress = logger.progress('Generating slides...');
     try {
-      final slides = await _pipeline.run();
+      final slides = await pipeline.run();
       progress.complete('Generated ${slides.length} slides.');
     } on Exception catch (e, stackTrace) {
       progress.fail();
@@ -51,17 +43,18 @@ class BuildCommand extends Command<int> {
 
   @override
   Future<int> run() async {
-    // Move this later to config
-    final repository = DeckRepository();
-
+    final _pipeline = TaskPipeline(
+      tasks: [MermaidConverterTask()],
+      dataStore: FileSystemDataStoreImpl(SuperdeckConfig()),
+    );
     final watch = boolArg('watch');
 
-    await _runPipeline();
+    await _runPipeline(_pipeline);
 
     if (watch) {
-      repository.markdownFile
+      final subscription = _pipeline.dataStore.configuration.markdownFile
           .watch(events: FileSystemEvent.modify)
-          .listen((event) => _runPipeline());
+          .listen((event) => _runPipeline(_pipeline));
     }
 
     return ExitCode.success.code;

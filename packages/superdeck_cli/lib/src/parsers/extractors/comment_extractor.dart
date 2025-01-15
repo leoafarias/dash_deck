@@ -1,10 +1,10 @@
-abstract class ICommentExtractor {
+abstract class CommentExtractor {
   List<String> parseComments(String content);
 }
 
-class HtmlCommentExtractor implements ICommentExtractor {
+class HtmlCommentExtractorImpl implements CommentExtractor {
   static final _commentRegex = RegExp(r'<!--(.*?)-->', dotAll: true);
-  const HtmlCommentExtractor();
+  const HtmlCommentExtractorImpl();
   @override
   List<String> parseComments(String content) {
     final matches = _commentRegex.allMatches(content);

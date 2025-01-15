@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:superdeck_cli/src/parsers/extractors/block_extractor.dart';
@@ -8,11 +9,13 @@ import 'package:superdeck_core/superdeck_core.dart';
 /// Responsible for splitting the entire markdown into separate slides,
 /// extracting front matter, and capturing comments.
 class MarkdownParser {
-  final IFrontmatterExtractor frontmatterExtractor;
-  final ICommentExtractor commentExtractor;
-  final IBlockExtractor blockExtractor;
+  final List<BlockTransformer> transformers;
+  final FrontmatterExtractor frontmatterExtractor;
+  final CommentExtractor commentExtractor;
+  final BlockExtractor blockExtractor;
 
   const MarkdownParser({
+    required this.transformers,
     required this.frontmatterExtractor,
     required this.commentExtractor,
     required this.blockExtractor,
@@ -59,27 +62,30 @@ class MarkdownParser {
     return slideContent.hashCode.toString();
   }
 
-  List<Slide> parse(String markdown) {
+  Future<List<Slide>> parse(String markdown) async {
     final lines = LineSplitter().convert(markdown);
-    final slidesRawContent = _splitSlides(lines);
+    final rawSlides = _splitSlides(lines);
 
     final slides = <Slide>[];
 
-    for (final slideContent in slidesRawContent) {
+    for (final rawSlide in rawSlides) {
       // 1) Extract front matter
-      final frontmatter = frontmatterExtractor.parseFrontmatter(slideContent);
+      final frontmatter = frontmatterExtractor.parseFrontmatter(rawSlide);
       // 2) Remove the front matter from the raw markdown
-      final stripped =
-          _removeFrontmatter(slideContent, frontmatter.extractedText);
+      var stripped = _removeFrontmatter(rawSlide, frontmatter.extractedText);
 
       // 3) Extract comments
       final comments = commentExtractor.parseComments(stripped);
+
+      for (final transformer in transformers) {
+        stripped = await transformer.transform(stripped);
+      }
 
       // 4) Parse sections
       final sections = blockExtractor.parse(stripped);
 
       // 4) Generate a key (this is just a placeholder)
-      final key = _generateKey(slideContent);
+      final key = _generateKey(rawSlide);
 
       slides.add(
         Slide(
@@ -100,6 +106,6 @@ bool _isCodeFence(String line) {
   return line.trim().startsWith('```');
 }
 
-abstract interface class IBlockParser<T extends Block> {
-  T parse(String markdown);
+abstract interface class BlockTransformer {
+  FutureOr<String> transform(String markdown);
 }

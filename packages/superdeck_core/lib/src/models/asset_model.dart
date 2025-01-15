@@ -1,37 +1,25 @@
-import 'package:collection/collection.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 part 'asset_model.mapper.dart';
 
 @MappableClass(discriminatorKey: 'type')
-sealed class LocalAsset with LocalAssetMappable {
-  final String key;
-  final String fileName;
-  final LocalAssetExtension extension;
+abstract class Asset with AssetMappable {
+  final String src;
   final String type;
 
-  LocalAsset({
-    required this.fileName,
-    required this.extension,
-    required this.key,
+  Asset({
+    required this.src,
     required this.type,
   });
 
-  static String buildKey(String valueToHash) => generateValueHash(valueToHash);
-  String get path => '${type}_$fileName.${extension.name}';
-
   static final schema = Schema.object(
     {
-      "file_name": Schema.string(),
-      "extension": LocalAssetExtension.schema,
-      "key": Schema.string(),
+      "src": Schema.string(),
       "type": Schema.string(),
     },
     required: [
-      "file_name",
-      "extension",
-      "key",
+      "src",
       "type",
     ],
   );
@@ -41,18 +29,78 @@ sealed class LocalAsset with LocalAssetMappable {
     schemas: {
       'thumbnail': SlideThumbnailAsset.schema,
       'mermaid': MermaidAsset.schema,
-      'remote': CacheRemoteAsset.schema,
+      'cache_remote': CacheRemoteAsset.schema,
+      'remote': RemoteAsset.schema,
     },
   );
 
-  LocalAsset fromMap(Map<String, dynamic> map) {
+  Asset fromMap(Map<String, dynamic> map) {
     typeSchema.validateOrThrow(map);
-    return LocalAssetMapper.fromMap(map);
+    return AssetMapper.fromMap(map);
   }
 }
 
+@MappableClass(discriminatorValue: 'remote')
+class RemoteAsset extends Asset with RemoteAssetMappable {
+  RemoteAsset({
+    required super.src,
+    required super.type,
+  });
+
+  factory RemoteAsset.fromUrl(String url) {
+    return RemoteAsset(
+      src: url,
+      type: 'remote',
+    );
+  }
+
+  static final schema = Asset.schema;
+}
+
+@MappableClass()
+sealed class LocalAsset extends Asset with LocalAssetMappable {
+  final String fileName;
+  final AssetExtension extension;
+
+  LocalAsset({
+    required this.fileName,
+    required this.extension,
+    required super.type,
+  }) : super(src: '${type}_$fileName.${extension.name}');
+
+  static String buildKey(String valueToHash) => generateValueHash(valueToHash);
+
+  String get path => src;
+
+  static final schema = Asset.schema.extend(
+    {
+      "file_name": Schema.string(),
+      "extension": AssetExtension.schema,
+      "key": Schema.string(),
+    },
+    required: [
+      "file_name",
+      "extension",
+      "key",
+    ],
+  );
+}
+
+@MappableClass()
+sealed class GeneratedAsset extends LocalAsset with GeneratedAssetMappable {
+  final String key;
+
+  GeneratedAsset({
+    required this.key,
+    required super.fileName,
+    required super.extension,
+    required super.type,
+  });
+}
+
 @MappableClass(discriminatorValue: 'thumbnail')
-class SlideThumbnailAsset extends LocalAsset with SlideThumbnailAssetMappable {
+class SlideThumbnailAsset extends GeneratedAsset
+    with SlideThumbnailAssetMappable {
   SlideThumbnailAsset({
     required super.key,
     required super.fileName,
@@ -63,7 +111,7 @@ class SlideThumbnailAsset extends LocalAsset with SlideThumbnailAssetMappable {
     return SlideThumbnailAsset(
       key: slideKey,
       fileName: slideKey,
-      extension: LocalAssetExtension.png,
+      extension: AssetExtension.png,
     );
   }
 
@@ -71,7 +119,7 @@ class SlideThumbnailAsset extends LocalAsset with SlideThumbnailAssetMappable {
 }
 
 @MappableClass(discriminatorValue: 'mermaid')
-class MermaidAsset extends LocalAsset with MermaidAssetMappable {
+class MermaidAsset extends GeneratedAsset with MermaidAssetMappable {
   @MappableConstructor()
   MermaidAsset({
     required super.key,
@@ -84,50 +132,29 @@ class MermaidAsset extends LocalAsset with MermaidAssetMappable {
     return MermaidAsset(
       key: key,
       fileName: key,
-      extension: LocalAssetExtension.png,
+      extension: AssetExtension.png,
     );
   }
 
   static final schema = LocalAsset.schema.extend({});
 }
 
-@MappableClass(discriminatorValue: 'remote')
-class CacheRemoteAsset extends LocalAsset with CacheRemoteAssetMappable {
+@MappableClass(discriminatorValue: 'cache_remote')
+class CacheRemoteAsset extends GeneratedAsset with CacheRemoteAssetMappable {
   @MappableConstructor()
   CacheRemoteAsset({
     required super.key,
     required super.fileName,
     required super.extension,
-  }) : super(type: 'remote');
+  }) : super(type: 'cache_remote');
 
   factory CacheRemoteAsset.fromUrl(String url) {
     return CacheRemoteAsset(
       key: url,
       fileName: LocalAsset.buildKey(url),
-      extension: LocalAssetExtension.png,
+      extension: AssetExtension.png,
     );
   }
 
   static final schema = LocalAsset.schema.extend({});
-}
-
-@MappableEnum()
-enum LocalAssetExtension {
-  png,
-  jpeg,
-  gif,
-  webp,
-  svg;
-
-  static final schema = Schema.enumValue(values);
-
-  static LocalAssetExtension? tryParse(String value) {
-    final extension = value.toLowerCase();
-
-    if (extension == 'jpg') {
-      return LocalAssetExtension.jpeg;
-    }
-    return LocalAssetExtension.values
-        .firstWhereOrNull((e) => e.name == extension);
-  }
 }

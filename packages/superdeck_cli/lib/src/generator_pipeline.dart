@@ -6,13 +6,17 @@ import 'package:superdeck_cli/src/parsers/extractors/block_extractor.dart';
 import 'package:superdeck_cli/src/parsers/extractors/comment_extractor.dart';
 import 'package:superdeck_cli/src/parsers/extractors/front_matter_extractor.dart';
 import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
+import 'package:superdeck_cli/src/tasks/dart_formatter_task.dart';
+import 'package:superdeck_cli/src/tasks/mermaid_task.dart';
+import 'package:superdeck_cli/src/tasks/remote_asset_task.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 /// Represents the context in which a slide is processed.
 /// It holds the raw slide data and manages associated assets.
-class SlideProcessingContext {
+class TaskContext {
   /// The index of the slide in the original list.
   final int slideIndex;
+  final FileSystemDataStoreImpl dataStore;
 
   /// The raw slide being processed.
   Slide slide;
@@ -20,73 +24,39 @@ class SlideProcessingContext {
   /// List of assets used during processing.
   final List<LocalAsset> _assetsUsed = [];
 
-  SlideProcessingContext(this.slideIndex, this.slide);
+  TaskContext(this.slideIndex, this.slide, this.dataStore);
+
+  List<Block> get blocks =>
+      slide.sections.map((e) => e.blocks).expand((e) => e).toList();
 
   /// Writes an asset to the specified path and tracks its usage.
   Future<void> writeAsset(LocalAsset asset, List<int> bytes) async {
     await File(asset.path).writeAsBytes(bytes);
     _assetsUsed.add(asset);
   }
-
-  /// Checks if an asset exists at the specified path.
-  /// If it exists, tracks its usage.
-  Future<bool> assetExists(LocalAsset asset) async {
-    if (await File(asset.path).exists()) {
-      _assetsUsed.add(asset);
-
-      return true;
-    }
-
-    return false;
-  }
-}
-
-/// Abstract base class representing a generic task in the pipeline.
-/// Each task should implement the [run] method to perform its specific operation.
-abstract class SlideTask {
-  /// Name of the task, used for logging and identification.
-  final String name;
-
-  /// Logger instance for the task.
-  late final Logger logger = Logger('SlideTask: $name');
-
-  SlideTask(this.name);
-
-  /// Executes the task using the provided [SlideProcessingContext].
-  Future<void> run(SlideProcessingContext context);
-
-  /// Disposes of any resources held by the task.
-  /// Override if the task holds resources that need explicit disposal.
-  Future<void> dispose() async {
-    // Default implementation does nothing.
-  }
 }
 
 /// Manages the execution of a series of [SlideTask] instances to process slides.
 /// It handles loading markdown content, parsing slides, executing tasks,
 /// cleaning up assets, and saving the processed slides.
-class SlideProcessingPipeline {
-  final int slideIndex;
-
+class TaskPipeline {
   /// List of tasks to execute for each slide.
-  final List<SlideTask> tasks;
+  final List<Task> tasks;
 
   /// Repository for loading and saving slides.
-  final DeckRepository repository = DeckRepository();
+  final FileSystemDataStoreImpl dataStore;
 
-  SlideProcessingPipeline(this.slideIndex, this.tasks);
+  const TaskPipeline({required this.tasks, required this.dataStore});
 
   /// Processes an individual slide by executing all tasks sequentially.
-  Future<TaskProcessingResult> _processSlide(
-    SlideProcessingContext context,
-  ) async {
+  Future<TaskProcessingResult> _processSlide(TaskContext context) async {
     for (var task in tasks) {
       try {
         await task.run(context);
       } on Exception catch (e, stackTrace) {
         // Wrap and rethrow the exception with additional context.
         Error.throwWithStackTrace(
-          SDTaskException(task.name, e, slideIndex),
+          SDTaskException(task.name, e, context.slideIndex),
           stackTrace,
         );
       }
@@ -98,7 +68,7 @@ class SlideProcessingPipeline {
   /// Cleans up generated files in [generatedDir] that are not present in [neededAssets].
   Future<void> _cleanupGeneratedFiles(
     Directory generatedDir,
-    Set<LocalAsset> neededAssets,
+    List<LocalAsset> neededAssets,
   ) async {
     final files = await _loadGeneratedFiles(generatedDir);
     final neededPaths = neededAssets.map((asset) => asset.path).toSet();
@@ -133,23 +103,28 @@ class SlideProcessingPipeline {
   /// 5. Saves the processed slides.
   Future<List<Slide>> run() async {
     // Load raw markdown content from the repository.
-    final markdownRaw = await repository.loadMarkdown();
+    final markdownRaw = await dataStore.getDeckMarkdown();
 
     // Initialize the markdown parser with necessary extractors.
     final markdownParser = MarkdownParser(
-      frontmatterExtractor: YamlFrontmatterExtractor(),
-      commentExtractor: HtmlCommentExtractor(),
-      blockExtractor: BlockExtractor(registry: BlockExtractorRegistry()),
+      transformers: [
+        MermaidBlockTransformer(),
+        DartCodeTransformer(),
+        RemoteAssetTransformer(),
+      ],
+      frontmatterExtractor: YamlFrontmatterExtractorImpl(),
+      commentExtractor: HtmlCommentExtractorImpl(),
+      blockExtractor: BlockExtractorImpl(registry: BlockExtractorRegistry()),
     );
 
     // Parse the raw markdown into individual raw slides.
-    final rawSlides = markdownParser.parse(markdownRaw);
+    final rawSlides = await markdownParser.parse(markdownRaw);
 
     // Prepare a list of futures to process each slide concurrently.
     final futures = <Future<TaskProcessingResult>>[];
 
     for (var i = 0; i < rawSlides.length; i++) {
-      futures.add(_processSlide(SlideProcessingContext(i, rawSlides[i])));
+      futures.add(_processSlide(TaskContext(i, rawSlides[i], dataStore)));
     }
 
     // Await all slide processing tasks to complete.
@@ -159,11 +134,25 @@ class SlideProcessingPipeline {
     final finalizedSlides = results.map((result) => result.context.slide);
 
     // Determine all assets that are still needed after processing.
-    final neededAssets =
-        finalizedSlides.expand((slide) => slide.assets).toSet();
+    final localAssets = finalizedSlides
+        .expand((slide) => slide.sections.map(
+              (e) => e.blocks.whereType<LocalAssetBlock>().map((e) => e.asset),
+            ))
+        .expand((e) => e)
+        .toSet()
+        .toList();
+
+    List<SlideThumbnailAsset> thumbnailAssets = [];
+
+    for (final slide in finalizedSlides) {
+      thumbnailAssets.add(SlideThumbnailAsset.fromSlideKey(slide.key));
+    }
 
     // Clean up any generated files that are no longer needed.
-    await _cleanupGeneratedFiles(repository.generatedDir, neededAssets);
+    await _cleanupGeneratedFiles(
+      dataStore.configuration.generatedDir,
+      [...localAssets, ...thumbnailAssets],
+    );
 
     // Dispose of all tasks after processing.
     for (var task in tasks) {
@@ -174,7 +163,7 @@ class SlideProcessingPipeline {
     final newSlides = finalizedSlides.toList();
 
     // Save the processed slides back to the repository.
-    await repository.saveSlides(newSlides);
+    await dataStore.saveSlides(newSlides);
 
     return newSlides;
   }
@@ -183,7 +172,7 @@ class SlideProcessingPipeline {
 /// Represents the result of processing a single slide.
 class TaskProcessingResult {
   /// The context after processing the slide.
-  final SlideProcessingContext context;
+  final TaskContext context;
 
   const TaskProcessingResult(this.context);
 }
@@ -219,7 +208,7 @@ abstract class Task {
   Task(this.name);
 
   /// Executes the task using the provided [TaskContext].
-  FutureOr<void> run(SlideProcessingContext context);
+  FutureOr<void> run(TaskContext context);
 
   /// Disposes of any resources held by the task.
   /// Override if the task holds resources that need explicit disposal.

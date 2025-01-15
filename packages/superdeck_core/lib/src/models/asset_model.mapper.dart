@@ -6,75 +6,191 @@
 
 part of 'asset_model.dart';
 
-class LocalAssetExtensionMapper extends EnumMapper<LocalAssetExtension> {
-  LocalAssetExtensionMapper._();
+class AssetMapper extends ClassMapperBase<Asset> {
+  AssetMapper._();
 
-  static LocalAssetExtensionMapper? _instance;
-  static LocalAssetExtensionMapper ensureInitialized() {
+  static AssetMapper? _instance;
+  static AssetMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals.use(_instance = LocalAssetExtensionMapper._());
+      MapperContainer.globals.use(_instance = AssetMapper._());
+      RemoteAssetMapper.ensureInitialized();
+      LocalAssetMapper.ensureInitialized();
     }
     return _instance!;
   }
 
-  static LocalAssetExtension fromValue(dynamic value) {
-    ensureInitialized();
-    return MapperContainer.globals.fromValue(value);
+  @override
+  final String id = 'Asset';
+
+  static String _$src(Asset v) => v.src;
+  static const Field<Asset, String> _f$src = Field('src', _$src);
+  static String _$type(Asset v) => v.type;
+  static const Field<Asset, String> _f$type = Field('type', _$type);
+
+  @override
+  final MappableFields<Asset> fields = const {
+    #src: _f$src,
+    #type: _f$type,
+  };
+  @override
+  final bool ignoreNull = true;
+
+  static Asset _instantiate(DecodingData data) {
+    throw MapperException.missingSubclass(
+        'Asset', 'type', '${data.value['type']}');
   }
 
   @override
-  LocalAssetExtension decode(dynamic value) {
-    switch (value) {
-      case 'png':
-        return LocalAssetExtension.png;
-      case 'jpeg':
-        return LocalAssetExtension.jpeg;
-      case 'gif':
-        return LocalAssetExtension.gif;
-      case 'webp':
-        return LocalAssetExtension.webp;
-      case 'svg':
-        return LocalAssetExtension.svg;
-      default:
-        throw MapperException.unknownEnumValue(value);
+  final Function instantiate = _instantiate;
+
+  static Asset fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<Asset>(map);
+  }
+
+  static Asset fromJson(String json) {
+    return ensureInitialized().decodeJson<Asset>(json);
+  }
+}
+
+mixin AssetMappable {
+  String toJson();
+  Map<String, dynamic> toMap();
+  AssetCopyWith<Asset, Asset, Asset> get copyWith;
+}
+
+abstract class AssetCopyWith<$R, $In extends Asset, $Out>
+    implements ClassCopyWith<$R, $In, $Out> {
+  $R call();
+  AssetCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class RemoteAssetMapper extends SubClassMapperBase<RemoteAsset> {
+  RemoteAssetMapper._();
+
+  static RemoteAssetMapper? _instance;
+  static RemoteAssetMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = RemoteAssetMapper._());
+      AssetMapper.ensureInitialized().addSubMapper(_instance!);
     }
+    return _instance!;
   }
 
   @override
-  dynamic encode(LocalAssetExtension self) {
-    switch (self) {
-      case LocalAssetExtension.png:
-        return 'png';
-      case LocalAssetExtension.jpeg:
-        return 'jpeg';
-      case LocalAssetExtension.gif:
-        return 'gif';
-      case LocalAssetExtension.webp:
-        return 'webp';
-      case LocalAssetExtension.svg:
-        return 'svg';
-    }
+  final String id = 'RemoteAsset';
+
+  static String _$src(RemoteAsset v) => v.src;
+  static const Field<RemoteAsset, String> _f$src = Field('src', _$src);
+  static String _$type(RemoteAsset v) => v.type;
+  static const Field<RemoteAsset, String> _f$type = Field('type', _$type);
+
+  @override
+  final MappableFields<RemoteAsset> fields = const {
+    #src: _f$src,
+    #type: _f$type,
+  };
+  @override
+  final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'type';
+  @override
+  final dynamic discriminatorValue = 'remote';
+  @override
+  late final ClassMapperBase superMapper = AssetMapper.ensureInitialized();
+
+  static RemoteAsset _instantiate(DecodingData data) {
+    return RemoteAsset(src: data.dec(_f$src), type: data.dec(_f$type));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static RemoteAsset fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<RemoteAsset>(map);
+  }
+
+  static RemoteAsset fromJson(String json) {
+    return ensureInitialized().decodeJson<RemoteAsset>(json);
   }
 }
 
-extension LocalAssetExtensionMapperExtension on LocalAssetExtension {
-  String toValue() {
-    LocalAssetExtensionMapper.ensureInitialized();
-    return MapperContainer.globals.toValue<LocalAssetExtension>(this) as String;
+mixin RemoteAssetMappable {
+  String toJson() {
+    return RemoteAssetMapper.ensureInitialized()
+        .encodeJson<RemoteAsset>(this as RemoteAsset);
+  }
+
+  Map<String, dynamic> toMap() {
+    return RemoteAssetMapper.ensureInitialized()
+        .encodeMap<RemoteAsset>(this as RemoteAsset);
+  }
+
+  RemoteAssetCopyWith<RemoteAsset, RemoteAsset, RemoteAsset> get copyWith =>
+      _RemoteAssetCopyWithImpl(this as RemoteAsset, $identity, $identity);
+  @override
+  String toString() {
+    return RemoteAssetMapper.ensureInitialized()
+        .stringifyValue(this as RemoteAsset);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return RemoteAssetMapper.ensureInitialized()
+        .equalsValue(this as RemoteAsset, other);
+  }
+
+  @override
+  int get hashCode {
+    return RemoteAssetMapper.ensureInitialized().hashValue(this as RemoteAsset);
   }
 }
 
-class LocalAssetMapper extends ClassMapperBase<LocalAsset> {
+extension RemoteAssetValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, RemoteAsset, $Out> {
+  RemoteAssetCopyWith<$R, RemoteAsset, $Out> get $asRemoteAsset =>
+      $base.as((v, t, t2) => _RemoteAssetCopyWithImpl(v, t, t2));
+}
+
+abstract class RemoteAssetCopyWith<$R, $In extends RemoteAsset, $Out>
+    implements AssetCopyWith<$R, $In, $Out> {
+  @override
+  $R call({String? src, String? type});
+  RemoteAssetCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _RemoteAssetCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, RemoteAsset, $Out>
+    implements RemoteAssetCopyWith<$R, RemoteAsset, $Out> {
+  _RemoteAssetCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<RemoteAsset> $mapper =
+      RemoteAssetMapper.ensureInitialized();
+  @override
+  $R call({String? src, String? type}) => $apply(FieldCopyWithData(
+      {if (src != null) #src: src, if (type != null) #type: type}));
+  @override
+  RemoteAsset $make(CopyWithData data) => RemoteAsset(
+      src: data.get(#src, or: $value.src),
+      type: data.get(#type, or: $value.type));
+
+  @override
+  RemoteAssetCopyWith<$R2, RemoteAsset, $Out2> $chain<$R2, $Out2>(
+          Then<$Out2, $R2> t) =>
+      _RemoteAssetCopyWithImpl($value, $cast, t);
+}
+
+class LocalAssetMapper extends SubClassMapperBase<LocalAsset> {
   LocalAssetMapper._();
 
   static LocalAssetMapper? _instance;
   static LocalAssetMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = LocalAssetMapper._());
-      SlideThumbnailAssetMapper.ensureInitialized();
-      MermaidAssetMapper.ensureInitialized();
-      CacheRemoteAssetMapper.ensureInitialized();
-      LocalAssetExtensionMapper.ensureInitialized();
+      AssetMapper.ensureInitialized().addSubMapper(_instance!);
+      GeneratedAssetMapper.ensureInitialized();
+      AssetExtensionMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -85,23 +201,31 @@ class LocalAssetMapper extends ClassMapperBase<LocalAsset> {
   static String _$fileName(LocalAsset v) => v.fileName;
   static const Field<LocalAsset, String> _f$fileName =
       Field('fileName', _$fileName, key: 'file_name');
-  static LocalAssetExtension _$extension(LocalAsset v) => v.extension;
-  static const Field<LocalAsset, LocalAssetExtension> _f$extension =
+  static AssetExtension _$extension(LocalAsset v) => v.extension;
+  static const Field<LocalAsset, AssetExtension> _f$extension =
       Field('extension', _$extension);
-  static String _$key(LocalAsset v) => v.key;
-  static const Field<LocalAsset, String> _f$key = Field('key', _$key);
   static String _$type(LocalAsset v) => v.type;
   static const Field<LocalAsset, String> _f$type = Field('type', _$type);
+  static String _$src(LocalAsset v) => v.src;
+  static const Field<LocalAsset, String> _f$src =
+      Field('src', _$src, mode: FieldMode.member);
 
   @override
   final MappableFields<LocalAsset> fields = const {
     #fileName: _f$fileName,
     #extension: _f$extension,
-    #key: _f$key,
     #type: _f$type,
+    #src: _f$src,
   };
   @override
   final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'type';
+  @override
+  final dynamic discriminatorValue = 'LocalAsset';
+  @override
+  late final ClassMapperBase superMapper = AssetMapper.ensureInitialized();
 
   static LocalAsset _instantiate(DecodingData data) {
     throw MapperException.missingSubclass(
@@ -127,9 +251,93 @@ mixin LocalAssetMappable {
 }
 
 abstract class LocalAssetCopyWith<$R, $In extends LocalAsset, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
-  $R call({String? fileName, LocalAssetExtension? extension, String? key});
+    implements AssetCopyWith<$R, $In, $Out> {
+  @override
+  $R call({String? fileName, AssetExtension? extension});
   LocalAssetCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class GeneratedAssetMapper extends SubClassMapperBase<GeneratedAsset> {
+  GeneratedAssetMapper._();
+
+  static GeneratedAssetMapper? _instance;
+  static GeneratedAssetMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = GeneratedAssetMapper._());
+      LocalAssetMapper.ensureInitialized().addSubMapper(_instance!);
+      SlideThumbnailAssetMapper.ensureInitialized();
+      MermaidAssetMapper.ensureInitialized();
+      CacheRemoteAssetMapper.ensureInitialized();
+      AssetExtensionMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'GeneratedAsset';
+
+  static String _$key(GeneratedAsset v) => v.key;
+  static const Field<GeneratedAsset, String> _f$key = Field('key', _$key);
+  static String _$fileName(GeneratedAsset v) => v.fileName;
+  static const Field<GeneratedAsset, String> _f$fileName =
+      Field('fileName', _$fileName, key: 'file_name');
+  static AssetExtension _$extension(GeneratedAsset v) => v.extension;
+  static const Field<GeneratedAsset, AssetExtension> _f$extension =
+      Field('extension', _$extension);
+  static String _$type(GeneratedAsset v) => v.type;
+  static const Field<GeneratedAsset, String> _f$type = Field('type', _$type);
+  static String _$src(GeneratedAsset v) => v.src;
+  static const Field<GeneratedAsset, String> _f$src =
+      Field('src', _$src, mode: FieldMode.member);
+
+  @override
+  final MappableFields<GeneratedAsset> fields = const {
+    #key: _f$key,
+    #fileName: _f$fileName,
+    #extension: _f$extension,
+    #type: _f$type,
+    #src: _f$src,
+  };
+  @override
+  final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'type';
+  @override
+  final dynamic discriminatorValue = 'GeneratedAsset';
+  @override
+  late final ClassMapperBase superMapper = LocalAssetMapper.ensureInitialized();
+
+  static GeneratedAsset _instantiate(DecodingData data) {
+    throw MapperException.missingSubclass(
+        'GeneratedAsset', 'type', '${data.value['type']}');
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static GeneratedAsset fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<GeneratedAsset>(map);
+  }
+
+  static GeneratedAsset fromJson(String json) {
+    return ensureInitialized().decodeJson<GeneratedAsset>(json);
+  }
+}
+
+mixin GeneratedAssetMappable {
+  String toJson();
+  Map<String, dynamic> toMap();
+  GeneratedAssetCopyWith<GeneratedAsset, GeneratedAsset, GeneratedAsset>
+      get copyWith;
+}
+
+abstract class GeneratedAssetCopyWith<$R, $In extends GeneratedAsset, $Out>
+    implements LocalAssetCopyWith<$R, $In, $Out> {
+  @override
+  $R call({String? key, String? fileName, AssetExtension? extension});
+  GeneratedAssetCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+      Then<$Out2, $R2> t);
 }
 
 class SlideThumbnailAssetMapper
@@ -140,8 +348,8 @@ class SlideThumbnailAssetMapper
   static SlideThumbnailAssetMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = SlideThumbnailAssetMapper._());
-      LocalAssetMapper.ensureInitialized().addSubMapper(_instance!);
-      LocalAssetExtensionMapper.ensureInitialized();
+      GeneratedAssetMapper.ensureInitialized().addSubMapper(_instance!);
+      AssetExtensionMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -154,9 +362,12 @@ class SlideThumbnailAssetMapper
   static String _$fileName(SlideThumbnailAsset v) => v.fileName;
   static const Field<SlideThumbnailAsset, String> _f$fileName =
       Field('fileName', _$fileName, key: 'file_name');
-  static LocalAssetExtension _$extension(SlideThumbnailAsset v) => v.extension;
-  static const Field<SlideThumbnailAsset, LocalAssetExtension> _f$extension =
+  static AssetExtension _$extension(SlideThumbnailAsset v) => v.extension;
+  static const Field<SlideThumbnailAsset, AssetExtension> _f$extension =
       Field('extension', _$extension);
+  static String _$src(SlideThumbnailAsset v) => v.src;
+  static const Field<SlideThumbnailAsset, String> _f$src =
+      Field('src', _$src, mode: FieldMode.member);
   static String _$type(SlideThumbnailAsset v) => v.type;
   static const Field<SlideThumbnailAsset, String> _f$type =
       Field('type', _$type, mode: FieldMode.member);
@@ -166,6 +377,7 @@ class SlideThumbnailAssetMapper
     #key: _f$key,
     #fileName: _f$fileName,
     #extension: _f$extension,
+    #src: _f$src,
     #type: _f$type,
   };
   @override
@@ -176,7 +388,8 @@ class SlideThumbnailAssetMapper
   @override
   final dynamic discriminatorValue = 'thumbnail';
   @override
-  late final ClassMapperBase superMapper = LocalAssetMapper.ensureInitialized();
+  late final ClassMapperBase superMapper =
+      GeneratedAssetMapper.ensureInitialized();
 
   static SlideThumbnailAsset _instantiate(DecodingData data) {
     return SlideThumbnailAsset(
@@ -239,9 +452,9 @@ extension SlideThumbnailAssetValueCopy<$R, $Out>
 }
 
 abstract class SlideThumbnailAssetCopyWith<$R, $In extends SlideThumbnailAsset,
-    $Out> implements LocalAssetCopyWith<$R, $In, $Out> {
+    $Out> implements GeneratedAssetCopyWith<$R, $In, $Out> {
   @override
-  $R call({String? key, String? fileName, LocalAssetExtension? extension});
+  $R call({String? key, String? fileName, AssetExtension? extension});
   SlideThumbnailAssetCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -255,7 +468,7 @@ class _SlideThumbnailAssetCopyWithImpl<$R, $Out>
   late final ClassMapperBase<SlideThumbnailAsset> $mapper =
       SlideThumbnailAssetMapper.ensureInitialized();
   @override
-  $R call({String? key, String? fileName, LocalAssetExtension? extension}) =>
+  $R call({String? key, String? fileName, AssetExtension? extension}) =>
       $apply(FieldCopyWithData({
         if (key != null) #key: key,
         if (fileName != null) #fileName: fileName,
@@ -280,8 +493,8 @@ class MermaidAssetMapper extends SubClassMapperBase<MermaidAsset> {
   static MermaidAssetMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = MermaidAssetMapper._());
-      LocalAssetMapper.ensureInitialized().addSubMapper(_instance!);
-      LocalAssetExtensionMapper.ensureInitialized();
+      GeneratedAssetMapper.ensureInitialized().addSubMapper(_instance!);
+      AssetExtensionMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -294,9 +507,12 @@ class MermaidAssetMapper extends SubClassMapperBase<MermaidAsset> {
   static String _$fileName(MermaidAsset v) => v.fileName;
   static const Field<MermaidAsset, String> _f$fileName =
       Field('fileName', _$fileName, key: 'file_name');
-  static LocalAssetExtension _$extension(MermaidAsset v) => v.extension;
-  static const Field<MermaidAsset, LocalAssetExtension> _f$extension =
+  static AssetExtension _$extension(MermaidAsset v) => v.extension;
+  static const Field<MermaidAsset, AssetExtension> _f$extension =
       Field('extension', _$extension);
+  static String _$src(MermaidAsset v) => v.src;
+  static const Field<MermaidAsset, String> _f$src =
+      Field('src', _$src, mode: FieldMode.member);
   static String _$type(MermaidAsset v) => v.type;
   static const Field<MermaidAsset, String> _f$type =
       Field('type', _$type, mode: FieldMode.member);
@@ -306,6 +522,7 @@ class MermaidAssetMapper extends SubClassMapperBase<MermaidAsset> {
     #key: _f$key,
     #fileName: _f$fileName,
     #extension: _f$extension,
+    #src: _f$src,
     #type: _f$type,
   };
   @override
@@ -316,7 +533,8 @@ class MermaidAssetMapper extends SubClassMapperBase<MermaidAsset> {
   @override
   final dynamic discriminatorValue = 'mermaid';
   @override
-  late final ClassMapperBase superMapper = LocalAssetMapper.ensureInitialized();
+  late final ClassMapperBase superMapper =
+      GeneratedAssetMapper.ensureInitialized();
 
   static MermaidAsset _instantiate(DecodingData data) {
     return MermaidAsset(
@@ -376,9 +594,9 @@ extension MermaidAssetValueCopy<$R, $Out>
 }
 
 abstract class MermaidAssetCopyWith<$R, $In extends MermaidAsset, $Out>
-    implements LocalAssetCopyWith<$R, $In, $Out> {
+    implements GeneratedAssetCopyWith<$R, $In, $Out> {
   @override
-  $R call({String? key, String? fileName, LocalAssetExtension? extension});
+  $R call({String? key, String? fileName, AssetExtension? extension});
   MermaidAssetCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -391,7 +609,7 @@ class _MermaidAssetCopyWithImpl<$R, $Out>
   late final ClassMapperBase<MermaidAsset> $mapper =
       MermaidAssetMapper.ensureInitialized();
   @override
-  $R call({String? key, String? fileName, LocalAssetExtension? extension}) =>
+  $R call({String? key, String? fileName, AssetExtension? extension}) =>
       $apply(FieldCopyWithData({
         if (key != null) #key: key,
         if (fileName != null) #fileName: fileName,
@@ -416,8 +634,8 @@ class CacheRemoteAssetMapper extends SubClassMapperBase<CacheRemoteAsset> {
   static CacheRemoteAssetMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = CacheRemoteAssetMapper._());
-      LocalAssetMapper.ensureInitialized().addSubMapper(_instance!);
-      LocalAssetExtensionMapper.ensureInitialized();
+      GeneratedAssetMapper.ensureInitialized().addSubMapper(_instance!);
+      AssetExtensionMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -430,9 +648,12 @@ class CacheRemoteAssetMapper extends SubClassMapperBase<CacheRemoteAsset> {
   static String _$fileName(CacheRemoteAsset v) => v.fileName;
   static const Field<CacheRemoteAsset, String> _f$fileName =
       Field('fileName', _$fileName, key: 'file_name');
-  static LocalAssetExtension _$extension(CacheRemoteAsset v) => v.extension;
-  static const Field<CacheRemoteAsset, LocalAssetExtension> _f$extension =
+  static AssetExtension _$extension(CacheRemoteAsset v) => v.extension;
+  static const Field<CacheRemoteAsset, AssetExtension> _f$extension =
       Field('extension', _$extension);
+  static String _$src(CacheRemoteAsset v) => v.src;
+  static const Field<CacheRemoteAsset, String> _f$src =
+      Field('src', _$src, mode: FieldMode.member);
   static String _$type(CacheRemoteAsset v) => v.type;
   static const Field<CacheRemoteAsset, String> _f$type =
       Field('type', _$type, mode: FieldMode.member);
@@ -442,6 +663,7 @@ class CacheRemoteAssetMapper extends SubClassMapperBase<CacheRemoteAsset> {
     #key: _f$key,
     #fileName: _f$fileName,
     #extension: _f$extension,
+    #src: _f$src,
     #type: _f$type,
   };
   @override
@@ -450,9 +672,10 @@ class CacheRemoteAssetMapper extends SubClassMapperBase<CacheRemoteAsset> {
   @override
   final String discriminatorKey = 'type';
   @override
-  final dynamic discriminatorValue = 'remote';
+  final dynamic discriminatorValue = 'cache_remote';
   @override
-  late final ClassMapperBase superMapper = LocalAssetMapper.ensureInitialized();
+  late final ClassMapperBase superMapper =
+      GeneratedAssetMapper.ensureInitialized();
 
   static CacheRemoteAsset _instantiate(DecodingData data) {
     return CacheRemoteAsset(
@@ -514,9 +737,9 @@ extension CacheRemoteAssetValueCopy<$R, $Out>
 }
 
 abstract class CacheRemoteAssetCopyWith<$R, $In extends CacheRemoteAsset, $Out>
-    implements LocalAssetCopyWith<$R, $In, $Out> {
+    implements GeneratedAssetCopyWith<$R, $In, $Out> {
   @override
-  $R call({String? key, String? fileName, LocalAssetExtension? extension});
+  $R call({String? key, String? fileName, AssetExtension? extension});
   CacheRemoteAssetCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -530,7 +753,7 @@ class _CacheRemoteAssetCopyWithImpl<$R, $Out>
   late final ClassMapperBase<CacheRemoteAsset> $mapper =
       CacheRemoteAssetMapper.ensureInitialized();
   @override
-  $R call({String? key, String? fileName, LocalAssetExtension? extension}) =>
+  $R call({String? key, String? fileName, AssetExtension? extension}) =>
       $apply(FieldCopyWithData({
         if (key != null) #key: key,
         if (fileName != null) #fileName: fileName,

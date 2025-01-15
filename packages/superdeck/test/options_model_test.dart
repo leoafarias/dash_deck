@@ -19,7 +19,7 @@ void main() {
 
   group('ImageOptions', () {
     test('constructor sets properties correctly', () {
-      final options = LocalImageBlock(
+      final options = LocalAssetBlock(
           src: 'image.png',
           fit: ImageFit.cover,
           flex: 3,

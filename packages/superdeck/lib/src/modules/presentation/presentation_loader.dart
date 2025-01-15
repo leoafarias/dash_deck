@@ -1,13 +1,13 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 import '../../components/atoms/loading_indicator.dart';
 import '../common/helpers/constants.dart';
+
+final _localDataStore = LocalAssetDataStoreImpl(SuperdeckConfig(),
+    fileReader: rootBundle.loadString);
+final _fileSystemDataStore = FileSystemDataStoreImpl(SuperdeckConfig());
 
 class PresentationLoaderBuilder extends StatefulWidget {
   const PresentationLoaderBuilder({
@@ -22,14 +22,7 @@ class PresentationLoaderBuilder extends StatefulWidget {
 }
 
 class _PresentationLoaderBuilderState extends State<PresentationLoaderBuilder> {
-  final _deckRepository = DeckRepository(
-    decoder: (String contents) => compute(jsonDecode, contents),
-    assetLoader: (String path) {
-      return kCanRunProcess
-          ? File(path).readAsString()
-          : rootBundle.loadString(path);
-    },
-  );
+  final _dataStore = kCanRunProcess ? _fileSystemDataStore : _localDataStore;
 
   @override
   Widget build(BuildContext context) {
@@ -49,14 +42,14 @@ class _PresentationLoaderBuilderState extends State<PresentationLoaderBuilder> {
       );
     }
 
-    if (kCanRunProcess) {
+    if (_dataStore is FileSystemDataStoreImpl) {
       return StreamBuilder(
-        stream: _deckRepository.watch(),
+        stream: _dataStore.watchSlides(),
         builder: buildSnapshot,
       );
     } else {
       return FutureBuilder(
-        future: _deckRepository.loadSlides(),
+        future: _dataStore.loadSlides(),
         builder: buildSnapshot,
       );
     }

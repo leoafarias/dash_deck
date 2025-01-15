@@ -42,7 +42,6 @@ class SlideThumbnail extends StatefulWidget {
 }
 
 class _SlideThumbnailState extends State<SlideThumbnail> {
-  final _deckRepository = DeckRepository();
   final _slideCaptureService = SlideCaptureService();
   late final _thumbnailGeneration = futureSignal(_load);
 
@@ -58,6 +57,11 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
     super.dispose();
   }
 
+  File _getThumbnailFile(SlideData slide) {
+    final asset = SlideThumbnailAsset.fromSlideKey(slide.data.key);
+    return File(asset.path);
+  }
+
   /// Generates the thumbnail for the given [slide].
   ///
   /// If [force] is true, it regenerates the thumbnail even if it already exists.
@@ -65,7 +69,7 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
     SlideData slide, {
     bool force = false,
   }) async {
-    final thumbnailFile = _deckRepository.getSlideThumbnail(slide.data.key);
+    final thumbnailFile = _getThumbnailFile(slide);
 
     if (await thumbnailFile.exists() && !force) {
       return thumbnailFile;
@@ -79,8 +83,8 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
   Future<void> _handleAction(_PopMenuAction action) async {
     switch (action) {
       case _PopMenuAction.refreshThumbnail:
-        final thumbnailFile =
-            _deckRepository.getSlideThumbnail(widget.slide.data.key);
+        final thumbnailFile = _getThumbnailFile(widget.slide);
+
         if (await thumbnailFile.exists()) {
           await thumbnailFile.delete();
         }
@@ -91,7 +95,7 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
   Future<File> _load() async {
     return kCanRunProcess
         ? await _generateThumbnail(widget.slide)
-        : _deckRepository.getSlideThumbnail(widget.slide.data.key);
+        : _getThumbnailFile(widget.slide);
   }
 
   @override

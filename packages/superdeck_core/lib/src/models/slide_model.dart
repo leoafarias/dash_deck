@@ -10,7 +10,6 @@ class Slide with SlideMappable {
   final String markdown;
   final List<SectionBlock> sections;
   final List<String> comments;
-  final List<LocalAsset> assets;
 
   const Slide({
     required this.key,
@@ -18,7 +17,6 @@ class Slide with SlideMappable {
     required this.markdown,
     this.sections = const [],
     this.comments = const [],
-    this.assets = const [],
   });
 
   static final schema = Schema.object(
@@ -29,7 +27,6 @@ class Slide with SlideMappable {
       'options': SlideOptions.schema,
       'sections': Schema.list(SectionBlock.schema),
       'comments': Schema.list(Schema.string()),
-      'assets': Schema.list(LocalAsset.typeSchema),
     },
     required: ['key', 'markdown'],
     additionalProperties: true,
@@ -53,4 +50,32 @@ class Slide with SlideMappable {
           ),
         ],
       );
+}
+
+@MappableClass(
+  hook: UnmappedPropertiesHook('args'),
+)
+class SlideOptions with SlideOptionsMappable {
+  final String? title;
+  final String? style;
+  final Map<String, Object?> args;
+
+  const SlideOptions({
+    this.title,
+    this.style,
+    this.args = const {},
+  });
+
+  static SlideOptions fromMap(Map<String, dynamic> map) {
+    schema.validateOrThrow(map);
+    return SlideOptionsMapper.fromMap(map);
+  }
+
+  static final schema = Schema.object(
+    {
+      "title": Schema.string(),
+      "style": Schema.string(),
+    },
+    additionalProperties: true,
+  );
 }
