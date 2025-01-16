@@ -14,7 +14,7 @@ class SlideMapper extends ClassMapperBase<Slide> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = SlideMapper._());
       SlideOptionsMapper.ensureInitialized();
-      SectionBlockMapper.ensureInitialized();
+      SectionElementMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -29,8 +29,8 @@ class SlideMapper extends ClassMapperBase<Slide> {
       Field('options', _$options, opt: true);
   static String _$markdown(Slide v) => v.markdown;
   static const Field<Slide, String> _f$markdown = Field('markdown', _$markdown);
-  static List<SectionBlock> _$sections(Slide v) => v.sections;
-  static const Field<Slide, List<SectionBlock>> _f$sections =
+  static List<SectionElement> _$sections(Slide v) => v.sections;
+  static const Field<Slide, List<SectionElement>> _f$sections =
       Field('sections', _$sections, opt: true, def: const []);
   static List<String> _$comments(Slide v) => v.comments;
   static const Field<Slide, List<String>> _f$comments =
@@ -103,14 +103,14 @@ extension SlideValueCopy<$R, $Out> on ObjectCopyWith<$R, Slide, $Out> {
 abstract class SlideCopyWith<$R, $In extends Slide, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   SlideOptionsCopyWith<$R, SlideOptions, SlideOptions>? get options;
-  ListCopyWith<$R, SectionBlock,
-      SectionBlockCopyWith<$R, SectionBlock, SectionBlock>> get sections;
+  ListCopyWith<$R, SectionElement,
+      SectionElementCopyWith<$R, SectionElement, SectionElement>> get sections;
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get comments;
   $R call(
       {String? key,
       SlideOptions? options,
       String? markdown,
-      List<SectionBlock>? sections,
+      List<SectionElement>? sections,
       List<String>? comments});
   SlideCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -125,8 +125,8 @@ class _SlideCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Slide, $Out>
   SlideOptionsCopyWith<$R, SlideOptions, SlideOptions>? get options =>
       $value.options?.copyWith.$chain((v) => call(options: v));
   @override
-  ListCopyWith<$R, SectionBlock,
-          SectionBlockCopyWith<$R, SectionBlock, SectionBlock>>
+  ListCopyWith<$R, SectionElement,
+          SectionElementCopyWith<$R, SectionElement, SectionElement>>
       get sections => ListCopyWith($value.sections,
           (v, t) => v.copyWith.$chain(t), (v) => call(sections: v));
   @override
@@ -138,7 +138,7 @@ class _SlideCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Slide, $Out>
           {String? key,
           Object? options = $none,
           String? markdown,
-          List<SectionBlock>? sections,
+          List<SectionElement>? sections,
           List<String>? comments}) =>
       $apply(FieldCopyWithData({
         if (key != null) #key: key,

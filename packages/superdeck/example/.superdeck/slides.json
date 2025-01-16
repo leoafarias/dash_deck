@@ -1,47 +1,385 @@
 [
   {
-    "key": "docUTq6Q",
+    "key": "596435967",
     "options": {},
-    "markdown": "{@column}\n\n## Another image Another image Another image Another image Another image Another image Another image Another image Another image Another image {.here}\n\n{@column}\n\n\n\n![mermaid](mermaid_wgsvOvJJ.png) {.code}",
+    "markdown": "{@column}\n\n## Another image Another image Another image Another image Another image Another image Another image Another image Another image Another image {.here}\n\n{@column}\n\n\n\n{\"syntax\":\"\\ngraph TD\\n    A[Start] --> B[Input]\\n    B --> C[Process]\\n    C --> D[Output]\\n    D --> E[End]\\n\",\"asset\":{\"key\":\"wgsvOvJJ\",\"file_name\":\"wgsvOvJJ\",\"extension\":\"png\",\"type\":\"mermaid\"},\"scrollable\":false,\"type\":\"mermaid\"} {.code}",
     "sections": [
       {
         "blocks": [
           {
+            "name": "column",
             "content": "## Another image Another image Another image Another image Another image Another image Another image Another image Another image Another image {.here}\n",
-            "type": "column",
+            "scrollable": false,
+            "type": "widget"
+          },
+          {
+            "name": "column",
+            "content": "{\"syntax\":\"\\ngraph TD\\n    A[Start] --> B[Input]\\n    B --> C[Process]\\n    C --> D[Output]\\n    D --> E[End]\\n\",\"asset\":{\"key\":\"wgsvOvJJ\",\"file_name\":\"wgsvOvJJ\",\"extension\":\"png\",\"type\":\"mermaid\"},\"scrollable\":false,\"type\":\"mermaid\"} {.code}",
+            "scrollable": false,
+            "type": "widget"
+          }
+        ],
+        "type": "section"
+      }
+    ],
+    "comments": []
+  },
+  {
+    "key": "63415004",
+    "options": {},
+    "markdown": "",
+    "sections": [],
+    "comments": []
+  },
+  {
+    "key": "734162632",
+    "options": {},
+    "markdown": "{@section}\n{@section flex: 2}\n{@column\n  align: center\n  flex: 2\n}\n\n\n```dart\nColumn(\n  crossAxisAlignment: CrossAxisAlignment.start,\n  children: spans.map((span) {\n    return RichText(\n      text: TextSpan(\n        style: interpolatedSpec.textStyle,\n        children: [span],\n      ),\n    );\n  }).toList(),\n)\n```{.code}\n\n{@column}\n\n{\"asset\":{\"src\":\"https://picsum.photos/800/1400\",\"type\":\"remote\"},\"scrollable\":false,\"type\":\"remote_image\"} {.cover}",
+    "sections": [
+      {
+        "blocks": [],
+        "type": "section"
+      },
+      {
+        "blocks": [],
+        "type": "section"
+      },
+      {
+        "blocks": [
+          {
+            "name": "column",
+            "flex": 2,
+            "align": "center",
+            "content": "```dart\nColumn(\n  crossAxisAlignment: CrossAxisAlignment.start,\n  children: spans.map((span) {\n    return RichText(\n      text: TextSpan(\n        style: interpolatedSpec.textStyle,\n        children: [span],\n      ),\n    );\n  }).toList(),\n)\n```{.code}\n",
+            "scrollable": false,
+            "type": "widget"
+          },
+          {
+            "name": "column",
+            "content": "{\"asset\":{\"src\":\"https://picsum.photos/800/1400\",\"type\":\"remote\"},\"scrollable\":false,\"type\":\"remote_image\"} {.cover}",
+            "scrollable": false,
+            "type": "widget"
+          }
+        ],
+        "flex": 2,
+        "type": "section"
+      }
+    ],
+    "comments": []
+  },
+  {
+    "key": "266014119",
+    "options": {},
+    "markdown": "{@column}\n\n## Another image{.here}\n\n{@column}\n\n{\"asset\":{\"src\":\"https://picsum.photos/800/1400\",\"type\":\"remote\"},\"scrollable\":false,\"type\":\"remote_image\"} {.cover}",
+    "sections": [
+      {
+        "blocks": [
+          {
+            "name": "column",
+            "content": "## Another image{.here}\n",
+            "scrollable": false,
+            "type": "widget"
+          },
+          {
+            "name": "column",
+            "content": "{\"asset\":{\"src\":\"https://picsum.photos/800/1400\",\"type\":\"remote\"},\"scrollable\":false,\"type\":\"remote_image\"} {.cover}",
+            "scrollable": false,
+            "type": "widget"
+          }
+        ],
+        "type": "section"
+      }
+    ],
+    "comments": []
+  },
+  {
+    "key": "499899078",
+    "options": {},
+    "markdown": "{@column}\n\n{\"asset\":{\"src\":\"https://picsum.photos/800/1400\",\"type\":\"remote\"},\"scrollable\":false,\"type\":\"remote_image\"} {.cover}\n\n{@column}\n\n## Yes different image{.here}",
+    "sections": [
+      {
+        "blocks": [
+          {
+            "name": "column",
+            "content": "{\"asset\":{\"src\":\"https://picsum.photos/800/1400\",\"type\":\"remote\"},\"scrollable\":false,\"type\":\"remote_image\"} {.cover}\n",
+            "scrollable": false,
+            "type": "widget"
+          },
+          {
+            "name": "column",
+            "content": "## Yes different image{.here}",
+            "scrollable": false,
+            "type": "widget"
+          }
+        ],
+        "type": "section"
+      }
+    ],
+    "comments": []
+  },
+  {
+    "key": "395126440",
+    "options": {},
+    "markdown": "{@column\n    align: center_right\n}\n\n#### Leo Farias\n@leoafarias{.here}\n\n\n{@column\n    align: center_left\n}\n\n- Founder/CEO/CTO\n- Open Source Contributor\n- Flutter & Dart GDE\n- Passionate about UI/UX/DX",
+    "sections": [
+      {
+        "blocks": [
+          {
+            "name": "column",
+            "align": "center_right",
+            "content": "#### Leo Farias\n@leoafarias{.here}\n\n",
+            "scrollable": false,
+            "type": "widget"
+          },
+          {
+            "name": "column",
+            "align": "center_left",
+            "content": "- Founder/CEO/CTO\n- Open Source Contributor\n- Flutter & Dart GDE\n- Passionate about UI/UX/DX",
+            "scrollable": false,
+            "type": "widget"
+          }
+        ],
+        "type": "section"
+      }
+    ],
+    "comments": []
+  },
+  {
+    "key": "294428641",
+    "options": {},
+    "markdown": "{@column}\n\n{@column \n  align: center_left \n  flex: 2\n}\n> [!WARNING]  \n> This presentation contains live AI-generated content. Unexpected things may occur during the demonstration. \n\n{@column}",
+    "sections": [
+      {
+        "blocks": [
+          {
+            "name": "column",
+            "content": "",
+            "scrollable": false,
+            "type": "widget"
+          },
+          {
+            "name": "column",
+            "flex": 2,
+            "align": "center_left",
+            "content": "> [!WARNING]  \n> This presentation contains live AI-generated content. Unexpected things may occur during the demonstration. \n",
+            "scrollable": false,
+            "type": "widget"
+          },
+          {
+            "name": "column",
+            "scrollable": false,
+            "type": "widget"
+          }
+        ],
+        "type": "section"
+      }
+    ],
+    "comments": []
+  },
+  {
+    "key": "814159457",
+    "options": {},
+    "markdown": "{@column \n  flex: 2 \n  align: center_right\n}\n### Generative UI\n{@column}\n## VS\n{@column flex: 2}\n### AI Assisted Code Generation",
+    "sections": [
+      {
+        "blocks": [
+          {
+            "name": "column",
+            "flex": 2,
+            "align": "center_right",
+            "content": "### Generative UI",
+            "scrollable": false,
+            "type": "widget"
+          },
+          {
+            "name": "column",
+            "content": "## VS",
+            "scrollable": false,
+            "type": "widget"
+          },
+          {
+            "name": "column",
+            "flex": 2,
+            "content": "### AI Assisted Code Generation",
+            "scrollable": false,
+            "type": "widget"
+          }
+        ],
+        "type": "section"
+      }
+    ],
+    "comments": []
+  },
+  {
+    "key": "826732848",
+    "options": {},
+    "markdown": "### What is Generative UI?{.animate}\n\n{@column}\n\n- LLMs are great at generating content based on context\n- GUIs are great at providing structured, interactive interfaces for user input and navigation",
+    "sections": [
+      {
+        "blocks": [
+          {
+            "content": "### What is Generative UI?{.animate}\n",
+            "type": "content",
             "scrollable": false
           },
           {
-            "content": "![mermaid](mermaid_wgsvOvJJ.png) {.code}",
-            "type": "column",
+            "name": "column",
+            "content": "- LLMs are great at generating content based on context\n- GUIs are great at providing structured, interactive interfaces for user input and navigation",
+            "scrollable": false,
+            "type": "widget"
+          }
+        ],
+        "type": "section"
+      }
+    ],
+    "comments": []
+  },
+  {
+    "key": "532075853",
+    "options": {},
+    "markdown": "# LLM ❤️ GUI{.animate}",
+    "sections": [
+      {
+        "blocks": [
+          {
+            "content": "# LLM ❤️ GUI{.animate}",
+            "type": "content",
             "scrollable": false
           }
         ],
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": [
+    "comments": []
+  },
+  {
+    "key": "1027564960",
+    "options": {},
+    "markdown": "{@column}\n{@column\n  flex: 2\n  align: center\n}\nCreates dynamic, context-aware UIs by interpreting actions and maintaining state with LLMs for fluid, interactive responses.{.animate}\n\n{@column}",
+    "sections": [
       {
-        "key": "wgsvOvJJ",
-        "file_name": "wgsvOvJJ",
-        "extension": "png",
-        "type": "mermaid"
+        "blocks": [
+          {
+            "name": "column",
+            "scrollable": false,
+            "type": "widget"
+          },
+          {
+            "name": "column",
+            "flex": 2,
+            "align": "center",
+            "content": "Creates dynamic, context-aware UIs by interpreting actions and maintaining state with LLMs for fluid, interactive responses.{.animate}\n",
+            "scrollable": false,
+            "type": "widget"
+          },
+          {
+            "name": "column",
+            "scrollable": false,
+            "type": "widget"
+          }
+        ],
+        "type": "section"
       }
-    ]
+    ],
+    "comments": []
   },
   {
-    "key": "ToUV8xcA",
+    "key": "688315070",
     "options": {},
-    "markdown": "",
-    "sections": [],
-    "comments": [],
-    "assets": []
+    "markdown": "### Benefits of UI over Chat{.animate}\n\n- More intuitive and user-friendly, especially for complex tasks\n- Faster feedback loop between users and LLMs\n- Enhances efficiency and interaction",
+    "sections": [
+      {
+        "blocks": [
+          {
+            "content": "### Benefits of UI over Chat{.animate}\n\n- More intuitive and user-friendly, especially for complex tasks\n- Faster feedback loop between users and LLMs\n- Enhances efficiency and interaction",
+            "type": "content",
+            "scrollable": false
+          }
+        ],
+        "type": "section"
+      }
+    ],
+    "comments": []
   },
   {
-    "key": "4OPpCLpy",
+    "key": "16064337",
     "options": {},
-    "markdown": "{@section}\n{@section flex: 2}\n{@column\n  align: center\n  flex: 2\n}\n\n\n```dart\nColumn(\n  crossAxisAlignment: CrossAxisAlignment.start,\n  children: spans.map((span) {\n    return RichText(\n      text: TextSpan(\n        style: interpolatedSpec.textStyle,\n        children: [span],\n      ),\n    );\n  }).toList(),\n)\n```{.code}\n\n{@column}\n\n![structured_output](https://picsum.photos/800/1400) {.cover}",
+    "markdown": "{@column\n  flex: 3 \n  align: center\n}\n### Flutter is Well-Suited <br>for Generative UI\nBuilt for any screen: Ideal for generating<br>adaptive UIs across devices and platforms.\n{@column}",
+    "sections": [
+      {
+        "blocks": [
+          {
+            "name": "column",
+            "flex": 3,
+            "align": "center",
+            "content": "### Flutter is Well-Suited <br>for Generative UI\nBuilt for any screen: Ideal for generating<br>adaptive UIs across devices and platforms.",
+            "scrollable": false,
+            "type": "widget"
+          },
+          {
+            "name": "column",
+            "scrollable": false,
+            "type": "widget"
+          }
+        ],
+        "type": "section"
+      }
+    ],
+    "comments": []
+  },
+  {
+    "key": "146674156",
+    "options": {},
+    "markdown": "## How can LLMs Understtand Your UI?\n\n{@column}\n{\"asset\":{\"src\":\"assets/structured_output.png\",\"type\":\"remote\"},\"scrollable\":false,\"type\":\"remote_image\"}",
+    "sections": [
+      {
+        "blocks": [
+          {
+            "content": "## How can LLMs Understtand Your UI?\n",
+            "type": "content",
+            "scrollable": false
+          },
+          {
+            "name": "column",
+            "content": "{\"asset\":{\"src\":\"assets/structured_output.png\",\"type\":\"remote\"},\"scrollable\":false,\"type\":\"remote_image\"}",
+            "scrollable": false,
+            "type": "widget"
+          }
+        ],
+        "type": "section"
+      }
+    ],
+    "comments": []
+  },
+  {
+    "key": "980992502",
+    "options": {},
+    "markdown": "{@column}\n\n### Structured Output\n\n{@column}\n```dart\nfinal schema = Schema.array(\n  description: 'List of recipes',\n  items: Schema.object(\n    properties: {\n      'recipeName': Schema.string(\n        description: 'Name of the recipe.',\n        nullable: false,\n      ),\n    },\n    requiredProperties: ['recipeName'],\n  ),\n);\n```",
+    "sections": [
+      {
+        "blocks": [
+          {
+            "name": "column",
+            "content": "### Structured Output\n",
+            "scrollable": false,
+            "type": "widget"
+          },
+          {
+            "name": "column",
+            "content": "```dart\nfinal schema = Schema.array(\n  description: 'List of recipes',\n  items: Schema.object(\n    properties: {\n      'recipeName': Schema.string(\n        description: 'Name of the recipe.',\n        nullable: false,\n      ),\n    },\n    requiredProperties: ['recipeName'],\n  ),\n);\n```",
+            "scrollable": false,
+            "type": "widget"
+          }
+        ],
+        "type": "section"
+      }
+    ],
+    "comments": []
+  },
+  {
+    "key": "954136583",
+    "options": {},
+    "markdown": "{@section}\n```dart\n\nfinal model = GenerativeModel(\n  model: 'gemini-1.5-pro',\n  apiKey: apiKey,\n  generationConfig: GenerationConfig(\n    responseMimeType: 'application/json',\n    responseSchema: schema,\n  ),\n);\n\nfinal prompt = 'List a few popular cookie recipes.';\nfinal response = await model.generateContent([Content.text(prompt)]);\n\n```",
     "sections": [
       {
         "blocks": [],
@@ -50,384 +388,56 @@
       {
         "blocks": [
           {
-            "content": "```dart\nColumn(\n  crossAxisAlignment: CrossAxisAlignment.start,\n  children: spans.map((span) {\n    return RichText(\n      text: TextSpan(\n        style: interpolatedSpec.textStyle,\n        children: [span],\n      ),\n    );\n  }).toList(),\n)\n```{.code}\n",
-            "flex": 2,
-            "align": "center",
-            "type": "column",
-            "scrollable": false
-          },
-          {
-            "content": "![structured_output](https://picsum.photos/800/1400) {.cover}",
-            "type": "column",
-            "scrollable": false
-          }
-        ],
-        "flex": 2,
-        "type": "section"
-      }
-    ],
-    "comments": [],
-    "assets": []
-  },
-  {
-    "key": "rPTQlMdP",
-    "options": {},
-    "markdown": "{@column}\n\n## Another image{.here}\n\n{@column}\n\n![structured_output](https://picsum.photos/800/1400) {.cover}",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "content": "## Another image{.here}\n",
-            "type": "column",
-            "scrollable": false
-          },
-          {
-            "content": "![structured_output](https://picsum.photos/800/1400) {.cover}",
-            "type": "column",
-            "scrollable": false
-          }
-        ],
-        "type": "section"
-      }
-    ],
-    "comments": [],
-    "assets": []
-  },
-  {
-    "key": "1fa2WWM3",
-    "options": {},
-    "markdown": "{@column}\n\n![structured_output](https://picsum.photos/800/1400) {.cover}\n\n{@column}\n\n## Yes different image{.here}",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "content": "![structured_output](https://picsum.photos/800/1400) {.cover}\n",
-            "type": "column",
-            "scrollable": false
-          },
-          {
-            "content": "## Yes different image{.here}",
-            "type": "column",
-            "scrollable": false
-          }
-        ],
-        "type": "section"
-      }
-    ],
-    "comments": [],
-    "assets": []
-  },
-  {
-    "key": "P6nguqAy",
-    "options": {},
-    "markdown": "{@column\n    align: center_right\n}\n\n#### Leo Farias\n@leoafarias{.here}\n\n\n{@column\n    align: center_left\n}\n\n- Founder/CEO/CTO\n- Open Source Contributor\n- Flutter & Dart GDE\n- Passionate about UI/UX/DX",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "content": "#### Leo Farias\n@leoafarias{.here}\n\n",
-            "align": "center_right",
-            "type": "column",
-            "scrollable": false
-          },
-          {
-            "content": "- Founder/CEO/CTO\n- Open Source Contributor\n- Flutter & Dart GDE\n- Passionate about UI/UX/DX",
-            "align": "center_left",
-            "type": "column",
-            "scrollable": false
-          }
-        ],
-        "type": "section"
-      }
-    ],
-    "comments": [],
-    "assets": []
-  },
-  {
-    "key": "kYWa7y5P",
-    "options": {},
-    "markdown": "{@column}\n\n{@column \n  align: center_left \n  flex: 2\n}\n> [!WARNING]  \n> This presentation contains live AI-generated content. Unexpected things may occur during the demonstration. \n\n{@column}",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "content": "",
-            "type": "column",
-            "scrollable": false
-          },
-          {
-            "content": "> [!WARNING]  \n> This presentation contains live AI-generated content. Unexpected things may occur during the demonstration. \n",
-            "flex": 2,
-            "align": "center_left",
-            "type": "column",
-            "scrollable": false
-          },
-          {
-            "type": "column",
-            "scrollable": false
-          }
-        ],
-        "type": "section"
-      }
-    ],
-    "comments": [],
-    "assets": []
-  },
-  {
-    "key": "D4etKl0J",
-    "options": {},
-    "markdown": "{@column \n  flex: 2 \n  align: center_right\n}\n### Generative UI\n{@column}\n## VS\n{@column flex: 2}\n### AI Assisted Code Generation",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "content": "### Generative UI",
-            "flex": 2,
-            "align": "center_right",
-            "type": "column",
-            "scrollable": false
-          },
-          {
-            "content": "## VS",
-            "type": "column",
-            "scrollable": false
-          },
-          {
-            "content": "### AI Assisted Code Generation",
-            "flex": 2,
-            "type": "column",
-            "scrollable": false
-          }
-        ],
-        "type": "section"
-      }
-    ],
-    "comments": [],
-    "assets": []
-  },
-  {
-    "key": "A8nJ3H8k",
-    "options": {},
-    "markdown": "### What is Generative UI?{.animate}\n\n{@column}\n\n- LLMs are great at generating content based on context\n- GUIs are great at providing structured, interactive interfaces for user input and navigation",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "content": "### What is Generative UI?{.animate}\n",
-            "type": "column",
-            "scrollable": false
-          },
-          {
-            "content": "- LLMs are great at generating content based on context\n- GUIs are great at providing structured, interactive interfaces for user input and navigation",
-            "type": "column",
-            "scrollable": false
-          }
-        ],
-        "type": "section"
-      }
-    ],
-    "comments": [],
-    "assets": []
-  },
-  {
-    "key": "9mHDFwa9",
-    "options": {},
-    "markdown": "# LLM ❤️ GUI{.animate}",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "content": "# LLM ❤️ GUI{.animate}",
-            "type": "column",
-            "scrollable": false
-          }
-        ],
-        "type": "section"
-      }
-    ],
-    "comments": [],
-    "assets": []
-  },
-  {
-    "key": "DH56wp0H",
-    "options": {},
-    "markdown": "{@column}\n{@column\n  flex: 2\n  align: center\n}\nCreates dynamic, context-aware UIs by interpreting actions and maintaining state with LLMs for fluid, interactive responses.{.animate}\n\n{@column}",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "type": "column",
-            "scrollable": false
-          },
-          {
-            "content": "Creates dynamic, context-aware UIs by interpreting actions and maintaining state with LLMs for fluid, interactive responses.{.animate}\n",
-            "flex": 2,
-            "align": "center",
-            "type": "column",
-            "scrollable": false
-          },
-          {
-            "type": "column",
-            "scrollable": false
-          }
-        ],
-        "type": "section"
-      }
-    ],
-    "comments": [],
-    "assets": []
-  },
-  {
-    "key": "3sLdrfsM",
-    "options": {},
-    "markdown": "### Benefits of UI over Chat{.animate}\n\n- More intuitive and user-friendly, especially for complex tasks\n- Faster feedback loop between users and LLMs\n- Enhances efficiency and interaction",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "content": "### Benefits of UI over Chat{.animate}\n\n- More intuitive and user-friendly, especially for complex tasks\n- Faster feedback loop between users and LLMs\n- Enhances efficiency and interaction",
-            "type": "column",
-            "scrollable": false
-          }
-        ],
-        "type": "section"
-      }
-    ],
-    "comments": [],
-    "assets": []
-  },
-  {
-    "key": "CsyEcFYH",
-    "options": {},
-    "markdown": "{@column\n  flex: 3 \n  align: center\n}\n### Flutter is Well-Suited <br>for Generative UI\nBuilt for any screen: Ideal for generating<br>adaptive UIs across devices and platforms.\n{@column}",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "content": "### Flutter is Well-Suited <br>for Generative UI\nBuilt for any screen: Ideal for generating<br>adaptive UIs across devices and platforms.",
-            "flex": 3,
-            "align": "center",
-            "type": "column",
-            "scrollable": false
-          },
-          {
-            "type": "column",
-            "scrollable": false
-          }
-        ],
-        "type": "section"
-      }
-    ],
-    "comments": [],
-    "assets": []
-  },
-  {
-    "key": "zB26rHOq",
-    "options": {},
-    "markdown": "## How can LLMs Understtand Your UI?\n\n{@column}\n![structured_output](assets/structured_output.png)",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "content": "## How can LLMs Understtand Your UI?\n",
-            "type": "column",
-            "scrollable": false
-          },
-          {
-            "content": "![structured_output](assets/structured_output.png)",
-            "type": "column",
-            "scrollable": false
-          }
-        ],
-        "type": "section"
-      }
-    ],
-    "comments": [],
-    "assets": []
-  },
-  {
-    "key": "E91UAp8B",
-    "options": {},
-    "markdown": "{@column}\n\n### Structured Output\n\n{@column}\n```dart\nfinal schema = Schema.array(\n  description: 'List of recipes',\n  items: Schema.object(\n    properties: {\n      'recipeName': Schema.string(\n        description: 'Name of the recipe.',\n        nullable: false,\n      ),\n    },\n    requiredProperties: ['recipeName'],\n  ),\n);\n```",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "content": "### Structured Output\n",
-            "type": "column",
-            "scrollable": false
-          },
-          {
-            "content": "```dart\nfinal schema = Schema.array(\n  description: 'List of recipes',\n  items: Schema.object(\n    properties: {\n      'recipeName': Schema.string(\n        description: 'Name of the recipe.',\n        nullable: false,\n      ),\n    },\n    requiredProperties: ['recipeName'],\n  ),\n);\n```",
-            "type": "column",
-            "scrollable": false
-          }
-        ],
-        "type": "section"
-      }
-    ],
-    "comments": [],
-    "assets": []
-  },
-  {
-    "key": "wvZOvQz1",
-    "options": {},
-    "markdown": "{@section}\n```dart\n\nfinal model = GenerativeModel(\n  model: 'gemini-1.5-pro',\n  apiKey: apiKey,\n  generationConfig: GenerationConfig(\n    responseMimeType: 'application/json',\n    responseSchema: schema,\n  ),\n);\n\nfinal prompt = 'List a few popular cookie recipes.';\nfinal response = await model.generateContent([Content.text(prompt)]);\n\n```",
-    "sections": [
-      {
-        "blocks": [
-          {
             "content": "```dart\n\nfinal model = GenerativeModel(\n  model: 'gemini-1.5-pro',\n  apiKey: apiKey,\n  generationConfig: GenerationConfig(\n    responseMimeType: 'application/json',\n    responseSchema: schema,\n  ),\n);\n\nfinal prompt = 'List a few popular cookie recipes.';\nfinal response = await model.generateContent([Content.text(prompt)]);\n\n```",
-            "type": "column",
+            "type": "content",
             "scrollable": false
           }
         ],
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "6EU2Xxrf",
+    "key": "771566282",
     "options": {},
     "markdown": "{@column}\n### Color Palette Generator\n\nGenerate a color palette based on a given text.\n\n- Name of the palette\n- Font family\n- Font color\n- Color for each corner of the palette",
     "sections": [
       {
         "blocks": [
           {
+            "name": "column",
             "content": "### Color Palette Generator\n\nGenerate a color palette based on a given text.\n\n- Name of the palette\n- Font family\n- Font color\n- Color for each corner of the palette",
-            "type": "column",
-            "scrollable": false
+            "scrollable": false,
+            "type": "widget"
           }
         ],
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "qek7UrZY",
+    "key": "991500743",
     "options": {},
     "markdown": "{@column}\n```dart\nfinal schema = Schema.object(properties: {\n  'name': Schema.string(\n    description:\n        'The text content to display on color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'font': Schema.enumString(\n    enumValues: ColorPaletteFontFamily.enumString,\n    description: 'The font to use for the poster text.',\n    nullable: false,\n  ),\n  'fontColor': Schema.string(\n    description: 'The hex color value of the poster text. Format: #FF0000',\n    nullable: false,\n  ),\n  'topLeftColor': Schema.string(\n    description:\n        'The hex color value top left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'topRightColor': Schema.string(\n    description:\n        'The hex color value top right corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomLeftColor': Schema.string(\n    description:\n        'The hex color value bottom left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomRightColor': Schema.string(\n    description:\n        'The hex color value bottom right corner of color palette. Format: #FF0000',\n    nullable: false,\n  )\n}, requiredProperties: [\n  'name',\n  'font',\n  'fontColor',\n  'topLeftColor',\n  'topRightColor',\n  'bottomLeftColor',\n  'bottomRightColor',\n]);\n\n```",
     "sections": [
       {
         "blocks": [
           {
+            "name": "column",
             "content": "```dart\nfinal schema = Schema.object(properties: {\n  'name': Schema.string(\n    description:\n        'The text content to display on color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'font': Schema.enumString(\n    enumValues: ColorPaletteFontFamily.enumString,\n    description: 'The font to use for the poster text.',\n    nullable: false,\n  ),\n  'fontColor': Schema.string(\n    description: 'The hex color value of the poster text. Format: #FF0000',\n    nullable: false,\n  ),\n  'topLeftColor': Schema.string(\n    description:\n        'The hex color value top left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'topRightColor': Schema.string(\n    description:\n        'The hex color value top right corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomLeftColor': Schema.string(\n    description:\n        'The hex color value bottom left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomRightColor': Schema.string(\n    description:\n        'The hex color value bottom right corner of color palette. Format: #FF0000',\n    nullable: false,\n  )\n}, requiredProperties: [\n  'name',\n  'font',\n  'fontColor',\n  'topLeftColor',\n  'topRightColor',\n  'bottomLeftColor',\n  'bottomRightColor',\n]);\n\n```",
-            "type": "column",
-            "scrollable": false
+            "scrollable": false,
+            "type": "widget"
           }
         ],
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "Gh3bTZb2",
+    "key": "728789730",
     "options": {
       "style": "demo"
     },
@@ -452,11 +462,10 @@
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "u905Mj3Z",
+    "key": "652768754",
     "options": {
       "style": "demo"
     },
@@ -481,11 +490,10 @@
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "H0jUl8Aj",
+    "key": "190763547",
     "options": {},
     "markdown": "## LLMs Orchestrate APIs",
     "sections": [
@@ -493,26 +501,29 @@
         "blocks": [
           {
             "content": "## LLMs Orchestrate APIs",
-            "type": "column",
+            "type": "content",
             "scrollable": false
           }
         ],
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "5rmJo1pB",
+    "key": "396516862",
     "options": {},
-    "markdown": "{@section \n  align: center_right\n  flex: 2\n} \n\n### Gemini Function Calling\nThe Function Calling feature is in Beta release\n\n{@section flex: 5}\n\n![llm tools](assets/llm_tools.png)",
+    "markdown": "{@section \n  align: center_right\n  flex: 2\n} \n\n### Gemini Function Calling\nThe Function Calling feature is in Beta release\n\n{@section flex: 5}\n\n{\"asset\":{\"src\":\"assets/llm_tools.png\",\"type\":\"remote\"},\"scrollable\":false,\"type\":\"remote_image\"}",
     "sections": [
+      {
+        "blocks": [],
+        "type": "section"
+      },
       {
         "blocks": [
           {
             "content": "### Gemini Function Calling\nThe Function Calling feature is in Beta release\n",
-            "type": "column",
+            "type": "content",
             "scrollable": false
           }
         ],
@@ -523,8 +534,8 @@
       {
         "blocks": [
           {
-            "content": "![llm tools](assets/llm_tools.png)",
-            "type": "column",
+            "content": "{\"asset\":{\"src\":\"assets/llm_tools.png\",\"type\":\"remote\"},\"scrollable\":false,\"type\":\"remote_image\"}",
+            "type": "content",
             "scrollable": false
           }
         ],
@@ -532,11 +543,10 @@
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "1n3nxlhk",
+    "key": "452173386",
     "options": {
       "style": "demo"
     },
@@ -562,64 +572,65 @@
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "Zn801w4G",
+    "key": "301134721",
     "options": {},
-    "markdown": "{@column \n  align: bottom_right\n  flex: 2\n}\n\n### User Interaction{.heading}\nNatural Language way to interact with an LLM\n\n{@column\n  flex: 4\n}\n![llm response](assets/llm_interaction.png)",
+    "markdown": "{@column \n  align: bottom_right\n  flex: 2\n}\n\n### User Interaction{.heading}\nNatural Language way to interact with an LLM\n\n{@column\n  flex: 4\n}\n{\"asset\":{\"src\":\"assets/llm_interaction.png\",\"type\":\"remote\"},\"scrollable\":false,\"type\":\"remote_image\"}",
     "sections": [
       {
         "blocks": [
           {
-            "content": "### User Interaction{.heading}\nNatural Language way to interact with an LLM\n",
+            "name": "column",
             "flex": 2,
             "align": "bottom_right",
-            "type": "column",
-            "scrollable": false
+            "content": "### User Interaction{.heading}\nNatural Language way to interact with an LLM\n",
+            "scrollable": false,
+            "type": "widget"
           },
           {
-            "content": "![llm response](assets/llm_interaction.png)",
+            "name": "column",
             "flex": 4,
-            "type": "column",
-            "scrollable": false
+            "content": "{\"asset\":{\"src\":\"assets/llm_interaction.png\",\"type\":\"remote\"},\"scrollable\":false,\"type\":\"remote_image\"}",
+            "scrollable": false,
+            "type": "widget"
           }
         ],
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "aY8Y9HBu",
+    "key": "356584949",
     "options": {},
-    "markdown": "{@column\n  align: center_left\n}\n### Widget Response{.heading}\n\n{@column \n  flex: 3\n}\n![widget_response](assets/widget_response.png)",
+    "markdown": "{@column\n  align: center_left\n}\n### Widget Response{.heading}\n\n{@column \n  flex: 3\n}\n{\"asset\":{\"src\":\"assets/widget_response.png\",\"type\":\"remote\"},\"scrollable\":false,\"type\":\"remote_image\"}",
     "sections": [
       {
         "blocks": [
           {
-            "content": "### Widget Response{.heading}\n",
+            "name": "column",
             "align": "center_left",
-            "type": "column",
-            "scrollable": false
+            "content": "### Widget Response{.heading}\n",
+            "scrollable": false,
+            "type": "widget"
           },
           {
-            "content": "![widget_response](assets/widget_response.png)",
+            "name": "column",
             "flex": 3,
-            "type": "column",
-            "scrollable": false
+            "content": "{\"asset\":{\"src\":\"assets/widget_response.png\",\"type\":\"remote\"},\"scrollable\":false,\"type\":\"remote_image\"}",
+            "scrollable": false,
+            "type": "widget"
           }
         ],
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "g8ZxHmlw",
+    "key": "760668501",
     "options": {
       "style": "demo"
     },
@@ -645,11 +656,10 @@
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "pNxPyfLK",
+    "key": "286896136",
     "options": {},
     "markdown": "## What if the tool to use is a widget schema?",
     "sections": [
@@ -657,18 +667,17 @@
         "blocks": [
           {
             "content": "## What if the tool to use is a widget schema?",
-            "type": "column",
+            "type": "content",
             "scrollable": false
           }
         ],
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "5cGNbsJx",
+    "key": "786608929",
     "options": {},
     "markdown": "### Experimental\n\n```dart\nfinal schema = Schema.object(properties: {\n  'textFields': Schema.array(\n    description: 'A list of text fields',\n    items: TextFieldSchemaDto.schema,\n    nullable: true,\n  ),\n  'dropdowns': Schema.array(\n    description: 'A list of dropdowns',\n    items: DropdownSchemaDto.schema,\n    nullable: true,\n  ),\n  'colorPickers': Schema.array(\n    description: 'A list of colors pickers',\n    items: ColorPickerDtoSchema.schema,\n    nullable: true,\n  ),\n});\n\n```",
     "sections": [
@@ -676,18 +685,17 @@
         "blocks": [
           {
             "content": "### Experimental\n\n```dart\nfinal schema = Schema.object(properties: {\n  'textFields': Schema.array(\n    description: 'A list of text fields',\n    items: TextFieldSchemaDto.schema,\n    nullable: true,\n  ),\n  'dropdowns': Schema.array(\n    description: 'A list of dropdowns',\n    items: DropdownSchemaDto.schema,\n    nullable: true,\n  ),\n  'colorPickers': Schema.array(\n    description: 'A list of colors pickers',\n    items: ColorPickerDtoSchema.schema,\n    nullable: true,\n  ),\n});\n\n```",
-            "type": "column",
+            "type": "content",
             "scrollable": false
           }
         ],
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "sas6s4nZ",
+    "key": "142589368",
     "options": {
       "style": "demo"
     },
@@ -711,11 +719,10 @@
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "3kW1wOHd",
+    "key": "801396691",
     "options": {},
     "markdown": "## The future of UI might be orchestrating user experiences rather than creating it.",
     "sections": [
@@ -723,18 +730,17 @@
         "blocks": [
           {
             "content": "## The future of UI might be orchestrating user experiences rather than creating it.",
-            "type": "column",
+            "type": "content",
             "scrollable": false
           }
         ],
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   },
   {
-    "key": "UqCN11cB",
+    "key": "310182512",
     "options": {},
     "markdown": "### Thank you\n\nLeo Farias\n@leoafarias\n(GitHub, Twitter/X)",
     "sections": [
@@ -742,14 +748,13 @@
         "blocks": [
           {
             "content": "### Thank you\n\nLeo Farias\n@leoafarias\n(GitHub, Twitter/X)",
-            "type": "column",
+            "type": "content",
             "scrollable": false
           }
         ],
         "type": "section"
       }
     ],
-    "comments": [],
-    "assets": []
+    "comments": []
   }
 ]

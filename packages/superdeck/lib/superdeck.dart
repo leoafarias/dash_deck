@@ -11,6 +11,6 @@ export 'package:superdeck/src/modules/presentation/presentation_hooks.dart';
 export 'package:superdeck/src/modules/presentation/presentation_loader.dart';
 export 'package:superdeck/src/modules/presentation/slide_data.dart';
 export 'package:superdeck/src/modules/slide/slide_parts.dart';
-export 'package:superdeck_core/superdeck_core.dart' show WidgetBlock;
+export 'package:superdeck_core/superdeck_core.dart' show WidgetElement;
 
 export 'src/components/organisms/app_shell.dart';

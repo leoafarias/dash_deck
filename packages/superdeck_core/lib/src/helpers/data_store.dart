@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:path/path.dart' as p;
 import 'package:superdeck_core/superdeck_core.dart';
@@ -118,11 +117,15 @@ class FileSystemDataStoreImpl extends LocalAssetDataStoreImpl {
   }
 
   Future<void> writeAsset(LocalAsset asset, List<int> bytes) async {
-    await File(p.join(configuration.assetDir.path, asset.path))
+    await File(p.join(configuration.generatedDir.path, asset.path))
         .writeAsBytes(bytes);
   }
 
-  Future<void> saveSlides(List<Slide> slides) async {
+  Future<File> getAssetFile(LocalAsset asset) async {
+    return File(p.join(configuration.generatedDir.path, asset.path));
+  }
+
+  Future<void> saveSlides(Iterable<Slide> slides) async {
     final json = prettyJson(slides.map((e) => e.toMap()).toList());
     await configuration.deckFile.writeAsString(json);
   }
@@ -145,7 +148,7 @@ class FileSystemDataStoreImpl extends LocalAssetDataStoreImpl {
         configuration.deckFile.watch(events: FileSystemEvent.modify).listen(
       (event) async {
         try {
-          final slides = await Isolate.run(() => loadSlides());
+          final slides = await loadSlides();
           controller.add(slides);
         } catch (e) {
           controller.addError(e);

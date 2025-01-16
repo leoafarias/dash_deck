@@ -7,6 +7,7 @@ import 'package:superdeck_cli/src/helpers/exceptions.dart';
 import 'package:superdeck_cli/src/helpers/extensions.dart';
 import 'package:superdeck_cli/src/helpers/logger.dart';
 import 'package:superdeck_cli/src/helpers/update_pubspec.dart';
+import 'package:superdeck_cli/src/tasks/dart_formatter_task.dart';
 import 'package:superdeck_cli/src/tasks/mermaid_task.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
@@ -44,7 +45,7 @@ class BuildCommand extends Command<int> {
   @override
   Future<int> run() async {
     final _pipeline = TaskPipeline(
-      tasks: [MermaidConverterTask()],
+      tasks: [MermaidConverterTask(), DartFormatterTask()],
       dataStore: FileSystemDataStoreImpl(SuperdeckConfig()),
     );
     final watch = boolArg('watch');

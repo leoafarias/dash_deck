@@ -1,12 +1,12 @@
-abstract class CommentExtractor {
-  List<String> parseComments(String content);
+abstract class NotesExtractor {
+  List<String> extract(String content);
 }
 
-class HtmlCommentExtractorImpl implements CommentExtractor {
+class HtmlCommentExtractorImpl implements NotesExtractor {
   static final _commentRegex = RegExp(r'<!--(.*?)-->', dotAll: true);
   const HtmlCommentExtractorImpl();
   @override
-  List<String> parseComments(String content) {
+  List<String> extract(String content) {
     final matches = _commentRegex.allMatches(content);
 
     return matches

@@ -193,14 +193,14 @@ class DeckController extends Controller {
   ) {
     final widgetBlocks = slide.sections
         .expand((section) => section.blocks)
-        .whereType<WidgetBlock>();
+        .whereType<WidgetElement>();
 
     final slideWidgets = <String, WidgetBuilderWithOptions>{};
 
     for (final block in widgetBlocks) {
-      final widgetBuilder = configuration.widgets[block.name];
+      final widgetBuilder = configuration.widgets[block.type];
       if (widgetBuilder != null) {
-        slideWidgets[block.key] = widgetBuilder;
+        slideWidgets[block.name] = widgetBuilder;
       }
     }
     return SlideData(
@@ -230,7 +230,7 @@ Style _buildSlideStyle(String? name, DeckConfiguration configuration) {
 
 typedef WidgetBuilderWithOptions = Widget Function(
   BuildContext context,
-  WidgetBlock options,
+  WidgetElement options,
 );
 
 final kRootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');

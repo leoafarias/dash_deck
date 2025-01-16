@@ -1,5 +1,7 @@
 library superdeck_core;
 
+export 'src/elements/content_element.dart';
+export 'src/elements/layout_element.dart';
 export 'src/helpers/constants.dart';
 export 'src/helpers/data_store.dart';
 export 'src/helpers/extensions.dart';

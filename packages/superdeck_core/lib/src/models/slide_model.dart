@@ -8,7 +8,7 @@ class Slide with SlideMappable {
   final String key;
   final SlideOptions? options;
   final String markdown;
-  final List<SectionBlock> sections;
+  final List<SectionElement> sections;
   final List<String> comments;
 
   const Slide({
@@ -25,7 +25,7 @@ class Slide with SlideMappable {
       "markdown": Schema.string(),
       "title": Schema.string(),
       'options': SlideOptions.schema,
-      'sections': Schema.list(SectionBlock.schema),
+      'sections': Schema.list(SectionElement.schema),
       'comments': Schema.list(Schema.string()),
     },
     required: ['key', 'markdown'],
@@ -41,10 +41,10 @@ class Slide with SlideMappable {
         key: 'empty',
         markdown: 'No slides found',
         sections: [
-          SectionBlock(
+          SectionElement(
             blocks: [
-              ContentBlock(
-                content: 'No slides found',
+              ContentElement(
+                'No slides found',
               ),
             ],
           ),
@@ -66,7 +66,7 @@ class SlideOptions with SlideOptionsMappable {
     this.args = const {},
   });
 
-  static SlideOptions fromMap(Map<String, dynamic> map) {
+  static SlideOptions parse(Map<String, dynamic> map) {
     schema.validateOrThrow(map);
     return SlideOptionsMapper.fromMap(map);
   }

@@ -1,24 +1,28 @@
 import 'dart:async';
 
+import 'package:superdeck_cli/src/generator_pipeline.dart';
 import 'package:superdeck_cli/src/helpers/dart_process.dart';
-import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
+import 'package:superdeck_cli/src/parsers/parsers/block_parser.dart';
 
-class DartCodeTransformer implements BlockTransformer {
-  const DartCodeTransformer();
+class DartFormatterTask extends Task {
+  DartFormatterTask() : super('dart_formatter');
+
   @override
-  Future<String> transform(String markdown) async {
-    final codeBlockRegex = RegExp('```dart\n(.*?)\n```');
-    final matches = codeBlockRegex.allMatches(markdown);
+  Future<void> run(TaskContext context) async {
+    final codeBlocks = parseFencedCode(context.slide.content);
 
-    for (final match in matches) {
-      final code = match.group(1)!;
+    final dartBlocks = codeBlocks.where((e) => e.language == 'dart');
 
-      final formattedCode = await DartProcess.format(code);
+    for (final dartBlock in dartBlocks) {
+      final formattedCode = await DartProcess.format(dartBlock.content);
 
-      markdown =
-          markdown.replaceAll(match.group(0)!, '```dart\n$formattedCode\n```');
+      final updatedMarkdown = context.slide.content.replaceRange(
+        dartBlock.startIndex,
+        dartBlock.endIndex,
+        '```dart\n$formattedCode\n```',
+      );
+
+      context.slide.content = updatedMarkdown;
     }
-
-    return markdown;
   }
 }

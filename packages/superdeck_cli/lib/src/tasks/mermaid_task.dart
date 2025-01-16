@@ -1,31 +1,11 @@
 import 'dart:async';
 
+import 'package:image/image.dart' as img;
 import 'package:puppeteer/puppeteer.dart';
 import 'package:superdeck_cli/src/generator_pipeline.dart';
 import 'package:superdeck_cli/src/helpers/logger.dart';
-import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
+import 'package:superdeck_cli/src/parsers/parsers/block_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
-
-class MermaidBlockTransformer implements BlockTransformer {
-  const MermaidBlockTransformer();
-  @override
-  String transform(String markdown) {
-    final mermaidBlockRegex = RegExp(r'```mermaid.*?([\s\S]*?)```');
-    final matches = mermaidBlockRegex.allMatches(markdown);
-
-    if (matches.isEmpty) return markdown;
-
-    final mermaidSyntax = matches.first.group(1);
-
-    if (mermaidSyntax == null) return markdown;
-
-    final asset = MermaidAsset.fromSyntax(mermaidSyntax);
-
-    final mermaidBlock = MermaidBlock(syntax: mermaidSyntax, asset: asset);
-
-    return markdown.replaceAll(matches.first.group(0)!, mermaidBlock.toJson());
-  }
-}
 
 class MermaidConverterTask extends Task {
   Browser? _browser;
@@ -44,19 +24,44 @@ class MermaidConverterTask extends Task {
 
   @override
   Future<void> run(TaskContext context) async {
-    final mermaidBlocks = context.blocks.whereType<MermaidBlock>();
+    final codeBlocks = parseFencedCode(context.slide.content);
+
+    final mermaidBlocks = codeBlocks.where((e) => e.language == 'mermaid');
+
+    if (mermaidBlocks.isEmpty) return;
 
     for (final mermaidBlock in mermaidBlocks) {
-      final asset = mermaidBlock.asset;
+      final mermaidAsset = LocalAsset.mermaidGraph(mermaidBlock.content);
 
-      if (await context.dataStore.checkAssetExists(asset)) continue;
+      if (await context.dataStore.checkAssetExists(mermaidAsset)) continue;
 
       final browser = await _getBrowser();
 
       final imageData =
-          await _generateMermaidGraphImage(browser, mermaidBlock.syntax);
+          await _generateMermaidGraphImage(browser, mermaidBlock.content);
 
-      await context.dataStore.writeAsset(asset, imageData);
+      await context.dataStore.writeAsset(mermaidAsset, imageData);
+
+      final assetFile = await context.dataStore.getAssetFile(mermaidAsset);
+
+      final image = await img.decodePsdFile(assetFile.path);
+
+      final width = image?.width;
+      final height = image?.height;
+
+      final assetElement = AssetElement(
+        asset: mermaidAsset,
+        width: width?.toDouble(),
+        height: height?.toDouble(),
+      );
+
+      final updatedMarkdown = context.slide.content.replaceRange(
+        mermaidBlock.startIndex,
+        mermaidBlock.endIndex,
+        assetElement.toJson(),
+      );
+
+      context.slide.content = updatedMarkdown;
     }
   }
 }

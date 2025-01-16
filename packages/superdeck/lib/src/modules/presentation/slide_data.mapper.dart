@@ -38,11 +38,12 @@ class SlideDataMapper extends ClassMapperBase<SlideData> {
   static SlidePartWidget? _$_background(SlideData v) => v._background;
   static const Field<SlideData, SlidePartWidget> _f$_background =
       Field('_background', _$_background, key: 'background', opt: true);
-  static Map<String, Widget Function(BuildContext, WidgetBlock)> _$_widgets(
+  static Map<String, Widget Function(BuildContext, WidgetElement)> _$_widgets(
           SlideData v) =>
       v._widgets;
   static const Field<SlideData,
-          Map<String, Widget Function(BuildContext, WidgetBlock)>> _f$_widgets =
+          Map<String, Widget Function(BuildContext, WidgetElement)>>
+      _f$_widgets =
       Field('_widgets', _$_widgets, key: 'widgets', opt: true, def: const {});
   static int _$totalSlideCount(SlideData v) => v.totalSlideCount;
   static const Field<SlideData, int> _f$totalSlideCount =
@@ -126,9 +127,9 @@ abstract class SlideDataCopyWith<$R, $In extends SlideData, $Out>
   MapCopyWith<
       $R,
       String,
-      Widget Function(BuildContext, WidgetBlock),
-      ObjectCopyWith<$R, Widget Function(BuildContext, WidgetBlock),
-          Widget Function(BuildContext, WidgetBlock)>> get _widgets;
+      Widget Function(BuildContext, WidgetElement),
+      ObjectCopyWith<$R, Widget Function(BuildContext, WidgetElement),
+          Widget Function(BuildContext, WidgetElement)>> get _widgets;
   $R call(
       {int? slideIndex,
       Style? style,
@@ -136,7 +137,7 @@ abstract class SlideDataCopyWith<$R, $In extends SlideData, $Out>
       FixedSlidePartWidget? header,
       FixedSlidePartWidget? footer,
       SlidePartWidget? background,
-      Map<String, Widget Function(BuildContext, WidgetBlock)>? widgets,
+      Map<String, Widget Function(BuildContext, WidgetElement)>? widgets,
       int? totalSlideCount});
   SlideDataCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -156,9 +157,9 @@ class _SlideDataCopyWithImpl<$R, $Out>
   MapCopyWith<
       $R,
       String,
-      Widget Function(BuildContext, WidgetBlock),
-      ObjectCopyWith<$R, Widget Function(BuildContext, WidgetBlock),
-          Widget Function(BuildContext, WidgetBlock)>> get _widgets =>
+      Widget Function(BuildContext, WidgetElement),
+      ObjectCopyWith<$R, Widget Function(BuildContext, WidgetElement),
+          Widget Function(BuildContext, WidgetElement)>> get _widgets =>
       MapCopyWith($value._widgets, (v, t) => ObjectCopyWith(v, $identity, t),
           (v) => call(widgets: v));
   @override
@@ -169,7 +170,7 @@ class _SlideDataCopyWithImpl<$R, $Out>
           Object? header = $none,
           Object? footer = $none,
           Object? background = $none,
-          Map<String, Widget Function(BuildContext, WidgetBlock)>? widgets,
+          Map<String, Widget Function(BuildContext, WidgetElement)>? widgets,
           int? totalSlideCount}) =>
       $apply(FieldCopyWithData({
         if (slideIndex != null) #slideIndex: slideIndex,
