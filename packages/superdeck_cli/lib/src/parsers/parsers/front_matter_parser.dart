@@ -1,5 +1,6 @@
 import 'package:petitparser/petitparser.dart';
 import 'package:superdeck_cli/src/helpers/logger.dart';
+import 'package:superdeck_cli/src/parsers/parsers/grammar_definitions.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 typedef ExtractedFrontmatter = ({
@@ -10,36 +11,24 @@ typedef ExtractedFrontmatter = ({
 class FrontmatterParser {
   const FrontmatterParser();
 
-  Parser _createFrontmatterParser() {
-    final delimiter = string('---').trim();
-    final yamlContent = any().starLazy(delimiter).flatten();
-    final markdownContent = any().star().flatten();
-
-    return (delimiter & yamlContent & delimiter & markdownContent).end();
-  }
-
   ExtractedFrontmatter extract(String content) {
-    final parser = _createFrontmatterParser();
+    final parser = const FrontMatterGrammarDefinition()
+        .build<FrontMatterGrammarDefinitionResult>();
     final result = parser.parse(content);
 
     if (result is Failure) {
-      // No frontmatter found
-      final contents = content.split('---').last;
-
-      return (frontmatter: {}, contents: contents);
+      throw FormatException(result.message, content, result.position);
     }
 
-    final yamlString = result.value[1] as String?;
-    final markdownContent = result.value[2] as String;
+    final yamlString = result.value.yaml;
+    final markdownContent = result.value.markdown;
     Map<String, dynamic> yamlMap = {};
 
-    if (yamlString != null) {
-      try {
-        yamlMap = convertYamlToMap(yamlString);
-      } catch (e) {
-        logger.err('Cannot parse yaml frontmatter: $e');
-        yamlMap = {};
-      }
+    try {
+      yamlMap = convertYamlToMap(yamlString);
+    } catch (e) {
+      logger.err('Cannot parse yaml frontmatter: $e');
+      yamlMap = {};
     }
 
     return (frontmatter: yamlMap, contents: markdownContent);
