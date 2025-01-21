@@ -4,7 +4,7 @@ import 'package:superdeck_core/superdeck_core.dart';
 part 'content_element.mapper.dart';
 
 @MappableClass()
-abstract class BlockElement extends LayoutElement with BlockElementMappable {
+sealed class BlockElement extends LayoutElement with BlockElementMappable {
   final String type;
 
   BlockElement({

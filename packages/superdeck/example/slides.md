@@ -1,10 +1,10 @@
 ---
 
-{@column}
+@column
 
 ## Another image Another image Another image Another image Another image Another image Another image Another image Another image Another image {.here}
 
-{@column}
+@column
 
 
 
@@ -42,43 +42,43 @@ Column(
 )
 ```{.code}
 
-{@column}
+@column
 
 ![structured_output](https://picsum.photos/800/1400) {.cover}
 
 ---
 
 
-{@column}
+@column
 
 ## Another image{.here}
 
-{@column}
+@column
 
 ![structured_output](https://picsum.photos/800/1400) {.cover}
 
 ---
 
-{@column}
+@column
 
 ![structured_output](https://picsum.photos/800/1400) {.cover}
 
-{@column}
+@column
 
 ## Yes different image{.here}
 
 ---
 
-{@column
-    align: center_right
+@column {
+  align: center_right
 }
 
 #### Leo Farias
-@leoafarias{.here}
+leoafarias{.here}
 
 
-{@column
-    align: center_left
+@column {
+  align: center_left
 }
 
 - Founder/CEO/CTO
@@ -88,29 +88,31 @@ Column(
 
 ---
 
-{@column}
+@column
 
-{@column 
+@column {
   align: center_left 
   flex: 2
 }
 > [!WARNING]  
 > This presentation contains live AI-generated content. Unexpected things may occur during the demonstration. 
 
-{@column}
+@column
 
 ---
 
 
 
-{@column 
+@column {
   flex: 2 
   align: center_right
 }
 ### Generative UI
-{@column}
+@column
 ## VS
-{@column flex: 2}
+@column {
+  flex: 2
+}
 ### AI Assisted Code Generation
 
 ---
@@ -118,7 +120,7 @@ Column(
 
 ### What is Generative UI?{.animate}
 
-{@column}
+@column
 
 - LLMs are great at generating content based on context
 - GUIs are great at providing structured, interactive interfaces for user input and navigation
@@ -130,14 +132,14 @@ Column(
 
 ---
 
-{@column}
-{@column
+@column
+@column {
   flex: 2
   align: center
 }
 Creates dynamic, context-aware UIs by interpreting actions and maintaining state with LLMs for fluid, interactive responses.{.animate}
 
-{@column}
+@column
 
 ---
 
@@ -151,31 +153,31 @@ Creates dynamic, context-aware UIs by interpreting actions and maintaining state
 
 
 
-{@column
+@column {
   flex: 3 
   align: center
 }
 ### Flutter is Well-Suited <br>for Generative UI
 Built for any screen: Ideal for generating<br>adaptive UIs across devices and platforms.
-{@column}
+@column
 
 ---
 
 
 ## How can LLMs Understtand Your UI?
 
-{@column}
+@column
 ![structured_output](assets/structured_output.png)
 
 
 ---
 
-{@column}
+@column
 
 ### Structured Output
 
-{@column}
-```dart
+@column
+```dart 
 final schema = Schema.array(
   description: 'List of recipes',
   items: Schema.object(
@@ -192,7 +194,7 @@ final schema = Schema.array(
 
 ---
 
-{@section}
+@section
 ```dart
 
 final model = GenerativeModel(
@@ -211,7 +213,7 @@ final response = await model.generateContent([Content.text(prompt)]);
 
 ---
 
-{@column}
+@column
 ### Color Palette Generator
 
 Generate a color palette based on a given text.
@@ -223,7 +225,7 @@ Generate a color palette based on a given text.
 
 --- 
 
-{@column}
+@column
 ```dart
 final schema = Schema.object(properties: {
   'name': Schema.string(
@@ -276,161 +278,7 @@ final schema = Schema.object(properties: {
 style: demo
 ---
 
-{@colorPalette
+@colorPalette {
   schema: true
-  prompts:
-    - tropical
-    - vibrant
-    - pastel
-    - chocolatey pink unicorn
-    - cyberpunk
+  prompts: [tropical, vibrant, pastel, chocolatey pink unicorn, cyberpunk]
 }
-
----
-style: demo
----
-
-{@colorPalette
-  schema: false
-  prompts:
-    - tropical
-    - vibrant
-    - pastel
-    - chocolatey pink unicorn
-    - cyberpunk
-}
-
----
-
-## LLMs Orchestrate APIs
-
----
-
-{@section 
-  align: center_right
-  flex: 2
-} 
-
-### Gemini Function Calling
-The Function Calling feature is in Beta release
-
-{@section flex: 5}
-
-![llm tools](assets/llm_tools.png)
-
-
-
----
-style: demo
----
-
-{@lightControl 
-  schema: true
-  prompts:
-    - Dim the lights by 20
-    - Increase by 35
-    - Turn off the lights
-    - Set it to 80
-    - Lower by half
-    - Max brightness
-}
-
---- 
-
-{@column 
-  align: bottom_right
-  flex: 2
-}
-
-### User Interaction{.heading}
-Natural Language way to interact with an LLM
-
-{@column
-  flex: 4
-}
-![llm response](assets/llm_interaction.png)
-
-
----
-
-
-{@column
-  align: center_left
-}
-### Widget Response{.heading}
-
-{@column 
-  flex: 3
-}
-![widget_response](assets/widget_response.png)
-
-
-
----
-style: demo
----
-
-{@lightControl
-  schema: false
-  prompts:
-    - Dim the lights by 20
-    - Increase by 35
-    - Turn off the lights
-    - Set it to 80
-    - Lower by half
-    - Max brightness
-}
-
----
-
-## What if the tool to use is a widget schema?
-
----
-
-### Experimental
-
-```dart
-final schema = Schema.object(properties: {
-  'textFields': Schema.array(
-    description: 'A list of text fields',
-    items: TextFieldSchemaDto.schema,
-    nullable: true,
-  ),
-  'dropdowns': Schema.array(
-    description: 'A list of dropdowns',
-    items: DropdownSchemaDto.schema,
-    nullable: true,
-  ),
-  'colorPickers': Schema.array(
-    description: 'A list of colors pickers',
-    items: ColorPickerDtoSchema.schema,
-    nullable: true,
-  ),
-});
-
-```
-
----
-style: demo
----
-
-{@widgetSchema
-  schema: false
-  prompts:
-    - Change top colors
-    - Change font
-    - Change all colors
-    - Change everything
-}
-
----
-
-## The future of UI might be orchestrating user experiences rather than creating it.
-
----
-
-### Thank you
-
-Leo Farias
-@leoafarias
-(GitHub, Twitter/X)

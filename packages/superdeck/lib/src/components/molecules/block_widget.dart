@@ -21,7 +21,7 @@ class BlockData {
   });
 
   final SlideSpec spec;
-  final ContainerBlock block;
+  final BlockElement block;
   final Size size;
 
   @override
@@ -65,7 +65,7 @@ class SectionBlockWidget extends StatelessWidget {
       return Expanded(
         flex: flex,
         child: SpecBuilder(
-          style: slide.style.applyVariant(Variant(block.type.name)),
+          style: slide.style.applyVariant(Variant(block.type)),
           builder: (context) {
             final spec = SlideSpec.of(context);
 
@@ -101,8 +101,8 @@ class SectionBlockWidget extends StatelessWidget {
                                     _WidgetBlockWidget(block),
                                   DartPadElement block =>
                                     _DartPadBlockWidget(block),
-                                  ContainerBlock block =>
-                                    ColumnBlockWidget(block),
+                                  ContentElement block =>
+                                    ContentElementWidget(block),
                                 },
                               ],
                             ),
@@ -127,7 +127,7 @@ class SectionBlockWidget extends StatelessWidget {
   }
 }
 
-abstract class _BlockWidget<T extends ContainerBlock> extends StatelessWidget {
+abstract class _BlockWidget<T extends BlockElement> extends StatelessWidget {
   const _BlockWidget(
     this.block, {
     super.key,
@@ -136,8 +136,8 @@ abstract class _BlockWidget<T extends ContainerBlock> extends StatelessWidget {
   final T block;
 }
 
-class ColumnBlockWidget extends _BlockWidget<ContainerBlock> {
-  const ColumnBlockWidget(super.block, {super.key});
+class ContentElementWidget extends _BlockWidget<ContentElement> {
+  const ContentElementWidget(super.block, {super.key});
 
   @override
   Widget build(context) {

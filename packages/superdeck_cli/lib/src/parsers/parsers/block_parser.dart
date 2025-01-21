@@ -1,4 +1,5 @@
-import 'dart:convert';
+import 'package:superdeck_cli/src/helpers/logger.dart';
+import 'package:superdeck_core/superdeck_core.dart';
 
 final codeFencePattern = RegExp(
   r'```(?<backtickInfo>[^`]*)[\s\S]*?```',
@@ -52,8 +53,11 @@ List<ParsedFencedCode> parseFencedCode(String text) {
     final startIndex = match.start;
     final endIndex = match.end;
 
+    final Map<String, dynamic> optionsMap =
+        options.isNotEmpty ? extractStringMap(options) : {};
+
     parsedBlocks.add(ParsedFencedCode(
-      options: jsonDecode(extractStringMap(options)),
+      options: optionsMap,
       language: language,
       content: content.trim(),
       startIndex: startIndex,
@@ -91,66 +95,71 @@ List<ParsedTagBlock> parseTagBlocks(String text) {
   // }
 
   // Get the "tag", which could be any word, and also maybe it does not have space
-  final tagRegex = RegExp(r'@(\w+)(?:\s*{([^{}]*)})?');
+  final tagRegex = RegExp(r'(?<!\S)@(\w+)(?:\s*{([^{}]*)})?');
 
   final matches = tagRegex.allMatches(text);
   List<ParsedTagBlock> parsedBlocks = [];
-  for (final match in matches) {
-    final tag = match.group(1) ?? '';
-    final options = match.group(2) ?? '';
+  try {
+    for (final match in matches) {
+      final tag = match.group(1) ?? '';
+      final options = match.group(2) ?? '';
 
-    final startIndex = match.start;
-    final endIndex = match.end;
+      final startIndex = match.start;
+      final endIndex = match.end;
 
-    parsedBlocks.add(ParsedTagBlock(
-      tag: tag,
-      options: jsonDecode(extractStringMap(options)),
-      startIndex: startIndex,
-      endIndex: endIndex,
-    ));
+      final optionsMap = convertYamlToMap(options);
+
+      parsedBlocks.add(ParsedTagBlock(
+        tag: tag,
+        options: optionsMap,
+        startIndex: startIndex,
+        endIndex: endIndex,
+      ));
+    }
+
+    return parsedBlocks;
+  } catch (e) {
+    logger.err('Failed to parse tag blocks: $e');
+    // print(text);
+
+    return [];
   }
-
-  return parsedBlocks;
 }
 
 /// Transforms a string of the format `{key1: value1, key2: value2}`
 /// into a JSON-like string with keys and string values properly quoted.
-String extractStringMap(String input) {
+Map<String, dynamic> extractStringMap(String input) {
   String content = input.trim();
   if (content.startsWith('{') && content.endsWith('}')) {
     content = content.substring(1, content.length - 1);
   }
 
-  final keyValues = content
-      .split(RegExp(r'\s*(,|\n)\s*'))
-      .where((keyValue) => keyValue.isNotEmpty);
+  // input will be valus like
+  // Boolean examples
+  // example 1: showLineNumbers=true
+  // output 1: {showLineNumbers: true}
+  // example 2: showLineNumbers=false
+  // output 2: {showLineNumbers: false}
+  // example 3: showLineNumbers // this equals to true
+  // output 3: {showLineNumbers: true}
+  // example 4: showLineNumbers="true"
+  // output 4: {showLineNumbers: true}
+  // example 5: showLineNumbers="false"
+  // output 5: {showLineNumbers: false}
 
-  final keyValuePairs = keyValues.map((keyValue) {
-    final key = (keyValue.split(':')[0]).trim();
-    var value = keyValue.split(':')[1].trim();
+  // String examples
+  // example 1: fileName="example.dart"
+  // output 1: {fileName: "example.dart"}
+  // example 2: anotherOption="another_example.dart"
+  // output 2: {anotherOption: "another_example.dart"}
 
-    // Check if value is true or false
+  // List examples
+  // example 1: options=["option1", "option2", "option3"]
+  // output 1: {options: ["option1", "option2", "option3"]}
+  // example 2: otherOptions=["option1", "option2"]
+  // output 2: {otherOptions: ["option1", "option2"]}
+  // example 3: lines=[1, 2-3]
+  // output 3: {lines: ["1", "2-3"]}
 
-    if (bool.tryParse(value) != null) {
-      value = bool.parse(value).toString();
-    } else if (int.tryParse(value) != null) {
-      value = int.parse(value).toString();
-    } else if (double.tryParse(value) != null) {
-      value = double.parse(value).toString();
-    } else {
-      value = _addQuotesIfNeeded(value);
-    }
-
-    return '${_addQuotesIfNeeded(key)}: $value';
-  });
-
-  return '{${keyValuePairs.join(', ')}}';
-}
-
-String _addQuotesIfNeeded(String value) {
-  if (!value.startsWith('"') && !value.endsWith('"')) {
-    value = '"$value"';
-  }
-
-  return value;
+  return {};
 }

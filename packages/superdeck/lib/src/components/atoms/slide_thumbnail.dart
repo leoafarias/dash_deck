@@ -58,7 +58,7 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
   }
 
   File _getThumbnailFile(SlideData slide) {
-    final asset = SlideThumbnailAsset.fromSlideKey(slide.data.key);
+    final asset = LocalAsset.thumbnail(slide.data.key);
     return File(asset.path);
   }
 

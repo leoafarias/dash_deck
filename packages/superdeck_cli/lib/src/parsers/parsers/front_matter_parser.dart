@@ -1,7 +1,6 @@
-import 'dart:convert';
-
+import 'package:petitparser/petitparser.dart';
 import 'package:superdeck_cli/src/helpers/logger.dart';
-import 'package:yaml/yaml.dart';
+import 'package:superdeck_core/superdeck_core.dart';
 
 typedef ExtractedFrontmatter = ({
   Map<String, dynamic> frontmatter,
@@ -11,37 +10,32 @@ typedef ExtractedFrontmatter = ({
 class FrontmatterParser {
   const FrontmatterParser();
 
+  Parser _createFrontmatterParser() {
+    final delimiter = string('---').trim();
+    final yamlContent = any().starLazy(delimiter).flatten();
+    final markdownContent = any().star().flatten();
+
+    return (delimiter & yamlContent & delimiter & markdownContent).end();
+  }
+
   ExtractedFrontmatter extract(String content) {
-    /// Extracts frontmatter from the input slide.
-    /// Returns a tuple: (yamlMap, remainingMarkdown).
-    /// If no frontmatter is found, returns (null, entireInputAfterSecondDelimiterIfPresent).
+    final parser = _createFrontmatterParser();
+    final result = parser.parse(content);
 
-    final _frontmatterRegex = RegExp(
-      r'^---.*\r?\n([\s\S]*?)\r?\n---',
-      multiLine: true,
-    );
-
-    final match = _frontmatterRegex.firstMatch(content);
-    if (match == null) {
+    if (result is Failure) {
       // No frontmatter found
       final contents = content.split('---').last;
 
       return (frontmatter: {}, contents: contents);
     }
 
-    final yamlString = match.group(1);
-
-    final markdownContent = content.replaceFirst(match.group(0)!, '');
+    final yamlString = result.value[1] as String?;
+    final markdownContent = result.value[2] as String;
     Map<String, dynamic> yamlMap = {};
 
     if (yamlString != null) {
       try {
-        final parsed = loadYaml(yamlString);
-        if (parsed is YamlMap) {
-          yamlMap = jsonDecode(jsonEncode(parsed)) as Map<String, dynamic>;
-        } else if (parsed is String) {
-          yamlMap = {'$parsed': null} as Map<String, dynamic>;
-        }
+        yamlMap = convertYamlToMap(yamlString);
       } catch (e) {
         logger.err('Cannot parse yaml frontmatter: $e');
         yamlMap = {};

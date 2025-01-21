@@ -400,7 +400,7 @@ Header content.
         const markdown = '''
 @section
 @column{
-  align:invalid_alignment
+  align: invalid_alignment
 }
 Header content.
 

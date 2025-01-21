@@ -14,15 +14,19 @@ class DartFormatterTask extends Task {
     final dartBlocks = codeBlocks.where((e) => e.language == 'dart');
 
     for (final dartBlock in dartBlocks) {
-      final formattedCode = await DartProcess.format(dartBlock.content);
+      try {
+        final formattedCode = await DartProcess.format(dartBlock.content);
 
-      final updatedMarkdown = context.slide.content.replaceRange(
-        dartBlock.startIndex,
-        dartBlock.endIndex,
-        '```dart\n$formattedCode\n```',
-      );
+        final updatedMarkdown = context.slide.content.replaceRange(
+          dartBlock.startIndex,
+          dartBlock.endIndex,
+          '```dart\n$formattedCode\n```',
+        );
 
-      context.slide.content = updatedMarkdown;
+        context.slide.content = updatedMarkdown;
+      } catch (e) {
+        logger.severe('Failed to format Dart code: $e');
+      }
     }
   }
 }

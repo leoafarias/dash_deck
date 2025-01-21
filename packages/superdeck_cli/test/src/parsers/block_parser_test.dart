@@ -143,6 +143,25 @@ void main() {
 }''',
       }
     ],
+  },
+  {
+    'description': 'Test Case 7: Dart code block with no options',
+    'input': '''
+```dart
+void main() {
+  print("Hello, Dart!");
+}
+```
+''',
+    'expectedBlocks': [
+      {
+        'language': 'dart',
+        'options': {},
+        'content': '''void main() {
+  print("Hello, Dart!");
+}''',
+      }
+    ],
   }
 ];
 
@@ -178,7 +197,10 @@ final List<Map<String, dynamic>> testCaseTagBlock = [
   {
     'description': 'Test Case 3: Tag block with multiple options',
     'input': '''
-@tag {key: value, key2: value2}
+@tag {
+  key: value
+  key2: value2
+}
 Test content
 ''',
     'expectedBlocks': [
@@ -186,7 +208,7 @@ Test content
         tag: 'tag',
         options: {'key': 'value', 'key2': 'value2'},
         startIndex: 0,
-        endIndex: 31,
+        endIndex: 36,
       )
     ],
   },
@@ -247,14 +269,18 @@ Test content
     'description':
         'Test Case 7: Tag block with different values like int, dboules, and bool',
     'input': '''
-@tag {key: 1, key2: 2.0, key3: true}
+@tag {
+  key: 1
+  key2: 2.0
+  key3: true
+}
 ''',
     'expectedBlocks': [
       ParsedTagBlock(
         tag: 'tag',
         options: {'key': 1, 'key2': 2.0, 'key3': true},
         startIndex: 0,
-        endIndex: 36,
+        endIndex: 42,
       ),
     ],
   },
@@ -304,6 +330,14 @@ Test content 2
         endIndex: 39,
       )
     ],
+  },
+  // does not match {@column}
+  {
+    'description': 'Test Case 10: Does not match @column',
+    'input': '''
+{@column}
+''',
+    'expectedBlocks': [],
   }
 ];
 

@@ -4,7 +4,13 @@ import 'package:yaml/yaml.dart';
 
 Map<String, dynamic> convertYamlToMap(String yamlString) {
   if (yamlString.trim().isEmpty) return {};
-  final yamlMap = loadYaml(yamlString, recover: true) as YamlMap?;
+  final yamlMap = loadYaml(yamlString, recover: true);
 
-  return jsonDecode(jsonEncode(yamlMap));
+  if (yamlMap is YamlMap) {
+    return jsonDecode(jsonEncode(yamlMap));
+  } else {
+    throw FormatException(
+      'Invalid YAML format. $yamlString',
+    );
+  }
 }
