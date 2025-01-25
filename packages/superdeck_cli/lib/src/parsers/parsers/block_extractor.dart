@@ -8,8 +8,8 @@ LayoutElement _parseElement(ParsedTagBlock tagBlock) {
     (SectionElement.key) => SectionElement.parse(options),
     (ContentElement.key) =>
       ContentElement.parse({...options, 'type': tagBlock.tag, 'content': ''}),
-    (AssetElement.key) =>
-      AssetElement.parse({...options, 'type': tagBlock.tag}),
+    (ImageElement.key) =>
+      ImageElement.parse({...options, 'type': tagBlock.tag}),
     (DartPadElement.key) =>
       DartPadElement.parse({...options, 'type': tagBlock.tag}),
     _ => WidgetElement.parse(

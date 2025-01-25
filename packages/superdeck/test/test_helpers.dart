@@ -17,7 +17,7 @@ extension WidgetTesterX on WidgetTester {
     bool isSnapshot = false,
     DeckStyle? style,
     Map<String, WidgetBuilderWithOptions> widgets = const {},
-    List<LocalAsset> assets = const [],
+    List<GeneratedAsset> assets = const [],
   }) async {
     final controller = DeckController(
         options: DeckConfiguration(
@@ -26,10 +26,10 @@ extension WidgetTesterX on WidgetTester {
       widgets: widgets,
     ));
     return pumpWithScaffold(
-      Data(
-        data: slide,
-        child: Data(
-          data: controller,
+      Provider(
+        value: slide,
+        child: Provider(
+          value: controller,
           child: SlideView(slide),
         ),
       ),

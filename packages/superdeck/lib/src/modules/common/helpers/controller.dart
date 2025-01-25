@@ -1,70 +1,179 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-T _useProvider<T>() {
-  final context = useContext();
-
-  return Data.of<T>(context);
-}
-
-T _useController<T extends Controller>() {
-  final controller = _useProvider<T>();
-  return useListenable(controller);
-}
-
-abstract class UseController<T extends Controller> {
-  UseController();
-
-  T call() => _useProvider<T>();
-  T watch() => _useController<T>();
-  R select<R>(R Function(T) selector) => useControllerSelect(selector);
-}
-
-Return useControllerSelect<T extends Controller, Return>(
-    Return Function(T) selector) {
-  final controller = _useProvider<T>();
-  return useListenableSelector(controller, () => selector(controller));
-}
-
-Return useData<Param, Return>(Return Function(Param) selector) {
-  final controller = _useProvider<Param>();
-
-  if (controller is Listenable) {
-    return useListenableSelector(controller, () => selector(controller));
+/// Abstract Controller class extending ChangeNotifier
+abstract class Controller extends ChangeNotifier {
+  static Widget watch<T extends Controller>({
+    required T controller,
+    required Widget Function(BuildContext context) builder,
+  }) {
+    return Builder(builder: (context) {
+      return ControllerListenableBuilder(
+        controller: controller,
+        builder: (context) => builder(context),
+      );
+    });
   }
-  final selectedValue = selector(controller);
 
-  return useMemoized(() => selectedValue, [selectedValue]);
+  static Widget select<T extends Controller, Return>({
+    required T controller,
+    required Return Function(T) selector,
+    required Widget Function(BuildContext context, Return value) builder,
+  }) {
+    return _ListeableBuilderSelector<T, Return>(
+      listeable: controller,
+      selector: selector,
+      builder: builder,
+    );
+  }
 }
 
-abstract class Controller extends ChangeNotifier {}
-
-class Data<T> extends InheritedWidget {
-  final T data;
-
-  const Data({
+class ControllerListenableBuilder<T extends Controller> extends StatefulWidget {
+  const ControllerListenableBuilder({
     super.key,
-    required this.data,
-    required super.child,
+    required this.controller,
+    required this.builder,
   });
 
+  final T controller;
+
+  final Widget Function(BuildContext context) builder;
+
   @override
-  bool updateShouldNotify(covariant Data<T> oldWidget) {
-    return oldWidget.data != data;
+  State<ControllerListenableBuilder<T>> createState() =>
+      _ControllerListenableBuilderState<T>();
+}
+
+class _ControllerListenableBuilderState<T extends Controller>
+    extends State<ControllerListenableBuilder<T>> {
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: widget.controller,
+      builder: (context, _) => widget.builder(context),
+    );
+  }
+}
+
+class _ListeableBuilderSelector<T extends Listenable, Return>
+    extends StatefulWidget {
+  const _ListeableBuilderSelector({
+    super.key,
+    required this.listeable,
+    required this.selector,
+    required this.builder,
+  });
+
+  final T listeable;
+
+  final Return Function(T) selector;
+
+  final Widget Function(BuildContext context, Return value) builder;
+
+  @override
+  State<_ListeableBuilderSelector<T, Return>> createState() =>
+      _ListeableBuilderSelectorState<T, Return>();
+}
+
+class _ListeableBuilderSelectorState<T extends Listenable, Return>
+    extends State<_ListeableBuilderSelector<T, Return>> {
+  late Return selectedValue;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedValue = widget.selector(widget.listeable);
+
+    widget.listeable.addListener(_updateListeableValue);
   }
 
-  static T of<T>(BuildContext context) {
-    final provider = context.dependOnInheritedWidgetOfExactType<Data<T>>();
-
-    if (provider == null) {
-      throw FlutterError('The provider in Provider<$T> is null');
+  @override
+  void didUpdateWidget(_ListeableBuilderSelector<T, Return> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.listeable != widget.listeable) {
+      oldWidget.listeable.removeListener(_updateListeableValue);
+      widget.listeable.addListener(_updateListeableValue);
+      final newSelectedValue = widget.selector(widget.listeable);
+      if (newSelectedValue != selectedValue) {
+        setState(() {
+          selectedValue = newSelectedValue;
+        });
+      }
     }
-    return provider.data;
   }
 
-  static T? maybeOf<T>(BuildContext context) {
-    final provider = context.dependOnInheritedWidgetOfExactType<Data<T>>();
-
-    return provider?.data;
+  void _updateListeableValue() {
+    final newValue = widget.selector(widget.listeable);
+    if (newValue != selectedValue) {
+      setState(() {
+        selectedValue = newValue;
+      });
+    }
   }
+
+  @override
+  void dispose() {
+    widget.listeable.removeListener(_updateListeableValue);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.builder(context, selectedValue);
+  }
+}
+
+class Provider<T> extends InheritedWidget {
+  const Provider({
+    super.key,
+    required super.child,
+    required this.value,
+  });
+
+  final T value;
+
+  @override
+  bool updateShouldNotify(covariant Provider<T> oldWidget) {
+    return oldWidget.value != value;
+  }
+
+  static T? maybeTypeOf<T>(BuildContext context) {
+    final provider = context.dependOnInheritedWidgetOfExactType<Provider<T>>();
+    return provider?.value;
+  }
+
+  static T ofType<T>(BuildContext context) {
+    final provider = context.dependOnInheritedWidgetOfExactType<Provider<T>>();
+    if (provider == null) {
+      throw FlutterError('Provider of type $T not found in the widget tree');
+    }
+    return provider.value;
+  }
+
+  static T get<T>(BuildContext context) {
+    final provider = maybeGet<T>(context);
+    if (provider == null) {
+      throw FlutterError('Provider of type $T not found in the widget tree');
+    }
+    return provider;
+  }
+
+  static T? maybeGet<T>(BuildContext context) {
+    return context
+        .getElementForInheritedWidgetOfExactType<Provider<T>>()
+        ?.widget as T?;
+  }
+}
+
+T useController<T extends Controller>() {
+  final context = useContext();
+
+  return Provider.ofType<T>(context);
+}
+
+Return useControllerWatch<T extends Controller, Return>(
+  Return Function(T) selector,
+) {
+  final controller = useController<T>();
+  return useListenableSelector(controller, () => selector(controller));
 }

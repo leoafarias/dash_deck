@@ -95,6 +95,10 @@ class FileSystemDataStoreImpl extends LocalAssetDataStoreImpl {
 
   StreamController<List<Slide>>? _controller;
 
+  final List<GeneratedAsset> _generatedAssets = [];
+
+  List<GeneratedAsset> get generatedAssets => _generatedAssets;
+
   @override
   Future<void> initialize() async {
     if (!await configuration.generatedDir.exists()) {
@@ -112,17 +116,11 @@ class FileSystemDataStoreImpl extends LocalAssetDataStoreImpl {
     await super.initialize();
   }
 
-  Future<bool> checkAssetExists(LocalAsset asset) async {
-    return File(p.join(configuration.assetDir.path, asset.path)).exists();
-  }
-
-  Future<void> writeAsset(LocalAsset asset, List<int> bytes) async {
-    await File(p.join(configuration.generatedDir.path, asset.path))
-        .writeAsBytes(bytes);
-  }
-
-  Future<File> getAssetFile(LocalAsset asset) async {
-    return File(p.join(configuration.generatedDir.path, asset.path));
+  Future<File> getAssetFile(GeneratedAsset asset) async {
+    _generatedAssets.add(asset);
+    return File(
+      p.join(configuration.generatedDir.path, asset.path),
+    );
   }
 
   Future<void> saveSlides(Iterable<Slide> slides) async {

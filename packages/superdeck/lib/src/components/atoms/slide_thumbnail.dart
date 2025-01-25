@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:superdeck/src/modules/thumbnail/slide_capture_service.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
@@ -24,7 +23,6 @@ enum _PopMenuAction {
 }
 
 class SlideThumbnail extends StatefulWidget {
-  final VoidCallback onTap;
   final bool selected;
   final SlideData slide;
   final int page;
@@ -32,7 +30,6 @@ class SlideThumbnail extends StatefulWidget {
   const SlideThumbnail({
     super.key,
     required this.selected,
-    required this.onTap,
     required this.slide,
     required this.page,
   });
@@ -43,22 +40,9 @@ class SlideThumbnail extends StatefulWidget {
 
 class _SlideThumbnailState extends State<SlideThumbnail> {
   final _slideCaptureService = SlideCaptureService();
-  late final _thumbnailGeneration = futureSignal(_load);
-
-  @override
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _thumbnailGeneration.dispose();
-    super.dispose();
-  }
 
   File _getThumbnailFile(SlideData slide) {
-    final asset = LocalAsset.thumbnail(slide.data.key);
+    final asset = GeneratedAsset.thumbnail(slide.data.key);
     return File(asset.path);
   }
 
@@ -80,17 +64,17 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
     return await thumbnailFile.writeAsBytes(imageData, flush: true);
   }
 
-  Future<void> _handleAction(_PopMenuAction action) async {
-    switch (action) {
-      case _PopMenuAction.refreshThumbnail:
-        final thumbnailFile = _getThumbnailFile(widget.slide);
+  // Future<void> _handleAction(_PopMenuAction action) async {
+  //   switch (action) {
+  //     case _PopMenuAction.refreshThumbnail:
+  //       final thumbnailFile = _getThumbnailFile(widget.slide);
 
-        if (await thumbnailFile.exists()) {
-          await thumbnailFile.delete();
-        }
-        await _thumbnailGeneration.refresh();
-    }
-  }
+  //       if (await thumbnailFile.exists()) {
+  //         await thumbnailFile.delete();
+  //       }
+  //       await _thumbnailGeneration.refresh();
+  //   }
+  // }
 
   Future<File> _load() async {
     return kCanRunProcess
@@ -100,31 +84,26 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      onSecondaryTapDown: (details) {
-        _showOverlayMenu(context, details, _handleAction);
-      },
-      child: _PreviewContainer(
-        selected: widget.selected,
-        child: Stack(
-          children: [
-            AspectRatio(
-                aspectRatio: kAspectRatio,
-                child: Watch.builder(builder: (context) {
-                  return _thumbnailGeneration.value.map(
-                    data: (file) => Image(
-                      gaplessPlayback: true,
-                      image: getImageProvider(file.uri),
-                    ),
-                    loading: () => const IsometricLoading(),
-                    error: (error) => const Center(
-                      child: Text('Error loading image'),
-                    ),
+    return _PreviewContainer(
+      selected: widget.selected,
+      child: Stack(
+        children: [
+          AspectRatio(
+            aspectRatio: kAspectRatio,
+            child: FutureBuilder(
+              future: _load(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Image(
+                    gaplessPlayback: true,
+                    image: getImageProvider(snapshot.requireData.uri),
                   );
-                })),
-          ],
-        ),
+                }
+                return const IsometricLoading();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:logging/logging.dart';
+import 'package:path/path.dart';
+import 'package:superdeck_cli/src/helpers/logger.dart';
 import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
 import 'package:superdeck_cli/src/parsers/parsers/block_extractor.dart';
 import 'package:superdeck_core/superdeck_core.dart';
@@ -51,17 +53,24 @@ class TaskPipeline {
   /// Cleans up generated files in [generatedDir] that are not present in [neededAssets].
   Future<void> _cleanupGeneratedFiles(
     Directory generatedDir,
-    List<LocalAsset> neededAssets,
+    List<GeneratedAsset> neededAssets,
   ) async {
     final files = await _loadGeneratedFiles(generatedDir);
-    final neededPaths = neededAssets.map((asset) => asset.path).toSet();
 
+    final generatedAssets = {
+      for (var asset in neededAssets) join(generatedDir.path, asset.path),
+    };
+
+    List<File> filesToDelete = [];
     for (var file in files) {
-      if (!neededPaths.contains(file.path)) {
-        if (await file.exists()) {
-          await file.delete();
-        }
+      if (!generatedAssets.contains(file.path)) {
+        filesToDelete.add(file);
       }
+    }
+
+    for (var file in filesToDelete) {
+      logger.info('Deleting generated file: ${file.path}');
+      await file.delete();
     }
   }
 
@@ -115,25 +124,17 @@ class TaskPipeline {
         ));
 
     // Determine all assets that are still needed after processing.
-    final localAssets = slides
-        .expand((slide) => slide.sections.map(
-              (e) => e.blocks.whereType<AssetElement>().map((e) => e.asset),
-            ))
-        .expand((e) => e)
-        .whereType<LocalAsset>()
-        .toSet()
-        .toList();
 
-    List<LocalAsset> thumbnailAssets = [];
+    List<GeneratedAsset> thumbnailAssets = [];
 
     for (final slide in finalizedSlides) {
-      thumbnailAssets.add(LocalAsset.thumbnail(slide.key));
+      thumbnailAssets.add(GeneratedAsset.thumbnail(slide.key));
     }
 
     // Clean up any generated files that are no longer needed.
     await _cleanupGeneratedFiles(
       dataStore.configuration.generatedDir,
-      [...localAssets, ...thumbnailAssets],
+      [...dataStore.generatedAssets, ...thumbnailAssets],
     );
 
     // Dispose of all tasks after processing.

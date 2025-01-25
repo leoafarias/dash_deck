@@ -50,7 +50,7 @@ class SectionBlockWidget extends StatelessWidget {
 
   @override
   Widget build(context) {
-    final slide = Data.of<SlideData>(context);
+    final slide = Provider.ofType<SlideData>(context);
 
     final children = section.blocks.map((block) {
       final flex = block.flex ?? 1;
@@ -77,8 +77,8 @@ class SectionBlockWidget extends StatelessWidget {
             final sizeOffset = getSizeWithoutSpacing(spec.blockContainer);
 
             return spec.blockContainer(
-              child: Data(
-                data: BlockData(
+              child: Provider(
+                value: BlockData(
                   block: block,
                   spec: spec,
                   size: (size - sizeOffset) as Size,
@@ -95,7 +95,7 @@ class SectionBlockWidget extends StatelessWidget {
                               mainAxisAlignment: alignment.$1,
                               children: [
                                 switch (block) {
-                                  AssetElement block =>
+                                  ImageElement block =>
                                     _ImageBlockWidget(block),
                                   WidgetElement block =>
                                     _WidgetBlockWidget(block),
@@ -143,8 +143,9 @@ class ContentElementWidget extends _BlockWidget<ContentElement> {
   Widget build(context) {
     final content = block.content;
 
-    final blockData = Data.of<BlockData>(context);
-    final capturing = Data.maybeOf<CapturingData>(context)?.isCapturing == true;
+    final blockData = Provider.ofType<BlockData>(context);
+    final capturing =
+        Provider.maybeTypeOf<CapturingData>(context)?.isCapturing == true;
 
     Widget current = MarkdownViewer(
       content: content,
@@ -171,7 +172,7 @@ class ContentElementWidget extends _BlockWidget<ContentElement> {
   }
 }
 
-class _ImageBlockWidget extends _BlockWidget<AssetElement> {
+class _ImageBlockWidget extends _BlockWidget<ImageElement> {
   const _ImageBlockWidget(super.block);
 
   @override
@@ -197,8 +198,8 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetElement> {
 
   @override
   Widget build(context) {
-    final slide = Data.of<SlideData>(context);
-    final blockData = Data.of<BlockData>(context);
+    final slide = Provider.ofType<SlideData>(context);
+    final blockData = Provider.ofType<BlockData>(context);
 
     final widgetBuilder = slide.getWidget(block.type);
 
@@ -237,11 +238,16 @@ class _DartPadBlockWidget extends _BlockWidget<DartPadElement> {
   @override
   Widget build(context) {
     final DartPadElement(:id, :theme, :embed) = block;
+    final blockData = Provider.ofType<BlockData>(context);
 
     final themeName = theme?.name ?? DartPadTheme.dark.name;
 
-    return WebViewWrapper(
-      url: 'https://dartpad.dev/?id=$id&theme=$themeName&embed=$embed',
+    return SizedBox(
+      height: blockData.size.height,
+      width: blockData.size.width,
+      child: WebViewWrapper(
+        url: 'https://dartpad.dev/?id=$id&theme=$themeName&embed=$embed',
+      ),
     );
   }
 }

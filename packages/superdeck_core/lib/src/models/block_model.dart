@@ -17,11 +17,6 @@ abstract class LayoutElement with LayoutElementMappable {
     this.scrollable = false,
   });
 
-  LayoutElement merge(LayoutElement? other) {
-    if (other == null) return this;
-    return copyWith.$merge(other);
-  }
-
   static final schema = Schema.object(
     {
       "align": Schema.enumValue(ContentAlignment.values),

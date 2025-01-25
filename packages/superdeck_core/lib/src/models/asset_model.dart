@@ -26,89 +26,68 @@ enum AssetExtension {
 
 @MappableEnum()
 enum AssetType {
-  remote,
-  local,
-  slideThumbnail,
-  mermaidImage,
-  cacheRemoteImage,
-}
-
-@MappableClass(discriminatorKey: 'type')
-abstract class Asset with AssetMappable {
-  final String src;
-  final AssetType type;
-
-  Asset({
-    required this.src,
-    required this.type,
-  });
-
-  static final schema = Schema.object(
-    {
-      "src": Schema.string(),
-      "type": Schema.enumValue(AssetType.values),
-    },
-    required: [
-      "src",
-      "type",
-    ],
-  );
+  image,
+  thumnail,
+  mermaid,
 }
 
 @MappableClass()
-class LocalAsset extends Asset with LocalAssetMappable {
+class GeneratedAsset with GeneratedAssetMappable {
   final String fileName;
   final AssetExtension extension;
+  final AssetType type;
 
-  LocalAsset._({
+  GeneratedAsset._({
     required this.fileName,
     required this.extension,
-    required super.type,
-  }) : super(src: '${type}_$fileName.${extension.name}');
+    required this.type,
+  });
+
+  String get src => '${type.name}_$fileName.${extension.name}';
 
   static String buildKey(String valueToHash) => generateValueHash(valueToHash);
 
   String get path => src;
 
-  static final schema = Asset.schema.extend(
+  static final schema = Schema.object(
     {
       "file_name": Schema.string(),
       "extension": AssetExtension.schema,
-      "key": Schema.string(),
+      "type": Schema.enumValue(AssetType.values),
     },
     required: [
       "file_name",
       "extension",
-      "key",
+      "type",
     ],
   );
 
-  static LocalAsset parse(Map<String, dynamic> map) {
+  static GeneratedAsset parse(Map<String, dynamic> map) {
     schema.validateOrThrow(map);
-    return LocalAssetMapper.fromMap(map);
+    return GeneratedAssetMapper.fromMap(map);
   }
 
-  factory LocalAsset.thumbnail(String slideKey) {
-    return LocalAsset._(
+  factory GeneratedAsset.thumbnail(String slideKey) {
+    return GeneratedAsset._(
       fileName: slideKey,
       extension: AssetExtension.png,
-      type: AssetType.slideThumbnail,
+      type: AssetType.thumnail,
     );
   }
 
-  factory LocalAsset.mermaidGraph(String syntax) {
-    return LocalAsset._(
-      fileName: syntax,
+  factory GeneratedAsset.mermaid(String syntax) {
+    return GeneratedAsset._(
+      fileName: GeneratedAsset.buildKey(syntax),
       extension: AssetExtension.png,
-      type: AssetType.mermaidImage,
+      type: AssetType.mermaid,
     );
   }
 
-  factory LocalAsset.cacheRemote(String url) {
-    return LocalAsset._(
-      fileName: LocalAsset.buildKey(url),
-      extension: AssetExtension.png,
-      type: AssetType.cacheRemoteImage,
+  factory GeneratedAsset.image(String url, AssetExtension extension) {
+    return GeneratedAsset._(
+      fileName: GeneratedAsset.buildKey(url),
+      extension: extension,
+      type: AssetType.image,
     );
   }
 }

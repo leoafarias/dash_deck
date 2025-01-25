@@ -83,16 +83,12 @@ class AssetTypeMapper extends EnumMapper<AssetType> {
   @override
   AssetType decode(dynamic value) {
     switch (value) {
-      case 'remote':
-        return AssetType.remote;
-      case 'local':
-        return AssetType.local;
-      case 'slide_thumbnail':
-        return AssetType.slideThumbnail;
-      case 'mermaid_image':
-        return AssetType.mermaidImage;
-      case 'cache_remote_image':
-        return AssetType.cacheRemoteImage;
+      case 'image':
+        return AssetType.image;
+      case 'thumnail':
+        return AssetType.thumnail;
+      case 'mermaid':
+        return AssetType.mermaid;
       default:
         throw MapperException.unknownEnumValue(value);
     }
@@ -101,16 +97,12 @@ class AssetTypeMapper extends EnumMapper<AssetType> {
   @override
   dynamic encode(AssetType self) {
     switch (self) {
-      case AssetType.remote:
-        return 'remote';
-      case AssetType.local:
-        return 'local';
-      case AssetType.slideThumbnail:
-        return 'slide_thumbnail';
-      case AssetType.mermaidImage:
-        return 'mermaid_image';
-      case AssetType.cacheRemoteImage:
-        return 'cache_remote_image';
+      case AssetType.image:
+        return 'image';
+      case AssetType.thumnail:
+        return 'thumnail';
+      case AssetType.mermaid:
+        return 'mermaid';
     }
   }
 }
@@ -122,189 +114,121 @@ extension AssetTypeMapperExtension on AssetType {
   }
 }
 
-class AssetMapper extends ClassMapperBase<Asset> {
-  AssetMapper._();
+class GeneratedAssetMapper extends ClassMapperBase<GeneratedAsset> {
+  GeneratedAssetMapper._();
 
-  static AssetMapper? _instance;
-  static AssetMapper ensureInitialized() {
+  static GeneratedAssetMapper? _instance;
+  static GeneratedAssetMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals.use(_instance = AssetMapper._());
-      LocalAssetMapper.ensureInitialized();
-      AssetTypeMapper.ensureInitialized();
+      MapperContainer.globals.use(_instance = GeneratedAssetMapper._());
     }
     return _instance!;
   }
 
   @override
-  final String id = 'Asset';
+  final String id = 'GeneratedAsset';
 
-  static String _$src(Asset v) => v.src;
-  static const Field<Asset, String> _f$src = Field('src', _$src);
-  static AssetType _$type(Asset v) => v.type;
-  static const Field<Asset, AssetType> _f$type = Field('type', _$type);
-
-  @override
-  final MappableFields<Asset> fields = const {
-    #src: _f$src,
-    #type: _f$type,
-  };
-  @override
-  final bool ignoreNull = true;
-
-  static Asset _instantiate(DecodingData data) {
-    throw MapperException.missingSubclass(
-        'Asset', 'type', '${data.value['type']}');
-  }
-
-  @override
-  final Function instantiate = _instantiate;
-
-  static Asset fromMap(Map<String, dynamic> map) {
-    return ensureInitialized().decodeMap<Asset>(map);
-  }
-
-  static Asset fromJson(String json) {
-    return ensureInitialized().decodeJson<Asset>(json);
-  }
-}
-
-mixin AssetMappable {
-  String toJson();
-  Map<String, dynamic> toMap();
-  AssetCopyWith<Asset, Asset, Asset> get copyWith;
-}
-
-abstract class AssetCopyWith<$R, $In extends Asset, $Out>
-    implements ClassCopyWith<$R, $In, $Out> {
-  $R call();
-  AssetCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
-}
-
-class LocalAssetMapper extends SubClassMapperBase<LocalAsset> {
-  LocalAssetMapper._();
-
-  static LocalAssetMapper? _instance;
-  static LocalAssetMapper ensureInitialized() {
-    if (_instance == null) {
-      MapperContainer.globals.use(_instance = LocalAssetMapper._());
-      AssetMapper.ensureInitialized().addSubMapper(_instance!);
-    }
-    return _instance!;
-  }
-
-  @override
-  final String id = 'LocalAsset';
-
-  static const Field<LocalAsset, String> _f$slideKey =
+  static const Field<GeneratedAsset, String> _f$slideKey =
       Field('slideKey', null, key: 'slide_key', mode: FieldMode.param);
-  static String _$src(LocalAsset v) => v.src;
-  static const Field<LocalAsset, String> _f$src =
-      Field('src', _$src, mode: FieldMode.member);
-  static AssetType _$type(LocalAsset v) => v.type;
-  static const Field<LocalAsset, AssetType> _f$type =
-      Field('type', _$type, mode: FieldMode.member);
-  static String _$fileName(LocalAsset v) => v.fileName;
-  static const Field<LocalAsset, String> _f$fileName =
+  static String _$fileName(GeneratedAsset v) => v.fileName;
+  static const Field<GeneratedAsset, String> _f$fileName =
       Field('fileName', _$fileName, key: 'file_name', mode: FieldMode.member);
-  static AssetExtension _$extension(LocalAsset v) => v.extension;
-  static const Field<LocalAsset, AssetExtension> _f$extension =
+  static AssetExtension _$extension(GeneratedAsset v) => v.extension;
+  static const Field<GeneratedAsset, AssetExtension> _f$extension =
       Field('extension', _$extension, mode: FieldMode.member);
+  static AssetType _$type(GeneratedAsset v) => v.type;
+  static const Field<GeneratedAsset, AssetType> _f$type =
+      Field('type', _$type, mode: FieldMode.member);
 
   @override
-  final MappableFields<LocalAsset> fields = const {
+  final MappableFields<GeneratedAsset> fields = const {
     #slideKey: _f$slideKey,
-    #src: _f$src,
-    #type: _f$type,
     #fileName: _f$fileName,
     #extension: _f$extension,
+    #type: _f$type,
   };
   @override
   final bool ignoreNull = true;
 
-  @override
-  final String discriminatorKey = 'type';
-  @override
-  final dynamic discriminatorValue = 'LocalAsset';
-  @override
-  late final ClassMapperBase superMapper = AssetMapper.ensureInitialized();
-
-  static LocalAsset _instantiate(DecodingData data) {
-    return LocalAsset.thumbnail(data.dec(_f$slideKey));
+  static GeneratedAsset _instantiate(DecodingData data) {
+    return GeneratedAsset.thumbnail(data.dec(_f$slideKey));
   }
 
   @override
   final Function instantiate = _instantiate;
 
-  static LocalAsset fromMap(Map<String, dynamic> map) {
-    return ensureInitialized().decodeMap<LocalAsset>(map);
+  static GeneratedAsset fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<GeneratedAsset>(map);
   }
 
-  static LocalAsset fromJson(String json) {
-    return ensureInitialized().decodeJson<LocalAsset>(json);
+  static GeneratedAsset fromJson(String json) {
+    return ensureInitialized().decodeJson<GeneratedAsset>(json);
   }
 }
 
-mixin LocalAssetMappable {
+mixin GeneratedAssetMappable {
   String toJson() {
-    return LocalAssetMapper.ensureInitialized()
-        .encodeJson<LocalAsset>(this as LocalAsset);
+    return GeneratedAssetMapper.ensureInitialized()
+        .encodeJson<GeneratedAsset>(this as GeneratedAsset);
   }
 
   Map<String, dynamic> toMap() {
-    return LocalAssetMapper.ensureInitialized()
-        .encodeMap<LocalAsset>(this as LocalAsset);
+    return GeneratedAssetMapper.ensureInitialized()
+        .encodeMap<GeneratedAsset>(this as GeneratedAsset);
   }
 
-  LocalAssetCopyWith<LocalAsset, LocalAsset, LocalAsset> get copyWith =>
-      _LocalAssetCopyWithImpl(this as LocalAsset, $identity, $identity);
+  GeneratedAssetCopyWith<GeneratedAsset, GeneratedAsset, GeneratedAsset>
+      get copyWith => _GeneratedAssetCopyWithImpl(
+          this as GeneratedAsset, $identity, $identity);
   @override
   String toString() {
-    return LocalAssetMapper.ensureInitialized()
-        .stringifyValue(this as LocalAsset);
+    return GeneratedAssetMapper.ensureInitialized()
+        .stringifyValue(this as GeneratedAsset);
   }
 
   @override
   bool operator ==(Object other) {
-    return LocalAssetMapper.ensureInitialized()
-        .equalsValue(this as LocalAsset, other);
+    return GeneratedAssetMapper.ensureInitialized()
+        .equalsValue(this as GeneratedAsset, other);
   }
 
   @override
   int get hashCode {
-    return LocalAssetMapper.ensureInitialized().hashValue(this as LocalAsset);
+    return GeneratedAssetMapper.ensureInitialized()
+        .hashValue(this as GeneratedAsset);
   }
 }
 
-extension LocalAssetValueCopy<$R, $Out>
-    on ObjectCopyWith<$R, LocalAsset, $Out> {
-  LocalAssetCopyWith<$R, LocalAsset, $Out> get $asLocalAsset =>
-      $base.as((v, t, t2) => _LocalAssetCopyWithImpl(v, t, t2));
+extension GeneratedAssetValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, GeneratedAsset, $Out> {
+  GeneratedAssetCopyWith<$R, GeneratedAsset, $Out> get $asGeneratedAsset =>
+      $base.as((v, t, t2) => _GeneratedAssetCopyWithImpl(v, t, t2));
 }
 
-abstract class LocalAssetCopyWith<$R, $In extends LocalAsset, $Out>
-    implements AssetCopyWith<$R, $In, $Out> {
-  @override
+abstract class GeneratedAssetCopyWith<$R, $In extends GeneratedAsset, $Out>
+    implements ClassCopyWith<$R, $In, $Out> {
   $R call({required String slideKey});
-  LocalAssetCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+  GeneratedAssetCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+      Then<$Out2, $R2> t);
 }
 
-class _LocalAssetCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, LocalAsset, $Out>
-    implements LocalAssetCopyWith<$R, LocalAsset, $Out> {
-  _LocalAssetCopyWithImpl(super.value, super.then, super.then2);
+class _GeneratedAssetCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, GeneratedAsset, $Out>
+    implements GeneratedAssetCopyWith<$R, GeneratedAsset, $Out> {
+  _GeneratedAssetCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<LocalAsset> $mapper =
-      LocalAssetMapper.ensureInitialized();
+  late final ClassMapperBase<GeneratedAsset> $mapper =
+      GeneratedAssetMapper.ensureInitialized();
   @override
   $R call({required String slideKey}) =>
       $apply(FieldCopyWithData({#slideKey: slideKey}));
   @override
-  LocalAsset $make(CopyWithData data) =>
-      LocalAsset.thumbnail(data.get(#slideKey));
+  GeneratedAsset $make(CopyWithData data) =>
+      GeneratedAsset.thumbnail(data.get(#slideKey));
 
   @override
-  LocalAssetCopyWith<$R2, LocalAsset, $Out2> $chain<$R2, $Out2>(
+  GeneratedAssetCopyWith<$R2, GeneratedAsset, $Out2> $chain<$R2, $Out2>(
           Then<$Out2, $R2> t) =>
-      _LocalAssetCopyWithImpl($value, $cast, t);
+      _GeneratedAssetCopyWithImpl($value, $cast, t);
 }

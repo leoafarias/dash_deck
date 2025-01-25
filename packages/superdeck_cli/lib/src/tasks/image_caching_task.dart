@@ -6,40 +6,19 @@
 // import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
 // import 'package:superdeck_core/superdeck_core.dart';
 
-// class RemoteAssetTransformer implements BlockTransformer {
-//   final http.Client _httpClient = http.Client();
-//   RemoteAssetTransformer();
-
-//   @override
-//   Future<String> transform(String markdown) async {
-//     final imageRegex = RegExp(r'\!\[.*?\]\((.*?)\s*("(?:.*[^"])")?\s*\)');
-//     final matches = imageRegex.allMatches(markdown);
-
-//     for (final match in matches) {
-//       final url = match.group(1)!;
-//       final asset = RemoteAsset.fromUrl(url);
-
-//       final block = AssetElement(asset: asset);
-//       markdown = markdown.replaceAll(match.group(0)!, block.toJson());
-//     }
-
-//     return markdown;
-//   }
-// }
-
 // /// A task responsible for caching images referenced in markdown slides.
-// class RemoteAssetCaching extends Task {
+// class ImageCachingTask extends Task {
 //   /// A set to track assets currently being processed to prevent duplicate downloads.
 //   static final Set<String> _executingAssets = {};
 
 //   /// HTTP client used for downloading images.
 //   static final http.Client _httpClient = http.Client();
 
-//   /// Constructs an [RemoteAssetCaching] with the name 'image_caching'.
-//   RemoteAssetCaching() : super('remote_asset_caching');
+//   /// Constructs an [ImageCachingTask] with the name 'image_caching'.
+//   ImageCachingTask() : super('remote_asset_caching');
 
 //   // Function to download and save a single asset.
-//   Future<Uint8List?> _fetchData(String url) async {
+//   Future<Uint8List?> _fetchData(TaskContext context, String url) async {
 //     try {
 //       logger.info('Downloading asset: $url');
 //       final response = await _httpClient.get(Uri.parse(url));
@@ -65,12 +44,23 @@
 
 //       final extension = contentType.split('/').last.toLowerCase();
 
-//       // Check if the image format is supported.
-//       if (AssetExtension.tryParse(extension) == null) {
+//       final assetExtension = AssetExtension.tryParse(extension);
+
+//       if (assetExtension == null) {
 //         logger.warning('Unsupported image format for $url: $extension');
 
 //         return null;
 //       }
+
+//       final asset = GeneratedAsset.image(url, assetExtension);
+
+//       final assetFile = await context.dataStore.getAssetFile(asset);
+
+//       if (await assetFile.exists()) {
+//         return null;
+//       }
+
+//       await assetFile.writeAsBytes(response.bodyBytes);
 
 //       return response.bodyBytes;
 //     } catch (e, stackTrace) {
@@ -82,27 +72,7 @@
 
 //   @override
 //   Future<TaskContext> run(TaskContext context) async {
-//     final assetBlocks = context.blocks.whereType<AssetElement<RemoteAsset>>();
-
-//     for (final block in assetBlocks) {
-//       final url = block.asset.src;
-
-//       if (_executingAssets.contains(url)) {
-//         continue;
-//       }
-
-//       _executingAssets.add(url);
-//       final asset = CacheRemoteAsset.fromUrl(url);
-//       if (await context.dataStore.checkAssetExists(asset)) {
-//         continue;
-//       }
-//       final data = await _fetchData(url);
-
-//       if (data == null) {
-//         continue;
-//       }
-//       await File(asset.path).writeAsBytes(data);
-//     }
+  
 
 //     return context;
 //   }

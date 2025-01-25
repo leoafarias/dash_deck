@@ -30,8 +30,6 @@ class DeckConfiguration with DeckConfigurationMappable {
     this.background,
     this.debug = false,
   });
-
-  static const fromMap = DeckConfigurationMapper.fromMap;
 }
 
 class DeckController extends Controller {
@@ -41,6 +39,20 @@ class DeckController extends Controller {
   bool _showNotes;
   int _currentSlideIndex = 0;
   late GoRouter _router;
+
+  Widget watch<T>({
+    required T Function(DeckController) selector,
+    required Widget Function(BuildContext context, T value) builder,
+  }) {
+    return Controller.select(
+      controller: this,
+      selector: selector,
+      builder: builder,
+    );
+  }
+
+  static DeckController of(BuildContext context) =>
+      Provider.ofType<DeckController>(context);
 
   /// Creates a [DeckController] with the given styles and examples.
   ///
@@ -100,6 +112,8 @@ class DeckController extends Controller {
     notifyListeners();
   }
 
+  SlideData getSlideByIndex(int index) => _slides[index];
+
   late final slides = _slides;
 
   bool get isMenuOpen => _isMenuOpen;
@@ -107,6 +121,8 @@ class DeckController extends Controller {
   bool get isNotesShown => _showNotes;
 
   int get currentPage => _currentSlideIndex + 1;
+
+  int get currentSlideIndex => _currentSlideIndex;
 
   DeckConfiguration get configuration => _configuration;
 

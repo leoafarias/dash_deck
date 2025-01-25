@@ -118,17 +118,17 @@ extension ImageFitMapperExtension on ImageFit {
   }
 }
 
-class BlockElementMapper extends ClassMapperBase<BlockElement> {
+class BlockElementMapper extends SubClassMapperBase<BlockElement> {
   BlockElementMapper._();
 
   static BlockElementMapper? _instance;
   static BlockElementMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = BlockElementMapper._());
-      LayoutElementMapper.ensureInitialized();
+      LayoutElementMapper.ensureInitialized().addSubMapper(_instance!);
       ContentElementMapper.ensureInitialized();
       DartPadElementMapper.ensureInitialized();
-      AssetElementMapper.ensureInitialized();
+      ImageElementMapper.ensureInitialized();
       WidgetElementMapper.ensureInitialized();
       ContentAlignmentMapper.ensureInitialized();
     }
@@ -160,8 +160,17 @@ class BlockElementMapper extends ClassMapperBase<BlockElement> {
   @override
   final bool ignoreNull = true;
 
+  @override
+  final String discriminatorKey = 'type';
+  @override
+  final dynamic discriminatorValue = 'BlockElement';
+  @override
+  late final ClassMapperBase superMapper =
+      LayoutElementMapper.ensureInitialized();
+
   static BlockElement _instantiate(DecodingData data) {
-    throw MapperException.missingConstructor('BlockElement');
+    throw MapperException.missingSubclass(
+        'BlockElement', 'type', '${data.value['type']}');
   }
 
   @override
@@ -189,14 +198,14 @@ abstract class BlockElementCopyWith<$R, $In extends BlockElement, $Out>
   BlockElementCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class ContentElementMapper extends ClassMapperBase<ContentElement> {
+class ContentElementMapper extends SubClassMapperBase<ContentElement> {
   ContentElementMapper._();
 
   static ContentElementMapper? _instance;
   static ContentElementMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ContentElementMapper._());
-      BlockElementMapper.ensureInitialized();
+      BlockElementMapper.ensureInitialized().addSubMapper(_instance!);
       ContentAlignmentMapper.ensureInitialized();
     }
     return _instance!;
@@ -231,6 +240,14 @@ class ContentElementMapper extends ClassMapperBase<ContentElement> {
   };
   @override
   final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'type';
+  @override
+  final dynamic discriminatorValue = ContentElement.key;
+  @override
+  late final ClassMapperBase superMapper =
+      BlockElementMapper.ensureInitialized();
 
   static ContentElement _instantiate(DecodingData data) {
     return ContentElement(data.dec(_f$content),
@@ -332,14 +349,14 @@ class _ContentElementCopyWithImpl<$R, $Out>
       _ContentElementCopyWithImpl($value, $cast, t);
 }
 
-class DartPadElementMapper extends ClassMapperBase<DartPadElement> {
+class DartPadElementMapper extends SubClassMapperBase<DartPadElement> {
   DartPadElementMapper._();
 
   static DartPadElementMapper? _instance;
   static DartPadElementMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = DartPadElementMapper._());
-      BlockElementMapper.ensureInitialized();
+      BlockElementMapper.ensureInitialized().addSubMapper(_instance!);
       DartPadThemeMapper.ensureInitialized();
       ContentAlignmentMapper.ensureInitialized();
     }
@@ -385,6 +402,14 @@ class DartPadElementMapper extends ClassMapperBase<DartPadElement> {
   };
   @override
   final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'type';
+  @override
+  final dynamic discriminatorValue = DartPadElement.key;
+  @override
+  late final ClassMapperBase superMapper =
+      BlockElementMapper.ensureInitialized();
 
   static DartPadElement _instantiate(DecodingData data) {
     return DartPadElement(
@@ -505,15 +530,15 @@ class _DartPadElementCopyWithImpl<$R, $Out>
       _DartPadElementCopyWithImpl($value, $cast, t);
 }
 
-class AssetElementMapper extends ClassMapperBase<AssetElement> {
-  AssetElementMapper._();
+class ImageElementMapper extends SubClassMapperBase<ImageElement> {
+  ImageElementMapper._();
 
-  static AssetElementMapper? _instance;
-  static AssetElementMapper ensureInitialized() {
+  static ImageElementMapper? _instance;
+  static ImageElementMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals.use(_instance = AssetElementMapper._());
-      BlockElementMapper.ensureInitialized();
-      AssetMapper.ensureInitialized();
+      MapperContainer.globals.use(_instance = ImageElementMapper._());
+      BlockElementMapper.ensureInitialized().addSubMapper(_instance!);
+      GeneratedAssetMapper.ensureInitialized();
       ImageFitMapper.ensureInitialized();
       ContentAlignmentMapper.ensureInitialized();
     }
@@ -521,34 +546,35 @@ class AssetElementMapper extends ClassMapperBase<AssetElement> {
   }
 
   @override
-  final String id = 'AssetElement';
+  final String id = 'ImageElement';
 
-  static Asset _$asset(AssetElement v) => v.asset;
-  static const Field<AssetElement, Asset> _f$asset = Field('asset', _$asset);
-  static ImageFit? _$fit(AssetElement v) => v.fit;
-  static const Field<AssetElement, ImageFit> _f$fit =
+  static GeneratedAsset _$asset(ImageElement v) => v.asset;
+  static const Field<ImageElement, GeneratedAsset> _f$asset =
+      Field('asset', _$asset);
+  static ImageFit? _$fit(ImageElement v) => v.fit;
+  static const Field<ImageElement, ImageFit> _f$fit =
       Field('fit', _$fit, opt: true);
-  static double? _$width(AssetElement v) => v.width;
-  static const Field<AssetElement, double> _f$width =
+  static double? _$width(ImageElement v) => v.width;
+  static const Field<ImageElement, double> _f$width =
       Field('width', _$width, opt: true);
-  static double? _$height(AssetElement v) => v.height;
-  static const Field<AssetElement, double> _f$height =
+  static double? _$height(ImageElement v) => v.height;
+  static const Field<ImageElement, double> _f$height =
       Field('height', _$height, opt: true);
-  static int? _$flex(AssetElement v) => v.flex;
-  static const Field<AssetElement, int> _f$flex =
+  static int? _$flex(ImageElement v) => v.flex;
+  static const Field<ImageElement, int> _f$flex =
       Field('flex', _$flex, opt: true);
-  static ContentAlignment? _$align(AssetElement v) => v.align;
-  static const Field<AssetElement, ContentAlignment> _f$align =
+  static ContentAlignment? _$align(ImageElement v) => v.align;
+  static const Field<ImageElement, ContentAlignment> _f$align =
       Field('align', _$align, opt: true);
-  static bool _$scrollable(AssetElement v) => v.scrollable;
-  static const Field<AssetElement, bool> _f$scrollable =
+  static bool _$scrollable(ImageElement v) => v.scrollable;
+  static const Field<ImageElement, bool> _f$scrollable =
       Field('scrollable', _$scrollable, opt: true, def: false);
-  static String _$type(AssetElement v) => v.type;
-  static const Field<AssetElement, String> _f$type =
+  static String _$type(ImageElement v) => v.type;
+  static const Field<ImageElement, String> _f$type =
       Field('type', _$type, mode: FieldMode.member);
 
   @override
-  final MappableFields<AssetElement> fields = const {
+  final MappableFields<ImageElement> fields = const {
     #asset: _f$asset,
     #fit: _f$fit,
     #width: _f$width,
@@ -561,8 +587,16 @@ class AssetElementMapper extends ClassMapperBase<AssetElement> {
   @override
   final bool ignoreNull = true;
 
-  static AssetElement _instantiate(DecodingData data) {
-    return AssetElement(
+  @override
+  final String discriminatorKey = 'type';
+  @override
+  final dynamic discriminatorValue = ImageElement.key;
+  @override
+  late final ClassMapperBase superMapper =
+      BlockElementMapper.ensureInitialized();
+
+  static ImageElement _instantiate(DecodingData data) {
+    return ImageElement(
         asset: data.dec(_f$asset),
         fit: data.dec(_f$fit),
         width: data.dec(_f$width),
@@ -575,78 +609,82 @@ class AssetElementMapper extends ClassMapperBase<AssetElement> {
   @override
   final Function instantiate = _instantiate;
 
-  static AssetElement fromMap(Map<String, dynamic> map) {
-    return ensureInitialized().decodeMap<AssetElement>(map);
+  static ImageElement fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<ImageElement>(map);
   }
 
-  static AssetElement fromJson(String json) {
-    return ensureInitialized().decodeJson<AssetElement>(json);
+  static ImageElement fromJson(String json) {
+    return ensureInitialized().decodeJson<ImageElement>(json);
   }
 }
 
-mixin AssetElementMappable {
+mixin ImageElementMappable {
   String toJson() {
-    return AssetElementMapper.ensureInitialized()
-        .encodeJson<AssetElement>(this as AssetElement);
+    return ImageElementMapper.ensureInitialized()
+        .encodeJson<ImageElement>(this as ImageElement);
   }
 
   Map<String, dynamic> toMap() {
-    return AssetElementMapper.ensureInitialized()
-        .encodeMap<AssetElement>(this as AssetElement);
+    return ImageElementMapper.ensureInitialized()
+        .encodeMap<ImageElement>(this as ImageElement);
   }
 
-  AssetElementCopyWith<AssetElement, AssetElement, AssetElement> get copyWith =>
-      _AssetElementCopyWithImpl(this as AssetElement, $identity, $identity);
+  ImageElementCopyWith<ImageElement, ImageElement, ImageElement> get copyWith =>
+      _ImageElementCopyWithImpl(this as ImageElement, $identity, $identity);
   @override
   String toString() {
-    return AssetElementMapper.ensureInitialized()
-        .stringifyValue(this as AssetElement);
+    return ImageElementMapper.ensureInitialized()
+        .stringifyValue(this as ImageElement);
   }
 
   @override
   bool operator ==(Object other) {
-    return AssetElementMapper.ensureInitialized()
-        .equalsValue(this as AssetElement, other);
+    return ImageElementMapper.ensureInitialized()
+        .equalsValue(this as ImageElement, other);
   }
 
   @override
   int get hashCode {
-    return AssetElementMapper.ensureInitialized()
-        .hashValue(this as AssetElement);
+    return ImageElementMapper.ensureInitialized()
+        .hashValue(this as ImageElement);
   }
 }
 
-extension AssetElementValueCopy<$R, $Out>
-    on ObjectCopyWith<$R, AssetElement, $Out> {
-  AssetElementCopyWith<$R, AssetElement, $Out> get $asAssetElement =>
-      $base.as((v, t, t2) => _AssetElementCopyWithImpl(v, t, t2));
+extension ImageElementValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, ImageElement, $Out> {
+  ImageElementCopyWith<$R, ImageElement, $Out> get $asImageElement =>
+      $base.as((v, t, t2) => _ImageElementCopyWithImpl(v, t, t2));
 }
 
-abstract class AssetElementCopyWith<$R, $In extends AssetElement, $Out>
+abstract class ImageElementCopyWith<$R, $In extends ImageElement, $Out>
     implements BlockElementCopyWith<$R, $In, $Out> {
+  GeneratedAssetCopyWith<$R, GeneratedAsset, GeneratedAsset> get asset;
   @override
   $R call(
-      {Asset? asset,
+      {GeneratedAsset? asset,
       ImageFit? fit,
       double? width,
       double? height,
       int? flex,
       ContentAlignment? align,
       bool? scrollable});
-  AssetElementCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+  ImageElementCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _AssetElementCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, AssetElement, $Out>
-    implements AssetElementCopyWith<$R, AssetElement, $Out> {
-  _AssetElementCopyWithImpl(super.value, super.then, super.then2);
+class _ImageElementCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, ImageElement, $Out>
+    implements ImageElementCopyWith<$R, ImageElement, $Out> {
+  _ImageElementCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<AssetElement> $mapper =
-      AssetElementMapper.ensureInitialized();
+  late final ClassMapperBase<ImageElement> $mapper =
+      ImageElementMapper.ensureInitialized();
+  @override
+  GeneratedAssetCopyWith<$R, GeneratedAsset, GeneratedAsset> get asset =>
+      $value.asset.copyWith.$chain((v) => call(asset: v));
   @override
   $R call(
-          {Asset? asset,
+          {GeneratedAsset? asset,
           Object? fit = $none,
           Object? width = $none,
           Object? height = $none,
@@ -663,7 +701,7 @@ class _AssetElementCopyWithImpl<$R, $Out>
         if (scrollable != null) #scrollable: scrollable
       }));
   @override
-  AssetElement $make(CopyWithData data) => AssetElement(
+  ImageElement $make(CopyWithData data) => ImageElement(
       asset: data.get(#asset, or: $value.asset),
       fit: data.get(#fit, or: $value.fit),
       width: data.get(#width, or: $value.width),
@@ -673,19 +711,19 @@ class _AssetElementCopyWithImpl<$R, $Out>
       scrollable: data.get(#scrollable, or: $value.scrollable));
 
   @override
-  AssetElementCopyWith<$R2, AssetElement, $Out2> $chain<$R2, $Out2>(
+  ImageElementCopyWith<$R2, ImageElement, $Out2> $chain<$R2, $Out2>(
           Then<$Out2, $R2> t) =>
-      _AssetElementCopyWithImpl($value, $cast, t);
+      _ImageElementCopyWithImpl($value, $cast, t);
 }
 
-class WidgetElementMapper extends ClassMapperBase<WidgetElement> {
+class WidgetElementMapper extends SubClassMapperBase<WidgetElement> {
   WidgetElementMapper._();
 
   static WidgetElementMapper? _instance;
   static WidgetElementMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = WidgetElementMapper._());
-      BlockElementMapper.ensureInitialized();
+      BlockElementMapper.ensureInitialized().addSubMapper(_instance!);
       ContentAlignmentMapper.ensureInitialized();
     }
     return _instance!;
@@ -723,6 +761,14 @@ class WidgetElementMapper extends ClassMapperBase<WidgetElement> {
   };
   @override
   final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'type';
+  @override
+  final dynamic discriminatorValue = WidgetElement.key;
+  @override
+  late final ClassMapperBase superMapper =
+      BlockElementMapper.ensureInitialized();
 
   @override
   final MappingHook hook = const UnmappedPropertiesHook('args');

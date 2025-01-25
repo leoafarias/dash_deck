@@ -63,6 +63,11 @@ Column(
 
 ![structured_output](https://picsum.photos/800/1400) {.cover}
 
+@dartpad {
+  id: idhere
+  code: ""
+}
+
 @column
 
 ## Yes different image{.here}
@@ -280,5 +285,6 @@ style: demo
 
 @colorPalette {
   schema: true
-  prompts: [tropical, vibrant, pastel, chocolatey pink unicorn, cyberpunk]
+  prompts: [tropical, 
+  vibrant, pastel, chocolatey pink unicorn, cyberpunk]
 }

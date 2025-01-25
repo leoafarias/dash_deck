@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import '../../modules/presentation/presentation_hooks.dart';
+import '../../modules/presentation/deck_hooks.dart';
 
 class SdBottomBar extends HookWidget {
   const SdBottomBar({

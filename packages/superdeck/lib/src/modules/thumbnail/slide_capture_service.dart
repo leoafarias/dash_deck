@@ -93,14 +93,14 @@ class SlideCaptureService {
     Size? targetSize,
   }) async {
     try {
-      final controller = Data.of<DeckController>(context);
+      final controller = Provider.ofType<DeckController>(context);
 
       final child = InheritedTheme.captureAll(
           context,
-          Data(
-            data: controller,
-            child: Data(
-              data: CapturingData(true),
+          Provider(
+            value: controller,
+            child: Provider(
+              value: CapturingData(true),
               child: MediaQuery(
                 data: MediaQuery.of(context),
                 child: MaterialApp(

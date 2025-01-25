@@ -5,8 +5,10 @@ import 'package:superdeck_core/superdeck_core.dart';
 import '../../components/atoms/loading_indicator.dart';
 import '../common/helpers/constants.dart';
 
-final _localDataStore = LocalAssetDataStoreImpl(SuperdeckConfig(),
-    fileReader: rootBundle.loadString);
+final _localDataStore = LocalAssetDataStoreImpl(
+  SuperdeckConfig(),
+  fileReader: rootBundle.loadString,
+);
 final _fileSystemDataStore = FileSystemDataStoreImpl(SuperdeckConfig());
 
 class PresentationLoaderBuilder extends StatefulWidget {
@@ -54,21 +56,4 @@ class _PresentationLoaderBuilderState extends State<PresentationLoaderBuilder> {
       );
     }
   }
-
-  // return StreamBuilder(
-  //     stream: _deckRepository.watch(),
-  //     builder: (context, snapshot) {
-  //       return Stack(
-  //         children: [
-  //           if (snapshot.hasData) widget.builder(snapshot.requireData),
-  //           if (snapshot.hasError)
-  //             Center(
-  //               child: Text('Error loading presentation ${snapshot.error}'),
-  //             ),
-  //           LoadingOverlay(
-  //             isLoading: snapshot.connectionState == ConnectionState.waiting,
-  //           ),
-  //         ],
-  //       );
-  //     });
 }

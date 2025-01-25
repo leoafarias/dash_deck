@@ -38,20 +38,31 @@ class BackgroundPart extends SlidePartWidget {
     super.key,
   });
 
+  int _getPreviousIndex(int currentSlideIndex, int slideCount) {
+    if (currentSlideIndex > 0 && currentSlideIndex < slideCount - 1) {
+      return currentSlideIndex - 1;
+    }
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final slideCount = useDeck.slideCount();
-    final activeSlide = useDeck.activeSlide();
-    final previousIndex =
-        activeSlide.slideIndex > 0 && activeSlide.slideIndex < slideCount - 1
-            ? activeSlide.slideIndex - 1
-            : 0;
+    final controller = DeckController.of(context);
 
-    return _AnimatedSwitcherOMesh(
-      colors: _determiniscOrderBasedOnIndex(activeSlide.slideIndex),
-      previousColors: _determiniscOrderBasedOnIndex(previousIndex),
-      duration: const Duration(milliseconds: 1000),
-    );
+    return controller.watch(
+        selector: (c) => (
+              currentSlideIndex: c.currentSlideIndex,
+              slideCount: c.slides.length
+            ),
+        builder: (context, value) {
+          return _AnimatedSwitcherOMesh(
+            colors: _determiniscOrderBasedOnIndex(value.currentSlideIndex),
+            previousColors: _determiniscOrderBasedOnIndex(
+              _getPreviousIndex(value.currentSlideIndex, value.slideCount),
+            ),
+            duration: const Duration(milliseconds: 1000),
+          );
+        });
   }
 }
 

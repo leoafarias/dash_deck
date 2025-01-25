@@ -1,86 +1,120 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-import '../../modules/common/helpers/hooks.dart';
 import '../../modules/common/helpers/utils.dart';
-import '../../modules/presentation/presentation_hooks.dart';
-import '../atoms/slide_thumbnail.dart';
 
-class ThumbnailPanel extends HookWidget {
+class ThumbnailPanel extends StatefulWidget {
   const ThumbnailPanel({
     super.key,
+    required this.itemBuilder,
+    required this.itemCount,
+    required this.activeIndex,
+    required this.onItemTap,
   });
 
+  final int activeIndex;
+
+  final Widget Function(int index) itemBuilder;
+  final void Function(int index) onItemTap;
+  final int itemCount;
+
+  @override
+  State<ThumbnailPanel> createState() => _ThumbnailPanelState();
+}
+
+class _ThumbnailPanelState extends State<ThumbnailPanel> {
   final _duration = const Duration(milliseconds: 300);
+  late final ItemScrollController _itemScrollController;
+  late final ItemPositionsListener _itemPositionsListener;
+  late List<ItemPosition> _visibleItems;
+
+  @override
+  void initState() {
+    super.initState();
+    _itemScrollController = ItemScrollController();
+    _itemPositionsListener = ItemPositionsListener.create();
+    _visibleItems = [];
+    _itemPositionsListener.itemPositions.addListener(_listener);
+  }
+
+  void _listener() {
+    setState(() {
+      _visibleItems = _itemPositionsListener.itemPositions.value.toList();
+    });
+  }
+
+  @override
+  void didUpdateWidget(ThumbnailPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.activeIndex != widget.activeIndex) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToActiveSlide(widget.activeIndex);
+      });
+    }
+  }
+
+  void _scrollToActiveSlide(int index) {
+    final visibleItems = _visibleItems;
+    double alignment;
+
+    if (visibleItems.isEmpty) return;
+
+    final visibleItem = visibleItems.firstWhereOrNull(
+      (e) => e.index == index,
+    );
+
+    if (visibleItem == null) {
+      final isBeginning = visibleItems.first.index > index;
+
+      alignment = isBeginning ? 0 : 0.7;
+    } else {
+      if (visibleItem.itemTrailingEdge > 1) {
+        final totalSpace =
+            visibleItem.itemTrailingEdge - visibleItem.itemLeadingEdge;
+        alignment = 1 - totalSpace;
+      } else if (visibleItem.itemLeadingEdge < 0) {
+        alignment = 0;
+      } else {
+        alignment = visibleItem.itemLeadingEdge;
+      }
+    }
+
+    _itemScrollController.scrollTo(
+      index: index,
+      alignment: alignment,
+      duration: _duration,
+      curve: _curve,
+    );
+  }
+
+  @override
+  void dispose() {
+    _itemPositionsListener.itemPositions.removeListener(_listener);
+    super.dispose();
+  }
+
   final _curve = Curves.easeInOutCubic;
 
   @override
   Widget build(BuildContext context) {
-    final actions = useDeck.actions();
-
-    final activeSlide = useDeck.activeSlide();
-    final slides = useDeck.slides();
-    final slideCount = useDeck.slideCount();
-
-    final controller = useScrollVisibleController();
-    final visibleItems = controller.visibleItems;
-
-    usePostFrameEffect(() {
-      if (visibleItems.isEmpty) return;
-
-      final visibleItem = visibleItems.firstWhereOrNull(
-        (e) => e.index == activeSlide.slideIndex,
-      );
-
-      double alignment;
-
-      if (visibleItem == null) {
-        final isBeginning = visibleItems.first.index > activeSlide.slideIndex;
-
-        alignment = isBeginning ? 0 : 0.7;
-      } else {
-        if (visibleItem.itemTrailingEdge > 1) {
-          final totalSpace =
-              visibleItem.itemTrailingEdge - visibleItem.itemLeadingEdge;
-          alignment = 1 - totalSpace;
-        } else if (visibleItem.itemLeadingEdge < 0) {
-          alignment = 0;
-        } else {
-          alignment = visibleItem.itemLeadingEdge;
-        }
-      }
-      controller.itemScrollController.scrollTo(
-        index: activeSlide.slideIndex,
-        alignment: alignment,
-        duration: _duration,
-        curve: _curve,
-      );
-
-      return;
-    }, [activeSlide]);
-
     return Container(
       color: Colors.black,
       child: ScrollablePositionedList.builder(
           scrollDirection: context.isSmall ? Axis.horizontal : Axis.vertical,
-          itemCount: slideCount,
-          itemPositionsListener: controller.itemPositionsListener,
-          itemScrollController: controller.itemScrollController,
+          itemCount: widget.itemCount,
+          itemPositionsListener: _itemPositionsListener,
+          itemScrollController: _itemScrollController,
           padding: const EdgeInsets.all(20),
           itemBuilder: (context, index) {
-            final page = index + 1;
             return Padding(
               padding: const EdgeInsets.symmetric(
                 vertical: 8,
                 horizontal: 10,
               ),
-              child: SlideThumbnail(
-                page: page,
-                selected: activeSlide.slideIndex == index,
-                onTap: () => actions.goToPage(page),
-                slide: slides[index],
+              child: GestureDetector(
+                onTap: () => widget.onItemTap(index),
+                child: widget.itemBuilder(index),
               ),
             );
           }),

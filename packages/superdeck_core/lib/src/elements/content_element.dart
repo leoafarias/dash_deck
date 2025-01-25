@@ -3,7 +3,9 @@ import 'package:superdeck_core/superdeck_core.dart';
 
 part 'content_element.mapper.dart';
 
-@MappableClass()
+@MappableClass(
+  discriminatorKey: 'type',
+)
 sealed class BlockElement extends LayoutElement with BlockElementMappable {
   final String type;
 
@@ -26,13 +28,13 @@ sealed class BlockElement extends LayoutElement with BlockElementMappable {
     schemas: {
       ContentElement.key: ContentElement.schema,
       DartPadElement.key: DartPadElement.schema,
-      AssetElement.key: AssetElement.schema,
       WidgetElement.key: WidgetElement.schema,
+      ImageElement.key: ImageElement.schema,
     },
   );
 }
 
-@MappableClass()
+@MappableClass(discriminatorValue: ContentElement.key)
 class ContentElement extends BlockElement with ContentElementMappable {
   static const key = 'column';
   final String content;
@@ -64,14 +66,14 @@ enum DartPadTheme {
   static final schema = Schema.enumValue(values);
 }
 
-@MappableClass()
+@MappableClass(discriminatorValue: DartPadElement.key)
 class DartPadElement extends BlockElement with DartPadElementMappable {
   final String id;
   final DartPadTheme? theme;
   final bool embed;
   final String code;
 
-  static const key = 'dart_pad';
+  static const key = 'dartpad';
 
   DartPadElement({
     required this.id,
@@ -88,6 +90,7 @@ class DartPadElement extends BlockElement with DartPadElementMappable {
       'id': Schema.string(),
       'theme': DartPadTheme.schema,
       'embed': Schema.boolean(),
+      'code': Schema.string(),
     },
     required: [
       "id",
@@ -100,14 +103,14 @@ class DartPadElement extends BlockElement with DartPadElementMappable {
   }
 }
 
-@MappableClass()
-class AssetElement extends BlockElement with AssetElementMappable {
-  static const key = 'asset';
-  final Asset asset;
+@MappableClass(discriminatorValue: ImageElement.key)
+class ImageElement extends BlockElement with ImageElementMappable {
+  static const key = 'image';
+  final GeneratedAsset asset;
   final ImageFit? fit;
   final double? width;
   final double? height;
-  AssetElement({
+  ImageElement({
     required this.asset,
     this.fit,
     this.width,
@@ -120,7 +123,7 @@ class AssetElement extends BlockElement with AssetElementMappable {
   static final schema = BlockElement.schema.extend(
     {
       "fit": Schema.enumValue(ImageFit.values),
-      "asset": Asset.schema,
+      "asset": GeneratedAsset.schema,
       "width": Schema.double(),
       "height": Schema.double(),
     },
@@ -129,9 +132,9 @@ class AssetElement extends BlockElement with AssetElementMappable {
     ],
   );
 
-  static AssetElement parse(Map<String, dynamic> map) {
+  static ImageElement parse(Map<String, dynamic> map) {
     schema.validateOrThrow(map);
-    return AssetElementMapper.fromMap(map);
+    return ImageElementMapper.fromMap(map);
   }
 }
 
@@ -147,6 +150,7 @@ enum ImageFit {
 }
 
 @MappableClass(
+  discriminatorValue: WidgetElement.key,
   hook: UnmappedPropertiesHook('args'),
 )
 class WidgetElement extends BlockElement with WidgetElementMappable {

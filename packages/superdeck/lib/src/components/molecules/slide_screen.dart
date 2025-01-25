@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:superdeck_core/superdeck_core.dart';
 
-import '../../modules/presentation/presentation_hooks.dart';
+import '../../modules/presentation/deck_hooks.dart';
 import '../atoms/slide_view.dart';
 
-class SlideScreen<T extends Slide> extends HookWidget {
+class SlideScreen extends HookWidget {
   const SlideScreen(
     this.slideIndex, {
     super.key,
@@ -15,9 +14,8 @@ class SlideScreen<T extends Slide> extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final slides = useDeck.slides();
+    final slide = useDeckWatch((deck) => deck.getSlideByIndex(slideIndex));
 
-    final slide = slides[slideIndex];
     useAutomaticKeepAlive();
 
     return Center(

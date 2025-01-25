@@ -2,19 +2,19 @@
   {
     "key": "YD8Lljdq",
     "options": {},
-    "markdown": "@column\n\n## Another image Another image Another image Another image Another image Another image Another image Another image Another image Another image {.here}\n\n@column\n\n\n\n{\"asset\":{\"type\":\"LocalAsset\"},\"scrollable\":false} {.code}",
+    "markdown": "@column\n\n## Another image Another image Another image Another image Another image Another image Another image Another image Another image Another image {.here}\n\n@column\n\n\n\n```mermaid\ngraph TD\n    A[Start] --> B[Input]\n    B --> C[Process]\n    C --> D[Output]\n    D --> E[End]\n``` {.code}",
     "sections": [
       {
         "blocks": [
           {
             "content": "## Another image Another image Another image Another image Another image Another image Another image Another image Another image Another image {.here}",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           },
           {
-            "content": "{\"asset\":{\"type\":\"LocalAsset\"},\"scrollable\":false} {.code}",
+            "content": "```mermaid\ngraph TD\n    A[Start] --> B[Input]\n    B --> C[Process]\n    C --> D[Output]\n    D --> E[End]\n``` {.code}",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           }
         ]
       }
@@ -47,12 +47,12 @@
             "flex": 2,
             "align": "center",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           },
           {
             "content": "![structured_output](https://picsum.photos/800/1400) {.cover}",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           }
         ],
         "flex": 2
@@ -70,12 +70,12 @@
           {
             "content": "## Another image{.here}",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           },
           {
             "content": "![structured_output](https://picsum.photos/800/1400) {.cover}",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           }
         ]
       }
@@ -83,21 +83,28 @@
     "comments": []
   },
   {
-    "key": "gfFHq6hy",
+    "key": "z34aal1W",
     "options": {},
-    "markdown": "@column\n\n![structured_output](https://picsum.photos/800/1400) {.cover}\n\n@column\n\n## Yes different image{.here}",
+    "markdown": "@column\n\n![structured_output](https://picsum.photos/800/1400) {.cover}\n\n@dartpad {\n  id: idhere\n  code: \"\"\n}\n\n@column\n\n## Yes different image{.here}",
     "sections": [
       {
         "blocks": [
           {
             "content": "![structured_output](https://picsum.photos/800/1400) {.cover}",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
+          },
+          {
+            "id": "idhere",
+            "code": "",
+            "embed": true,
+            "scrollable": false,
+            "type": "dartpad"
           },
           {
             "content": "## Yes different image{.here}",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           }
         ]
       }
@@ -105,55 +112,82 @@
     "comments": []
   },
   {
-    "key": "hJocRwhJ",
+    "key": "H2GzZVSx",
     "options": {},
-    "markdown": "{@column\n    align: center_right\n}\n\n#### Leo Farias\nleoafarias{.here}\n\n\n{@column\n    align: center_left\n}\n\n- Founder/CEO/CTO\n- Open Source Contributor\n- Flutter & Dart GDE\n- Passionate about UI/UX/DX",
+    "markdown": "@column {\n  align: center_right\n}\n\n#### Leo Farias\nleoafarias{.here}\n\n\n@column {\n  align: center_left\n}\n\n- Founder/CEO/CTO\n- Open Source Contributor\n- Flutter & Dart GDE\n- Passionate about UI/UX/DX",
     "sections": [
       {
         "blocks": [
           {
-            "content": "{@column\n    align: center_right\n}\n\n#### Leo Farias\nleoafarias{.here}\n\n\n{@column\n    align: center_left\n}\n\n- Founder/CEO/CTO\n- Open Source Contributor\n- Flutter & Dart GDE\n- Passionate about UI/UX/DX",
+            "content": "#### Leo Farias\nleoafarias{.here}",
+            "align": "center_right",
             "scrollable": false,
-            "__type": "ContentElement"
-          }
-        ]
-      }
-    ],
-    "comments": []
-  },
-  {
-    "key": "WMziYGR7",
-    "options": {},
-    "markdown": "@column\n\n{@column \n  align: center_left \n  flex: 2\n}\n> [!WARNING]  \n> This presentation contains live AI-generated content. Unexpected things may occur during the demonstration. \n\n@column",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "content": "@column\n\n{@column \n  align: center_left \n  flex: 2\n}\n> [!WARNING]  \n> This presentation contains live AI-generated content. Unexpected things may occur during the demonstration. \n\n@column",
-            "scrollable": false,
-            "__type": "ContentElement"
-          }
-        ]
-      }
-    ],
-    "comments": []
-  },
-  {
-    "key": "tNybSglZ",
-    "options": {},
-    "markdown": "{@column \n  flex: 2 \n  align: center_right\n}\n### Generative UI\n@column\n## VS\n{@column flex: 2}\n### AI Assisted Code Generation",
-    "sections": [
-      {
-        "blocks": [
-          {
-            "content": "{@column \n  flex: 2 \n  align: center_right\n}\n### Generative UI\n",
-            "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           },
           {
-            "content": "## VS\n{@column flex: 2}\n### AI Assisted Code Generation",
+            "content": "- Founder/CEO/CTO\n- Open Source Contributor\n- Flutter & Dart GDE\n- Passionate about UI/UX/DX",
+            "align": "center_left",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
+          }
+        ]
+      }
+    ],
+    "comments": []
+  },
+  {
+    "key": "SJncL4H2",
+    "options": {},
+    "markdown": "@column\n\n@column {\n  align: center_left \n  flex: 2\n}\n> [!WARNING]  \n> This presentation contains live AI-generated content. Unexpected things may occur during the demonstration. \n\n@column",
+    "sections": [
+      {
+        "blocks": [
+          {
+            "content": "",
+            "scrollable": false,
+            "type": "column"
+          },
+          {
+            "content": "> [!WARNING]  \n> This presentation contains live AI-generated content. Unexpected things may occur during the demonstration.",
+            "flex": 2,
+            "align": "center_left",
+            "scrollable": false,
+            "type": "column"
+          },
+          {
+            "content": "",
+            "scrollable": false,
+            "type": "column"
+          }
+        ]
+      }
+    ],
+    "comments": []
+  },
+  {
+    "key": "ybLDY8oi",
+    "options": {},
+    "markdown": "@column {\n  flex: 2 \n  align: center_right\n}\n### Generative UI\n@column\n## VS\n@column {\n  flex: 2\n}\n### AI Assisted Code Generation",
+    "sections": [
+      {
+        "blocks": [
+          {
+            "content": "### Generative UI",
+            "flex": 2,
+            "align": "center_right",
+            "scrollable": false,
+            "type": "column"
+          },
+          {
+            "content": "## VS",
+            "scrollable": false,
+            "type": "column"
+          },
+          {
+            "content": "### AI Assisted Code Generation",
+            "flex": 2,
+            "scrollable": false,
+            "type": "column"
           }
         ]
       }
@@ -170,12 +204,12 @@
           {
             "content": "### What is Generative UI?{.animate}\n\n",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           },
           {
             "content": "- LLMs are great at generating content based on context\n- GUIs are great at providing structured, interactive interfaces for user input and navigation",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           }
         ]
       }
@@ -192,7 +226,7 @@
           {
             "content": "# LLM ❤️ GUI{.animate}",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           }
         ]
       }
@@ -209,19 +243,19 @@
           {
             "content": "",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           },
           {
             "content": "Creates dynamic, context-aware UIs by interpreting actions and maintaining state with LLMs for fluid, interactive responses.{.animate}",
             "flex": 2,
             "align": "center",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           },
           {
             "content": "",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           }
         ]
       }
@@ -238,7 +272,7 @@
           {
             "content": "### Benefits of UI over Chat{.animate}\n\n- More intuitive and user-friendly, especially for complex tasks\n- Faster feedback loop between users and LLMs\n- Enhances efficiency and interaction",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           }
         ]
       }
@@ -257,12 +291,12 @@
             "flex": 3,
             "align": "center",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           },
           {
             "content": "",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           }
         ]
       }
@@ -279,12 +313,12 @@
           {
             "content": "## How can LLMs Understtand Your UI?\n\n",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           },
           {
             "content": "![structured_output](assets/structured_output.png)",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           }
         ]
       }
@@ -292,21 +326,21 @@
     "comments": []
   },
   {
-    "key": "YAWWIGSR",
+    "key": "9y5hBeTm",
     "options": {},
-    "markdown": "@column\n\n### Structured Output\n\n@column\n```dart\nfinal schema = Schema.array(\n  description: 'List of recipes',\n  items: Schema.object(\n    properties: {\n      'recipeName': Schema.string(\n        description: 'Name of the recipe.',\n        nullable: false,\n      ),\n    },\n    requiredProperties: ['recipeName'],\n  ),\n);\n```",
+    "markdown": "@column\n\n### Structured Output\n\n@column\n```dart\nfinal schema = Schema.object(properties: {\n  'name': Schema.string(\n    description:\n        'The text content to display on color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'font': Schema.enumString(\n    enumValues: ColorPaletteFontFamily.enumString,\n    description: 'The font to use for the poster text.',\n    nullable: false,\n  ),\n  'fontColor': Schema.string(\n    description: 'The hex color value of the poster text. Format: #FF0000',\n    nullable: false,\n  ),\n  'topLeftColor': Schema.string(\n    description:\n        'The hex color value top left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'topRightColor': Schema.string(\n    description:\n        'The hex color value top right corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomLeftColor': Schema.string(\n    description:\n        'The hex color value bottom left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomRightColor': Schema.string(\n    description:\n        'The hex color value bottom right corner of color palette. Format: #FF0000',\n    nullable: false,\n  )\n}, requiredProperties: [\n  'name',\n  'font',\n  'fontColor',\n  'topLeftColor',\n  'topRightColor',\n  'bottomLeftColor',\n  'bottomRightColor',\n]);\n\n```",
     "sections": [
       {
         "blocks": [
           {
             "content": "### Structured Output",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           },
           {
-            "content": "```dart\nfinal schema = Schema.array(\n  description: 'List of recipes',\n  items: Schema.object(\n    properties: {\n      'recipeName': Schema.string(\n        description: 'Name of the recipe.',\n        nullable: false,\n      ),\n    },\n    requiredProperties: ['recipeName'],\n  ),\n);\n```",
+            "content": "```dart\nfinal schema = Schema.object(properties: {\n  'name': Schema.string(\n    description:\n        'The text content to display on color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'font': Schema.enumString(\n    enumValues: ColorPaletteFontFamily.enumString,\n    description: 'The font to use for the poster text.',\n    nullable: false,\n  ),\n  'fontColor': Schema.string(\n    description: 'The hex color value of the poster text. Format: #FF0000',\n    nullable: false,\n  ),\n  'topLeftColor': Schema.string(\n    description:\n        'The hex color value top left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'topRightColor': Schema.string(\n    description:\n        'The hex color value top right corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomLeftColor': Schema.string(\n    description:\n        'The hex color value bottom left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomRightColor': Schema.string(\n    description:\n        'The hex color value bottom right corner of color palette. Format: #FF0000',\n    nullable: false,\n  )\n}, requiredProperties: [\n  'name',\n  'font',\n  'fontColor',\n  'topLeftColor',\n  'topRightColor',\n  'bottomLeftColor',\n  'bottomRightColor',\n]);\n\n```",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           }
         ]
       }
@@ -316,14 +350,14 @@
   {
     "key": "CwxHOCpO",
     "options": {},
-    "markdown": "@section\n```dart\n\nfinal model = GenerativeModel(\n  model: 'gemini-1.5-pro',\n  apiKey: apiKey,\n  generationConfig: GenerationConfig(\n    responseMimeType: 'application/json',\n    responseSchema: schema,\n  ),\n);\n\nfinal prompt = 'List a few popular cookie recipes.';\nfinal response = await model.generateContent([Content.text(prompt)]);\n\n```",
+    "markdown": "@section\n```dart\nfinal schema = Schema.object(properties: {\n  'name': Schema.string(\n    description:\n        'The text content to display on color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'font': Schema.enumString(\n    enumValues: ColorPaletteFontFamily.enumString,\n    description: 'The font to use for the poster text.',\n    nullable: false,\n  ),\n  'fontColor': Schema.string(\n    description: 'The hex color value of the poster text. Format: #FF0000',\n    nullable: false,\n  ),\n  'topLeftColor': Schema.string(\n    description:\n        'The hex color value top left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'topRightColor': Schema.string(\n    description:\n        'The hex color value top right corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomLeftColor': Schema.string(\n    description:\n        'The hex color value bottom left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomRightColor': Schema.string(\n    description:\n        'The hex color value bottom right corner of color palette. Format: #FF0000',\n    nullable: false,\n  )\n}, requiredProperties: [\n  'name',\n  'font',\n  'fontColor',\n  'topLeftColor',\n  'topRightColor',\n  'bottomLeftColor',\n  'bottomRightColor',\n]);\n\n```",
     "sections": [
       {
         "blocks": [
           {
-            "content": "```dart\n\nfinal model = GenerativeModel(\n  model: 'gemini-1.5-pro',\n  apiKey: apiKey,\n  generationConfig: GenerationConfig(\n    responseMimeType: 'application/json',\n    responseSchema: schema,\n  ),\n);\n\nfinal prompt = 'List a few popular cookie recipes.';\nfinal response = await model.generateContent([Content.text(prompt)]);\n\n```",
+            "content": "```dart\nfinal schema = Schema.object(properties: {\n  'name': Schema.string(\n    description:\n        'The text content to display on color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'font': Schema.enumString(\n    enumValues: ColorPaletteFontFamily.enumString,\n    description: 'The font to use for the poster text.',\n    nullable: false,\n  ),\n  'fontColor': Schema.string(\n    description: 'The hex color value of the poster text. Format: #FF0000',\n    nullable: false,\n  ),\n  'topLeftColor': Schema.string(\n    description:\n        'The hex color value top left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'topRightColor': Schema.string(\n    description:\n        'The hex color value top right corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomLeftColor': Schema.string(\n    description:\n        'The hex color value bottom left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomRightColor': Schema.string(\n    description:\n        'The hex color value bottom right corner of color palette. Format: #FF0000',\n    nullable: false,\n  )\n}, requiredProperties: [\n  'name',\n  'font',\n  'fontColor',\n  'topLeftColor',\n  'topRightColor',\n  'bottomLeftColor',\n  'bottomRightColor',\n]);\n\n```",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           }
         ]
       }
@@ -340,7 +374,7 @@
           {
             "content": "### Color Palette Generator\n\nGenerate a color palette based on a given text.\n\n- Name of the palette\n- Font family\n- Font color\n- Color for each corner of the palette",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           }
         ]
       }
@@ -357,7 +391,7 @@
           {
             "content": "```dart\nfinal schema = Schema.object(properties: {\n  'name': Schema.string(\n    description:\n        'The text content to display on color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'font': Schema.enumString(\n    enumValues: ColorPaletteFontFamily.enumString,\n    description: 'The font to use for the poster text.',\n    nullable: false,\n  ),\n  'fontColor': Schema.string(\n    description: 'The hex color value of the poster text. Format: #FF0000',\n    nullable: false,\n  ),\n  'topLeftColor': Schema.string(\n    description:\n        'The hex color value top left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'topRightColor': Schema.string(\n    description:\n        'The hex color value top right corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomLeftColor': Schema.string(\n    description:\n        'The hex color value bottom left corner of color palette. Format: #FF0000',\n    nullable: false,\n  ),\n  'bottomRightColor': Schema.string(\n    description:\n        'The hex color value bottom right corner of color palette. Format: #FF0000',\n    nullable: false,\n  )\n}, requiredProperties: [\n  'name',\n  'font',\n  'fontColor',\n  'topLeftColor',\n  'topRightColor',\n  'bottomLeftColor',\n  'bottomRightColor',\n]);\n\n```",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "column"
           }
         ]
       }
@@ -365,18 +399,26 @@
     "comments": []
   },
   {
-    "key": "fyaXJBlK",
+    "key": "XeDZiCNk",
     "options": {
       "style": "demo"
     },
-    "markdown": "@colorPalette {\n  schema: true\n  prompts: [tropical, vibrant, pastel, chocolatey pink unicorn, cyberpunk]\n}",
+    "markdown": "@colorPalette {\n  schema: true\n  prompts: [tropical, \n  vibrant, pastel, chocolatey pink unicorn, cyberpunk]\n}",
     "sections": [
       {
         "blocks": [
           {
-            "content": "@colorPalette {\n  schema: true\n  prompts: [tropical, vibrant, pastel, chocolatey pink unicorn, cyberpunk]\n}",
+            "name": "colorPalette",
             "scrollable": false,
-            "__type": "ContentElement"
+            "type": "widget",
+            "schema": true,
+            "prompts": [
+              "tropical",
+              "vibrant",
+              "pastel",
+              "chocolatey pink unicorn",
+              "cyberpunk"
+            ]
           }
         ]
       }

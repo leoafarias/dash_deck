@@ -12,9 +12,13 @@ class WebViewWrapper extends StatefulWidget {
   _WebViewWrapperState createState() => _WebViewWrapperState();
 }
 
-class _WebViewWrapperState extends State<WebViewWrapper> {
+class _WebViewWrapperState extends State<WebViewWrapper>
+    with AutomaticKeepAliveClientMixin {
   late WebViewController _controller;
   bool _hide = false;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -85,7 +89,9 @@ class _WebViewWrapperState extends State<WebViewWrapper> {
             ),
             // add button that clears the webview by running javascript
             IconButton(
-                onPressed: clearDartPadEditor, icon: const Icon(Icons.clear)),
+              onPressed: clearDartPadEditor,
+              icon: const Icon(Icons.clear),
+            ),
           ],
         )
       ],

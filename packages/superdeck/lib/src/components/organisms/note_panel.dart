@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
-import '../../modules/presentation/presentation_hooks.dart';
-
-class NotePanel extends HookWidget {
+class NotePanel extends StatelessWidget {
   const NotePanel({
     super.key,
+    required this.notes,
   });
+
+  final List<String> notes;
 
   @override
   Widget build(BuildContext context) {
-    final slide = useDeck.activeSlide();
-
-    final notes = slide.comments.isEmpty ? ['No notes'] : slide.comments;
-
-    if (slide.comments.isEmpty) return const SizedBox.shrink();
+    if (notes.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
