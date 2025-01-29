@@ -6,7 +6,7 @@ import 'package:superdeck/src/modules/thumbnail/slide_capture_service.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 import '../../modules/common/helpers/constants.dart';
-import '../../modules/presentation/slide_data.dart';
+import '../../modules/deck/slide_configuration.dart';
 import 'cache_image_widget.dart';
 import 'loading_indicator.dart';
 
@@ -24,14 +24,12 @@ enum _PopMenuAction {
 
 class SlideThumbnail extends StatefulWidget {
   final bool selected;
-  final SlideData slide;
-  final int page;
+  final SlideConfiguration slide;
 
   const SlideThumbnail({
     super.key,
     required this.selected,
     required this.slide,
-    required this.page,
   });
 
   @override
@@ -41,7 +39,7 @@ class SlideThumbnail extends StatefulWidget {
 class _SlideThumbnailState extends State<SlideThumbnail> {
   final _slideCaptureService = SlideCaptureService();
 
-  File _getThumbnailFile(SlideData slide) {
+  File _getThumbnailFile(SlideConfiguration slide) {
     final asset = GeneratedAsset.thumbnail(slide.data.key);
     return File(asset.path);
   }
@@ -50,7 +48,7 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
   ///
   /// If [force] is true, it regenerates the thumbnail even if it already exists.
   Future<File> _generateThumbnail(
-    SlideData slide, {
+    SlideConfiguration slide, {
     bool force = false,
   }) async {
     final thumbnailFile = _getThumbnailFile(slide);

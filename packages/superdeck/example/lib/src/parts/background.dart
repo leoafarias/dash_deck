@@ -33,49 +33,27 @@ OMeshRect _meshBuilder(List<Color> colors) {
   );
 }
 
-class BackgroundPart extends SlidePartWidget {
+class BackgroundPart extends StatelessWidget {
   const BackgroundPart({
     super.key,
   });
 
-  int _getPreviousIndex(int currentSlideIndex, int slideCount) {
-    if (currentSlideIndex > 0 && currentSlideIndex < slideCount - 1) {
-      return currentSlideIndex - 1;
-    }
-    return 0;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final controller = DeckController.of(context);
+    final configuration = SlideConfiguration.of(context);
 
-    return controller.watch(
-        selector: (c) => (
-              currentSlideIndex: c.currentSlideIndex,
-              slideCount: c.slides.length
-            ),
-        builder: (context, value) {
-          return _AnimatedSwitcherOMesh(
-            colors: _determiniscOrderBasedOnIndex(value.currentSlideIndex),
-            previousColors: _determiniscOrderBasedOnIndex(
-              _getPreviousIndex(value.currentSlideIndex, value.slideCount),
-            ),
-            duration: const Duration(milliseconds: 1000),
-          );
-        });
+    return _AnimatedSwitcherOMesh(
+      slide: configuration,
+    );
   }
 }
 
 // animate bwett colors and previous colors in duration
 class _AnimatedSwitcherOMesh extends StatefulWidget {
-  final List<Color> colors;
-  final List<Color> previousColors;
-  final Duration duration;
+  final SlideConfiguration slide;
 
   const _AnimatedSwitcherOMesh({
-    required this.colors,
-    required this.previousColors,
-    required this.duration,
+    required this.slide,
   });
 
   @override
@@ -86,25 +64,36 @@ class _AnimatedSwitcherOMeshState extends State<_AnimatedSwitcherOMesh>
     with SingleTickerProviderStateMixin {
   late List<Color> _colors;
 
+  final _duration = const Duration(milliseconds: 1000);
+
   @override
   void initState() {
     super.initState();
-    _colors = widget.previousColors;
+    _colors = _determiniscOrderBasedOnIndex(widget.slide.slideIndex);
 
     Future.delayed(const Duration(milliseconds: 300), () {
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        setState(() {
-          _colors = widget.colors;
-        });
+        setState(() {});
       });
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant _AnimatedSwitcherOMesh oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.slide.slideIndex != oldWidget.slide.slideIndex) {
+      setState(() {
+        _colors = _determiniscOrderBasedOnIndex(widget.slide.slideIndex);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedOMeshGradient(
       mesh: _meshBuilder(_colors),
-      duration: widget.duration,
+      duration: _duration,
     );
   }
 }

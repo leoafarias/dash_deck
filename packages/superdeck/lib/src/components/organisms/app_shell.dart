@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:superdeck/src/components/atoms/slide_thumbnail.dart';
 import 'package:superdeck/src/components/organisms/thumbnail_panel.dart';
-import 'package:superdeck/src/modules/presentation/presentation_controller.dart';
 
+import '../../modules/deck/deck_configuration.dart';
+import '../../modules/navigation/navigation_controller.dart';
 import '../molecules/bottom_bar.dart';
 import '../molecules/scaled_app.dart';
 import 'note_panel.dart';
@@ -12,7 +14,7 @@ final kScaffoldKey = GlobalKey<ScaffoldState>();
 
 /// Builds the "shell" for the app by building a Scaffold with a
 /// BottomNavigationBar, where [child] is placed in the body of the Scaffold.
-class AppShell extends StatelessWidget {
+class AppShell extends HookWidget {
   const AppShell({
     super.key,
     required this.child,
@@ -23,29 +25,34 @@ class AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = DeckController.of(context);
+    final navigation = NavigationController.of(context);
+
+    final slides = DeckConfiguration.of(context).slides;
+
+    final currentSlide = navigation.currentSlide;
+    final isMenuOpen = navigation.isMenuOpen;
 
     final bindings = {
       const SingleActivator(
         LogicalKeyboardKey.arrowRight,
         meta: true,
-      ): controller.nextSlide,
+      ): navigation.nextSlide,
       const SingleActivator(
         LogicalKeyboardKey.arrowDown,
         meta: true,
-      ): controller.nextSlide,
+      ): navigation.nextSlide,
       const SingleActivator(
         LogicalKeyboardKey.space,
         meta: true,
-      ): controller.nextSlide,
+      ): navigation.nextSlide,
       const SingleActivator(
         LogicalKeyboardKey.arrowLeft,
         meta: true,
-      ): controller.previousSlide,
+      ): navigation.previousSlide,
       const SingleActivator(
         LogicalKeyboardKey.arrowUp,
         meta: true,
-      ): controller.previousSlide,
+      ): navigation.previousSlide,
     };
 
     return CallbackShortcuts(
@@ -54,55 +61,37 @@ class AppShell extends StatelessWidget {
         key: kScaffoldKey,
         backgroundColor: const Color.fromARGB(255, 9, 9, 9),
         floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
-        floatingActionButton: controller.watch(
-          selector: (state) => state.isMenuOpen,
-          builder: (context, isMenuOpen) {
-            return IconButton(
-              onPressed: controller.openMenu,
-              icon: const Icon(Icons.menu),
-            );
-          },
-        ),
-        body: controller.watch(
-            selector: (c) => c.isMenuOpen,
-            builder: (context, isMenuOpen) {
-              return SplitView(
-                isOpen: isMenuOpen,
-                sideWidget: Column(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: controller.watch(
-                          selector: (c) => (
-                                currentSlideIndex: c.currentSlideIndex,
-                                slideCount: c.slides.length
-                              ),
-                          builder: (context, value) {
-                            return ThumbnailPanel(
-                              onItemTap: controller.goToSlide,
-                              activeIndex: value.currentSlideIndex,
-                              itemBuilder: (index) => SlideThumbnail(
-                                page: index + 1,
-                                selected: index == value.currentSlideIndex,
-                                slide: controller.getSlideByIndex(index),
-                              ),
-                              itemCount: value.slideCount,
-                            );
-                          }),
-                    ),
-                    IntrinsicHeight(
-                      child: controller.watch(
-                        selector: (c) => c.currentSlide.comments,
-                        builder: (context, comments) {
-                          return NotePanel(notes: comments);
-                        },
-                      ),
-                    ),
-                  ],
+        floatingActionButton: isMenuOpen
+            ? IconButton(
+                onPressed: navigation.openMenu,
+                icon: const Icon(Icons.menu),
+              )
+            : null,
+        body: SplitView(
+          isOpen: isMenuOpen,
+          sideWidget: Column(
+            children: [
+              Expanded(
+                flex: 3,
+                child: ThumbnailPanel(
+                  onItemTap: navigation.goToSlide,
+                  activeIndex: currentSlide.slideIndex,
+                  itemBuilder: (index, selected) {
+                    return SlideThumbnail(
+                      selected: selected,
+                      slide: slides[index],
+                    );
+                  },
+                  itemCount: slides.length,
                 ),
-                child: child,
-              );
-            }),
+              ),
+              IntrinsicHeight(
+                child: NotePanel(notes: currentSlide.comments),
+              ),
+            ],
+          ),
+          child: child,
+        ),
       ),
     );
   }

@@ -7,7 +7,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:superdeck/src/components/atoms/slide_view.dart';
 import 'package:superdeck/src/modules/thumbnail/slide_capture_service.dart';
 
-import '../modules/presentation/deck_hooks.dart';
+import '../modules/deck/deck_configuration.dart';
 
 enum _ExportStatus { idle, capturing, building, complete }
 
@@ -17,11 +17,12 @@ class ExportScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
     // Retrieve slides and current slide index using custom hooks or context
-    final slides = useDeckWatch((deck) => deck.slides);
-    final currentSlideIndex = useDeckWatch((deck) => deck.currentPage) - 1;
+    final slides = DeckConfiguration.of(context).slides;
+    final currentSlideIndex = useState(0);
 
     // Initialize PageController with the initial index
-    final pageController = usePageController(initialPage: currentSlideIndex);
+    final pageController =
+        usePageController(initialPage: currentSlideIndex.value);
 
     // Create a map of GlobalKeys for each slide using useMemo
     final slideKeys = useMemoized(

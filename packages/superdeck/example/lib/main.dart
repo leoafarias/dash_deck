@@ -14,16 +14,19 @@ void main() async {
         title: 'Superdeck',
         debugShowCheckedModeBanner: false,
         home: SuperDeckApp(
-          baseStyle: BaseStyle(),
-          styles: {
-            'announcement': AnnouncementStyle(),
-            'quote': QuoteStyle(),
-          },
-          background: const BackgroundPart(),
-          header: const HeaderPart(),
-          footer: const FooterPart(),
-
-          // ignore: prefer_const_literals_to_create_immutables
+          options: DeckOptions(
+            baseStyle: BaseStyle(),
+            debug: true,
+            styles: {
+              'announcement': AnnouncementStyle(),
+              'quote': QuoteStyle(),
+            },
+            parts: const SlideParts(
+              header: HeaderPart(),
+              footer: FooterPart(),
+              background: BackgroundPart(),
+            ),
+          ),
         ),
       );
     }),

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
-import '../../modules/presentation/deck_hooks.dart';
+import '../../modules/navigation/navigation_controller.dart';
 
-class SdBottomBar extends HookWidget {
+class SdBottomBar extends StatelessWidget {
   const SdBottomBar({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    final navigation = useDeck();
+    final navigation = NavigationController.of(context);
 
     return SizedBox(
       height: 60,

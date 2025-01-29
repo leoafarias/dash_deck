@@ -3,11 +3,11 @@ import 'package:mix/mix.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 import '../../modules/common/helpers/constants.dart';
-import '../../modules/common/helpers/controller.dart';
 import '../../modules/common/helpers/converters.dart';
+import '../../modules/common/helpers/provider.dart';
 import '../../modules/common/helpers/utils.dart';
 import '../../modules/common/styles/style_spec.dart';
-import '../../modules/presentation/slide_data.dart';
+import '../../modules/deck/slide_configuration.dart';
 import '../../modules/thumbnail/slide_capture_provider.dart';
 import '../atoms/cache_image_widget.dart';
 import '../atoms/markdown_viewer.dart';
@@ -50,7 +50,7 @@ class SectionBlockWidget extends StatelessWidget {
 
   @override
   Widget build(context) {
-    final slide = Provider.ofType<SlideData>(context);
+    final slide = SlideConfiguration.of(context);
 
     final children = section.blocks.map((block) {
       final flex = block.flex ?? 1;
@@ -95,14 +95,10 @@ class SectionBlockWidget extends StatelessWidget {
                               mainAxisAlignment: alignment.$1,
                               children: [
                                 switch (block) {
-                                  ImageElement block =>
-                                    _ImageBlockWidget(block),
-                                  WidgetElement block =>
-                                    _WidgetBlockWidget(block),
-                                  DartPadElement block =>
-                                    _DartPadBlockWidget(block),
-                                  ContentElement block =>
-                                    ContentElementWidget(block),
+                                  ImageElement b => _ImageBlockWidget(b),
+                                  WidgetElement b => _WidgetBlockWidget(b),
+                                  DartPadElement b => _DartPadBlockWidget(b),
+                                  ContentElement b => ContentElementWidget(b),
                                 },
                               ],
                             ),
@@ -127,13 +123,31 @@ class SectionBlockWidget extends StatelessWidget {
   }
 }
 
-abstract class _BlockWidget<T extends BlockElement> extends StatelessWidget {
+abstract class _BlockWidget<T extends BlockElement> extends StatefulWidget {
   const _BlockWidget(
     this.block, {
     super.key,
   });
 
+  Widget build(BuildContext context);
+
   final T block;
+
+  @override
+  State<_BlockWidget<T>> createState() => _BlockWidgetState<T>();
+}
+
+class _BlockWidgetState<T extends BlockElement> extends State<_BlockWidget<T>> {
+  @override
+  Widget build(context) {
+    final blockData = Provider.ofType<BlockData>(context);
+    return ConstrainedBox(
+      constraints: BoxConstraints.loose(
+        blockData.size,
+      ),
+      child: widget.build(context),
+    );
+  }
 }
 
 class ContentElementWidget extends _BlockWidget<ContentElement> {
@@ -163,12 +177,7 @@ class ContentElementWidget extends _BlockWidget<ContentElement> {
       );
     }
 
-    return ConstrainedBox(
-      constraints: BoxConstraints.loose(
-        blockData.size - const Offset(0, 0) as Size,
-      ),
-      child: current,
-    );
+    return current;
   }
 }
 
@@ -198,7 +207,7 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetElement> {
 
   @override
   Widget build(context) {
-    final slide = Provider.ofType<SlideData>(context);
+    final slide = Provider.ofType<SlideConfiguration>(context);
     final blockData = Provider.ofType<BlockData>(context);
 
     final widgetBuilder = slide.getWidget(block.type);

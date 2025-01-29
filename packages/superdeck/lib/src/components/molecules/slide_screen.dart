@@ -1,23 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
-import '../../modules/presentation/deck_hooks.dart';
+import '../../modules/common/helpers/provider.dart';
+import '../../modules/deck/slide_configuration.dart';
 import '../atoms/slide_view.dart';
 
-class SlideScreen extends HookWidget {
+class SlideScreen extends StatelessWidget {
   const SlideScreen(
-    this.slideIndex, {
+    this.slide, {
     super.key,
   });
 
-  final int slideIndex;
+  final SlideConfiguration slide;
 
   @override
   Widget build(BuildContext context) {
-    final slide = useDeckWatch((deck) => deck.getSlideByIndex(slideIndex));
-
-    useAutomaticKeepAlive();
-
     return Center(
       child: Container(
         decoration: BoxDecoration(
@@ -30,7 +26,10 @@ class SlideScreen extends HookWidget {
             ),
           ],
         ),
-        child: SlideView(slide),
+        child: Provider(
+          value: slide,
+          child: SlideView(slide),
+        ),
       ),
     );
   }

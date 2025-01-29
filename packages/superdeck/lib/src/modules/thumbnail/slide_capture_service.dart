@@ -6,13 +6,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:superdeck/src/modules/deck/deck_configuration.dart';
 
 import '../../components/atoms/slide_view.dart';
 import '../../components/organisms/app_shell.dart';
 import '../common/helpers/constants.dart';
-import '../common/helpers/controller.dart';
-import '../presentation/presentation_controller.dart';
-import '../presentation/slide_data.dart';
+import '../common/helpers/provider.dart';
+import '../deck/slide_configuration.dart';
 import 'slide_capture_provider.dart';
 
 enum SlideCaptureQuality {
@@ -36,7 +36,7 @@ class SlideCaptureService {
 
   Future<Uint8List> generate({
     SlideCaptureQuality quality = SlideCaptureQuality.low,
-    required SlideData slide,
+    required SlideConfiguration slide,
   }) async {
     final queueKey = shortHash(slide.key + quality.name);
     try {
@@ -47,7 +47,10 @@ class SlideCaptureService {
       _generationQueue.add(queueKey);
 
       final image = await _fromWidgetToImage(
-        SlideView(slide),
+        Provider(
+          value: slide,
+          child: SlideView(slide),
+        ),
         context: kScaffoldKey.currentContext!,
         pixelRatio: quality.pixelRatio,
         targetSize: kResolution,
@@ -93,12 +96,12 @@ class SlideCaptureService {
     Size? targetSize,
   }) async {
     try {
-      final controller = Provider.ofType<DeckController>(context);
+      final configuration = DeckConfiguration.of(context);
 
       final child = InheritedTheme.captureAll(
           context,
           Provider(
-            value: controller,
+            value: configuration,
             child: Provider(
               value: CapturingData(true),
               child: MediaQuery(

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:superdeck/superdeck.dart';
 
-class HeaderPart extends FixedSlidePartWidget {
+class HeaderPart extends StatelessWidget implements PreferredSizeWidget {
   const HeaderPart({
     super.key,
   });
 
   @override
-  double get height => 0;
+  Size get preferredSize => const Size.fromHeight(50);
 
   @override
   Widget build(context) {
-    final slide = Provider.ofType<SlideData>(context);
+    final slide = SlideConfiguration.of(context);
 
     final index = slide.slideIndex;
     return Padding(

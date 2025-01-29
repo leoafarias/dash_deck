@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:superdeck/superdeck.dart';
 
-class FooterPart extends FixedSlidePartWidget {
+class FooterPart extends StatelessWidget implements PreferredSizeWidget {
   const FooterPart({
     super.key,
   });
 
   @override
-  double get height => 0;
+  Size get preferredSize => const Size.fromHeight(50);
 
   @override
   Widget build(context) {

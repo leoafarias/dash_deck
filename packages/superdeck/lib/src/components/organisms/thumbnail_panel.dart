@@ -15,7 +15,7 @@ class ThumbnailPanel extends StatefulWidget {
 
   final int activeIndex;
 
-  final Widget Function(int index) itemBuilder;
+  final Widget Function(int index, bool selected) itemBuilder;
   final void Function(int index) onItemTap;
   final int itemCount;
 
@@ -114,7 +114,7 @@ class _ThumbnailPanelState extends State<ThumbnailPanel> {
               ),
               child: GestureDetector(
                 onTap: () => widget.onItemTap(index),
-                child: widget.itemBuilder(index),
+                child: widget.itemBuilder(index, index == widget.activeIndex),
               ),
             );
           }),
