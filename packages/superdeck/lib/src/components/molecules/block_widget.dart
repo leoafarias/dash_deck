@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
@@ -45,20 +46,15 @@ ${size.width.toStringAsFixed(2)} x ${size.height.toStringAsFixed(2)}''';
 
   @override
   Widget build(context) {
-    final blockOffsets = <Block, Offset>{};
-    var currentOffset = Offset.zero;
+    final blockLeftOffset = List.filled(section.blocks.length, 0.0);
+    double cumulativeLeftOffset = 0;
     final widthPerFlex = size.width / section.totalBlockFlex;
-    for (var block in section.blocks) {
+    // get index
+    for (var index = 0; index < section.blocks.length; index++) {
+      final block = section.blocks[index];
       final blockWidth = widthPerFlex * block.flex;
-      blockOffsets[block] = currentOffset;
-      currentOffset = Offset(
-        currentOffset.dx + blockWidth,
-        currentOffset.dy,
-      );
-
-      if (block == section.blocks.last) {
-        blockOffsets[block] = currentOffset;
-      }
+      blockLeftOffset[index] = cumulativeLeftOffset;
+      cumulativeLeftOffset = cumulativeLeftOffset + blockWidth;
     }
 
     final configuration = SlideConfiguration.of(context);
@@ -66,7 +62,7 @@ ${size.width.toStringAsFixed(2)} x ${size.height.toStringAsFixed(2)}''';
     final isDebug = configuration.debug;
 
     return Stack(
-      children: section.blocks.map((block) {
+      children: section.blocks.mapIndexed((index, block) {
         final widthPercentage = block.flex / section.totalBlockFlex;
 
         final blockSize = Size(
@@ -75,8 +71,8 @@ ${size.width.toStringAsFixed(2)} x ${size.height.toStringAsFixed(2)}''';
         );
 
         return Positioned(
-          left: blockOffsets[block]!.dx,
-          top: blockOffsets[block]!.dy,
+          left: blockLeftOffset[index],
+          top: 0,
           width: blockSize.width,
           height: blockSize.height,
           child: Stack(
