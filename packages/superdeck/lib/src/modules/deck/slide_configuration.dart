@@ -15,21 +15,22 @@ class SlideConfiguration with SlideConfigurationMappable {
   final Style style;
   final Slide _slide;
   final bool debug;
-  final SlideParts parts;
+  final SlideParts? parts;
   final Map<String, WidgetBuilderWithOptions> widgets;
-
+  final bool isExporting;
   SlideConfiguration({
     required this.slideIndex,
     required this.style,
     required Slide slide,
     this.debug = false,
-    required this.parts,
+    this.parts,
     this.widgets = const {},
+    this.isExporting = false,
   }) : _slide = slide;
 
   double get totalPartsHeight {
-    final headerHeight = parts.header?.preferredSize.height ?? 0;
-    final footerHeight = parts.footer?.preferredSize.height ?? 0;
+    final headerHeight = parts?.header?.preferredSize.height ?? 0;
+    final footerHeight = parts?.footer?.preferredSize.height ?? 0;
 
     return headerHeight + footerHeight;
   }
@@ -40,7 +41,7 @@ class SlideConfiguration with SlideConfigurationMappable {
 
   Slide get data => _slide;
 
-  List<SectionElement> get sections => _slide.sections;
+  List<SectionBlock> get sections => _slide.sections;
 
   List<String> get comments => _slide.comments;
 
@@ -51,6 +52,6 @@ class SlideConfiguration with SlideConfigurationMappable {
   }
 
   static SlideConfiguration of(BuildContext context) {
-    return Provider.ofType<SlideConfiguration>(context);
+    return InheritedData.of(context);
   }
 }

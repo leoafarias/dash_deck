@@ -1,50 +1,71 @@
-import 'package:collection/collection.dart';
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:superdeck_core/src/helpers/mappers.dart';
 import 'package:superdeck_core/superdeck_core.dart';
+
+import '../helpers/mappers.dart';
 
 part 'block_model.mapper.dart';
 
-@MappableClass()
-abstract class LayoutElement with LayoutElementMappable {
+@MappableClass(
+  discriminatorKey: 'type',
+)
+sealed class Block with BlockMappable {
+  final String type;
   final ContentAlignment? align;
-  final int? flex;
+  final int flex;
   final bool scrollable;
-
-  LayoutElement({
-    this.flex,
+  Block({
+    required this.type,
     this.align,
+    this.flex = 1,
     this.scrollable = false,
   });
 
   static final schema = Schema.object(
     {
-      "align": Schema.enumValue(ContentAlignment.values),
-      "flex": Schema.int(),
-      "scrollable": Schema.boolean(),
+      'type': Schema.string(),
+      'align': Schema.enumValue(ContentAlignment.values),
+      'flex': Schema.int(),
+      'scrollable': Schema.boolean(),
+    },
+    required: ['type'],
+  );
+
+  static final typeSchema = DiscriminatedObjectSchema(
+    discriminatorKey: 'type',
+    schemas: {
+      ColumnBlock.key: ColumnBlock.schema,
+      DartPadBlock.key: DartPadBlock.schema,
+      WidgetBlock.key: WidgetBlock.schema,
+      ImageBlock.key: ImageBlock.schema,
     },
   );
 }
 
 @MappableClass(
   includeCustomMappers: [NullIfEmptyBlock()],
+  discriminatorValue: SectionBlock.key,
 )
-class SectionElement extends LayoutElement with SectionElementMappable {
-  final List<BlockElement> blocks;
+class SectionBlock extends Block with SectionBlockMappable {
+  final List<Block> blocks;
 
   static const key = 'section';
 
-  SectionElement({
+  SectionBlock({
     this.blocks = const [],
-    super.flex,
     super.align,
-  });
+    super.flex,
+    super.scrollable,
+  }) : super(type: key);
 
-  SectionElement appendText(String content) {
+  int get totalBlockFlex {
+    return blocks.fold(0, (total, block) => total + block.flex);
+  }
+
+  SectionBlock appendText(String content) {
     final lastPart = blocks.lastOrNull;
     final blocksCopy = [...blocks];
 
-    if (lastPart is ContentElement) {
+    if (lastPart is ColumnBlock) {
       blocksCopy.last = lastPart.copyWith(
         content: lastPart.content.isEmpty
             ? content
@@ -53,7 +74,7 @@ class SectionElement extends LayoutElement with SectionElementMappable {
     } else {
       if (content.trim().isNotEmpty) {
         blocksCopy.add(
-          ContentElement(content),
+          ColumnBlock(content: content),
         );
       }
     }
@@ -61,17 +82,166 @@ class SectionElement extends LayoutElement with SectionElementMappable {
     return copyWith(blocks: blocksCopy);
   }
 
-  static SectionElement parse(Map<String, dynamic> map) {
+  static SectionBlock parse(Map<String, dynamic> map) {
     schema.validateOrThrow(map);
-    return SectionElementMapper.fromMap(map);
+    return SectionBlockMapper.fromMap(map);
   }
 
-  static final schema = LayoutElement.schema.extend({
-    'blocks': Schema.list(BlockElement.typeSchema),
-  });
+  static final schema = Block.schema.extend(
+    {
+      'blocks': Schema.list(Block.typeSchema),
+    },
+    required: ['blocks'],
+  );
 
-  SectionElement appendElement(BlockElement part) {
+  SectionBlock appendElement(Block part) {
     return copyWith(blocks: [...blocks, part]);
+  }
+}
+
+@MappableClass(discriminatorValue: ColumnBlock.key)
+class ColumnBlock extends Block with ColumnBlockMappable {
+  static const key = 'column';
+  final String content;
+  ColumnBlock({
+    this.content = '',
+    super.align,
+    super.flex,
+    super.scrollable,
+  }) : super(type: key);
+
+  static ColumnBlock parse(Map<String, dynamic> map) {
+    schema.validateOrThrow(map);
+    return ColumnBlockMapper.fromMap(map);
+  }
+
+  static final schema = Block.schema.extend(
+    {
+      'content': Schema.string(),
+    },
+    required: ['content'],
+  );
+}
+
+@MappableEnum()
+enum DartPadTheme {
+  dark,
+  light;
+}
+
+@MappableClass(discriminatorValue: DartPadBlock.key)
+class DartPadBlock extends Block with DartPadBlockMappable {
+  final String id;
+  final DartPadTheme? theme;
+  final bool embed;
+  final String code;
+
+  static const key = 'dartpad';
+
+  DartPadBlock({
+    required this.id,
+    this.theme,
+    required this.code,
+    this.embed = true,
+    super.align,
+    super.flex,
+    super.scrollable,
+  }) : super(type: key);
+
+  static final schema = Block.schema.extend(
+    {
+      'id': Schema.string(),
+      'theme': Schema.enumValue(DartPadTheme.values),
+      'embed': Schema.boolean(),
+      'code': Schema.string(),
+    },
+    required: [
+      "id",
+    ],
+  );
+
+  static DartPadBlock parse(Map<String, dynamic> map) {
+    schema.validateOrThrow(map);
+    return DartPadBlockMapper.fromMap(map);
+  }
+}
+
+@MappableClass(discriminatorValue: ImageBlock.key)
+class ImageBlock extends Block with ImageBlockMappable {
+  static const key = 'image';
+  final GeneratedAsset asset;
+  final ImageFit? fit;
+  final double? width;
+  final double? height;
+  ImageBlock({
+    required this.asset,
+    this.fit,
+    this.width,
+    this.height,
+    super.align,
+    super.flex,
+    super.scrollable,
+  }) : super(type: key);
+
+  static final schema = Block.schema.extend(
+    {
+      "fit": Schema.enumValue(ImageFit.values),
+      "asset": GeneratedAsset.schema,
+      "width": Schema.double(),
+      "height": Schema.double(),
+    },
+    required: [
+      "asset",
+    ],
+  );
+
+  static ImageBlock parse(Map<String, dynamic> map) {
+    schema.validateOrThrow(map);
+    return ImageBlockMapper.fromMap(map);
+  }
+}
+
+@MappableEnum()
+enum ImageFit {
+  fill,
+  contain,
+  cover,
+  fitWidth,
+  fitHeight,
+  none,
+  scaleDown;
+}
+
+@MappableClass(
+  discriminatorValue: WidgetBlock.key,
+  hook: UnmappedPropertiesHook('args'),
+)
+class WidgetBlock extends Block with WidgetBlockMappable {
+  static const key = 'widget';
+  final Map<String, dynamic> args;
+  final String name;
+  @override
+  WidgetBlock({
+    required this.name,
+    this.args = const {},
+    super.align,
+    super.flex,
+    super.scrollable,
+  }) : super(type: key);
+
+  static final schema = Block.schema.extend(
+    {
+      "name": Schema.string(),
+    },
+    required: [
+      "name",
+    ],
+    additionalProperties: true,
+  );
+
+  static WidgetBlock parse(Map<String, dynamic> map) {
+    schema.validateOrThrow(map);
+    return WidgetBlockMapper.fromMap(map);
   }
 }
 

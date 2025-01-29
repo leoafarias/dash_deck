@@ -10,11 +10,11 @@ class NavigationProviderBuilder extends StatefulWidget {
   final Widget Function(GoRouter router) builder;
   const NavigationProviderBuilder({
     super.key,
-    required this.configuration,
+    required DeckConfiguration configuration,
     required this.builder,
-  });
+  }) : _configuration = configuration;
 
-  final DeckConfiguration configuration;
+  final DeckConfiguration _configuration;
 
   @override
   State<NavigationProviderBuilder> createState() =>
@@ -29,7 +29,7 @@ class _NavigationProviderBuilderState extends State<NavigationProviderBuilder> {
     super.initState();
 
     _navigationController = NavigationController(
-      slides: widget.configuration.slides,
+      slides: widget._configuration.slides,
     );
   }
 
@@ -44,14 +44,14 @@ class _NavigationProviderBuilderState extends State<NavigationProviderBuilder> {
   void didUpdateWidget(NavigationProviderBuilder oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.configuration != oldWidget.configuration) {
+    if (widget._configuration != oldWidget._configuration) {
       final slidesChanged = listEquals(
-        widget.configuration.slides,
-        oldWidget.configuration.slides,
+        widget._configuration.slides,
+        oldWidget._configuration.slides,
       );
       if (slidesChanged) {
         _navigationController.updateSlides(
-          widget.configuration.slides,
+          widget._configuration.slides,
         );
       }
     }
@@ -59,8 +59,8 @@ class _NavigationProviderBuilderState extends State<NavigationProviderBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return Provider(
-      value: _navigationController,
+    return InheritedData(
+      data: _navigationController,
       child: ListenableBuilder(
         listenable: _navigationController,
         builder: (context, _) {

@@ -6,11 +6,11 @@ import '../atoms/slide_view.dart';
 
 class SlideScreen extends StatelessWidget {
   const SlideScreen(
-    this.slide, {
+    this.configuration, {
     super.key,
   });
 
-  final SlideConfiguration slide;
+  final SlideConfiguration configuration;
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +26,9 @@ class SlideScreen extends StatelessWidget {
             ),
           ],
         ),
-        child: Provider(
-          value: slide,
-          child: SlideView(slide),
+        child: InheritedData(
+          data: configuration,
+          child: SlideView(configuration),
         ),
       ),
     );

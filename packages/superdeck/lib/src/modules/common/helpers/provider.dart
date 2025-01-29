@@ -1,29 +1,31 @@
 import 'package:flutter/material.dart';
 
-class Provider<T> extends InheritedWidget {
-  const Provider({
+class InheritedData<T> extends InheritedWidget {
+  const InheritedData({
     super.key,
     required super.child,
-    required this.value,
+    required this.data,
   });
 
-  final T value;
+  final T data;
 
   @override
-  bool updateShouldNotify(covariant Provider<T> oldWidget) {
-    return oldWidget.value != value;
+  bool updateShouldNotify(covariant InheritedData<T> oldWidget) {
+    return oldWidget.data != data;
   }
 
-  static T? maybeTypeOf<T>(BuildContext context) {
-    final provider = context.dependOnInheritedWidgetOfExactType<Provider<T>>();
-    return provider?.value;
+  static T? maybeOf<T>(BuildContext context) {
+    final provider =
+        context.dependOnInheritedWidgetOfExactType<InheritedData<T>>();
+    return provider?.data;
   }
 
-  static T ofType<T>(BuildContext context) {
-    final provider = context.dependOnInheritedWidgetOfExactType<Provider<T>>();
+  static T of<T>(BuildContext context) {
+    final provider =
+        context.dependOnInheritedWidgetOfExactType<InheritedData<T>>();
     if (provider == null) {
       throw FlutterError('Provider of type $T not found in the widget tree');
     }
-    return provider.value;
+    return provider.data;
   }
 }

@@ -1,7 +1,8 @@
 import 'dart:io';
 
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:superdeck_core/src/models/block_model.dart';
+
+import '../models/block_model.dart';
 
 class FileMapper extends SimpleMapper<File> {
   const FileMapper();
@@ -31,16 +32,16 @@ class DurationMapper extends SimpleMapper<Duration> {
   }
 }
 
-class NullIfEmptyBlock extends SimpleMapper<LayoutElement> {
+class NullIfEmptyBlock extends SimpleMapper<Block> {
   const NullIfEmptyBlock();
 
   @override
-  LayoutElement decode(dynamic value) {
-    return LayoutElementMapper.fromMap(value);
+  Block decode(dynamic value) {
+    return BlockMapper.fromMap(value);
   }
 
   @override
-  dynamic encode(LayoutElement self) {
+  dynamic encode(Block self) {
     final map = self.toMap();
     if (map.isEmpty) {
       return null;

@@ -23,9 +23,6 @@ class DeckStyle {
       $.section.image(
         $.blockContainer.padding.all(0),
       ),
-      $.debug(
-        $.blockContainer.border.color(Colors.blue),
-      ),
       $.section.gist(
         $.blockContainer.chain
           ..margin.all(0)

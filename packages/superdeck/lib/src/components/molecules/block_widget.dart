@@ -1,199 +1,234 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
+import 'package:superdeck/src/components/molecules/block_provider.dart';
+import 'package:superdeck/src/modules/common/helpers/utils.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
-import '../../modules/common/helpers/constants.dart';
 import '../../modules/common/helpers/converters.dart';
 import '../../modules/common/helpers/provider.dart';
-import '../../modules/common/helpers/utils.dart';
 import '../../modules/common/styles/style_spec.dart';
 import '../../modules/deck/slide_configuration.dart';
-import '../../modules/thumbnail/slide_capture_provider.dart';
 import '../atoms/cache_image_widget.dart';
 import '../atoms/markdown_viewer.dart';
 import '../organisms/webview_wrapper.dart';
 
-class BlockData {
-  BlockData({
-    required this.spec,
-    required this.block,
+class SectionBlockWidget extends StatelessWidget {
+  const SectionBlockWidget({
+    super.key,
+    required this.section,
     required this.size,
   });
 
-  final SlideSpec spec;
-  final BlockElement block;
+  final SectionBlock section;
   final Size size;
 
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
+  Positioned _renderDebugInfo(Block block, Size size) {
+    const textStyle = TextStyle(
+      color: Colors.black,
+      fontSize: 12,
+    );
+    final label = '''
+@${block.type}
+${size.width.toStringAsFixed(2)} x ${size.height.toStringAsFixed(2)}''';
 
-    return other is BlockData &&
-        other.spec == spec &&
-        other.block == block &&
-        other.size == size;
+    return Positioned(
+      top: 0,
+      right: 0,
+      child: Container(
+        color: Colors.cyan,
+        padding: const EdgeInsets.all(8),
+        child: Text(label, style: textStyle),
+      ),
+    );
   }
 
   @override
-  int get hashCode => spec.hashCode ^ block.hashCode ^ size.hashCode;
-}
-
-class SectionBlockWidget extends StatelessWidget {
-  const SectionBlockWidget(
-    this.section, {
-    super.key,
-    required this.heightPercentage,
-  });
-
-  final SectionElement section;
-  final double heightPercentage;
-
-  @override
   Widget build(context) {
-    final slide = SlideConfiguration.of(context);
-
-    final children = section.blocks.map((block) {
-      final flex = block.flex ?? 1;
-      final alignment = ConverterHelper.toRowAlignment(
-        block.align ?? ContentAlignment.center,
+    final blockOffsets = <Block, Offset>{};
+    var currentOffset = Offset.zero;
+    final widthPerFlex = size.width / section.totalBlockFlex;
+    for (var block in section.blocks) {
+      final blockWidth = widthPerFlex * block.flex;
+      blockOffsets[block] = currentOffset;
+      currentOffset = Offset(
+        currentOffset.dx + blockWidth,
+        currentOffset.dy,
       );
-      final totalFlex =
-          section.blocks.map((b) => b.flex ?? 1).reduce((a, b) => a + b);
 
-      final widthPercentage = flex / totalFlex;
+      if (block == section.blocks.last) {
+        blockOffsets[block] = currentOffset;
+      }
+    }
 
-      return Expanded(
-        flex: flex,
-        child: SpecBuilder(
-          style: slide.style.applyVariant(Variant(block.type)),
-          builder: (context) {
-            final spec = SlideSpec.of(context);
+    final configuration = SlideConfiguration.of(context);
 
-            final size = Size(
-              kResolution.width * widthPercentage,
-              kResolution.height * heightPercentage,
-            );
+    final isDebug = configuration.debug;
 
-            final sizeOffset = getSizeWithoutSpacing(spec.blockContainer);
+    return Stack(
+      children: section.blocks.map((block) {
+        final widthPercentage = block.flex / section.totalBlockFlex;
 
-            return spec.blockContainer(
-              child: Provider(
-                value: BlockData(
-                  block: block,
-                  spec: spec,
-                  size: (size - sizeOffset) as Size,
-                ),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: alignment.$2,
-                              mainAxisAlignment: alignment.$1,
-                              children: [
-                                switch (block) {
-                                  ImageElement b => _ImageBlockWidget(b),
-                                  WidgetElement b => _WidgetBlockWidget(b),
-                                  DartPadElement b => _DartPadBlockWidget(b),
-                                  ContentElement b => ContentElementWidget(b),
-                                },
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      );
-    }).toList();
+        final blockSize = Size(
+          size.width * widthPercentage,
+          size.height,
+        );
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      // crossAxisAlignment: crossAxis,
-      children: children,
+        return Positioned(
+          left: blockOffsets[block]!.dx,
+          top: blockOffsets[block]!.dy,
+          width: blockSize.width,
+          height: blockSize.height,
+          child: Stack(
+            children: [
+              switch (block) {
+                ImageBlock b => _ImageBlockWidget(
+                    block: b,
+                    size: blockSize,
+                    configuration: configuration,
+                  ),
+                WidgetBlock b => _WidgetBlockWidget(
+                    block: b,
+                    size: blockSize,
+                    configuration: configuration,
+                  ),
+                DartPadBlock b => _DartPadBlockWidget(
+                    block: b,
+                    size: blockSize,
+                    configuration: configuration,
+                  ),
+                ColumnBlock b => ColumnBlockWidget(
+                    block: b,
+                    size: blockSize,
+                    configuration: configuration,
+                  ),
+                _ => const SizedBox.shrink(),
+              },
+              if (isDebug) _renderDebugInfo(block, blockSize),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 }
 
-abstract class _BlockWidget<T extends BlockElement> extends StatefulWidget {
-  const _BlockWidget(
-    this.block, {
+abstract class _BlockWidget<T extends Block> extends StatefulWidget {
+  const _BlockWidget({
     super.key,
+    required this.block,
+    required this.size,
+    required this.configuration,
   });
 
-  Widget build(BuildContext context);
+  Widget build(BuildContext context, BlockData<T> data);
 
   final T block;
-
+  final Size size;
+  final SlideConfiguration configuration;
   @override
   State<_BlockWidget<T>> createState() => _BlockWidgetState<T>();
 }
 
-class _BlockWidgetState<T extends BlockElement> extends State<_BlockWidget<T>> {
+class _BlockWidgetState<T extends Block> extends State<_BlockWidget<T>> {
   @override
   Widget build(context) {
-    final blockData = Provider.ofType<BlockData>(context);
-    return ConstrainedBox(
-      constraints: BoxConstraints.loose(
-        blockData.size,
-      ),
-      child: widget.build(context),
+    final style = widget.configuration.style.applyVariant(
+      Variant(widget.block.type),
+    );
+
+    return SpecBuilder(
+        style: style,
+        builder: (context) {
+          final spec = SlideSpec.of(context);
+
+          final blockOffset = calculateBlockOffset(spec.blockContainer);
+
+          final blockData = BlockData(
+            block: widget.block,
+            spec: spec,
+            size: Size(
+              widget.size.width - blockOffset.dx,
+              widget.size.height - blockOffset.dy,
+            ),
+          );
+
+          Widget current = InheritedData(
+            data: blockData,
+            child: spec.blockContainer(
+              child: widget.build(context, blockData),
+            ),
+          );
+
+          if (widget.block.scrollable && !widget.configuration.isExporting) {
+            current = SingleChildScrollView(
+              child: current,
+            );
+          } else {
+            current = Wrap(
+              clipBehavior: Clip.hardEdge,
+              children: [current],
+            );
+          }
+
+          return Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.cyan,
+                width: 2,
+              ),
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints.loose(widget.size),
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: ConverterHelper.toAlignment(
+                      blockData.block.align,
+                    ),
+                    child: current,
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+}
+
+class ColumnBlockWidget extends _BlockWidget<ColumnBlock> {
+  const ColumnBlockWidget({
+    super.key,
+    required super.block,
+    required super.size,
+    required super.configuration,
+  });
+
+  @override
+  Widget build(context, data) {
+    return MarkdownViewer(
+      content: data.block.content,
+      spec: data.spec,
     );
   }
 }
 
-class ContentElementWidget extends _BlockWidget<ContentElement> {
-  const ContentElementWidget(super.block, {super.key});
+class _ImageBlockWidget extends _BlockWidget<ImageBlock> {
+  const _ImageBlockWidget({
+    super.key,
+    required super.block,
+    required super.size,
+    required super.configuration,
+  });
 
   @override
-  Widget build(context) {
-    final content = block.content;
-
-    final blockData = Provider.ofType<BlockData>(context);
-    final capturing =
-        Provider.maybeTypeOf<CapturingData>(context)?.isCapturing == true;
-
-    Widget current = MarkdownViewer(
-      content: content,
-      spec: SlideSpec.of(context),
-    );
-
-    if (capturing) {
-      current = Wrap(
-        clipBehavior: Clip.hardEdge,
-        children: [current],
-      );
-    } else {
-      current = SingleChildScrollView(
-        child: current,
-      );
-    }
-
-    return current;
-  }
-}
-
-class _ImageBlockWidget extends _BlockWidget<ImageElement> {
-  const _ImageBlockWidget(super.block);
-
-  @override
-  Widget build(context) {
-    final options = block;
-
-    final alignment = options.align ?? ContentAlignment.center;
-    final imageFit = options.fit ?? ImageFit.cover;
-    final spec = SlideSpec.of(context);
+  Widget build(context, data) {
+    final alignment = data.block.align ?? ContentAlignment.center;
+    final imageFit = data.block.fit ?? ImageFit.cover;
+    final spec = data.spec;
 
     return CachedImage(
-      uri: Uri.parse(options.asset.src),
+      uri: Uri.parse(data.block.asset.src),
       spec: spec.image.copyWith(
         fit: ConverterHelper.toBoxFit(imageFit),
         alignment: ConverterHelper.toAlignment(alignment),
@@ -202,21 +237,25 @@ class _ImageBlockWidget extends _BlockWidget<ImageElement> {
   }
 }
 
-class _WidgetBlockWidget extends _BlockWidget<WidgetElement> {
-  const _WidgetBlockWidget(super.block);
+class _WidgetBlockWidget extends _BlockWidget<WidgetBlock> {
+  const _WidgetBlockWidget({
+    super.key,
+    required super.block,
+    required super.size,
+    required super.configuration,
+  });
 
   @override
-  Widget build(context) {
-    final slide = Provider.ofType<SlideConfiguration>(context);
-    final blockData = Provider.ofType<BlockData>(context);
+  Widget build(context, data) {
+    final slide = SlideConfiguration.of(context);
 
-    final widgetBuilder = slide.getWidget(block.type);
+    final widgetBuilder = slide.getWidget(data.block.type);
 
     if (widgetBuilder == null) {
       return Container(
         color: Colors.red,
         child: Center(
-          child: Text('Widget not found: ${block.type}'),
+          child: Text('Widget not found: ${data.block.type}'),
         ),
       );
     }
@@ -225,14 +264,14 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetElement> {
       builder: (context) {
         try {
           return SizedBox(
-            height: blockData.size.height,
-            child: widgetBuilder(context, block),
+            height: data.size.height,
+            child: widgetBuilder(context, data.block),
           );
         } catch (e) {
           return Container(
             color: Colors.red,
             child: Center(
-              child: Text('Error building widget: ${block.type}\n$e'),
+              child: Text('Error building widget: ${data.block.type}\n$e'),
             ),
           );
         }
@@ -241,19 +280,31 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetElement> {
   }
 }
 
-class _DartPadBlockWidget extends _BlockWidget<DartPadElement> {
-  const _DartPadBlockWidget(super.block);
+class _DartPadBlockWidget extends _BlockWidget<DartPadBlock> {
+  const _DartPadBlockWidget({
+    super.key,
+    required super.block,
+    required super.size,
+    required super.configuration,
+  });
 
   @override
-  Widget build(context) {
-    final DartPadElement(:id, :theme, :embed) = block;
-    final blockData = Provider.ofType<BlockData>(context);
+  Widget build(context, data) {
+    final DartPadBlock(:id, :theme, :embed) = data.block;
 
     final themeName = theme?.name ?? DartPadTheme.dark.name;
 
+    if (kDebugMode) {
+      return SizedBox(
+        height: data.size.height,
+        width: data.size.width,
+        child: const Text('DartPadBlockWidget'),
+      );
+    }
+
     return SizedBox(
-      height: blockData.size.height,
-      width: blockData.size.width,
+      height: data.size.height,
+      width: data.size.width,
       child: WebViewWrapper(
         url: 'https://dartpad.dev/?id=$id&theme=$themeName&embed=$embed',
       ),

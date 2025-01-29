@@ -16,7 +16,3 @@ targets:
       mix_generator|class_utility:
         generate_for:
           - lib/**/*.dart
-      riverpod_generator:
-        generate_for:
-          - lib/**/*.dart
-      

@@ -1,20 +1,16 @@
 import 'package:superdeck_cli/src/parsers/parsers/block_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
-LayoutElement _parseElement(ParsedTagBlock tagBlock) {
-  final options = tagBlock.options;
+Block _parseBlock(ParsedTagBlock tagBlock) {
+  final options = {...tagBlock.options, 'type': tagBlock.tag};
 
   return switch (tagBlock.tag) {
-    (SectionElement.key) => SectionElement.parse(options),
-    (ContentElement.key) =>
-      ContentElement.parse({...options, 'type': tagBlock.tag, 'content': ''}),
-    (ImageElement.key) =>
-      ImageElement.parse({...options, 'type': tagBlock.tag}),
-    (DartPadElement.key) =>
-      DartPadElement.parse({...options, 'type': tagBlock.tag}),
-    _ => WidgetElement.parse(
-        {...options, 'name': tagBlock.tag, 'type': WidgetElement.key},
-      ),
+    (SectionBlock.key) => SectionBlock.parse(options),
+    (ColumnBlock.key) => ColumnBlock.parse(options),
+    (ImageBlock.key) => ImageBlock.parse(options),
+    (DartPadBlock.key) => DartPadBlock.parse(options),
+    (WidgetBlock.key) => WidgetBlock.parse(options),
+    _ => WidgetBlock.parse({...options, 'name': tagBlock.tag}),
   };
 }
 
@@ -27,16 +23,16 @@ LayoutElement _parseElement(ParsedTagBlock tagBlock) {
 /// If a tag is found, it reads until a closing `}` is encountered, then converts
 /// the extracted tags into blocks, updating the current section or starting a
 /// new one as needed.
-List<SectionElement> parseSections(String markdown) {
-  final sections = <SectionElement>[];
-  SectionElement? currentSection;
+List<SectionBlock> parseSections(String markdown) {
+  final sections = <SectionBlock>[];
+  SectionBlock? currentSection;
 
   final tagBlocks = parseTagBlocks(markdown);
   final tagBlockContents = List.generate(tagBlocks.length, (index) => '');
 
   // If there are no tag blocks, we can just add the entire markdown as a single section.
   if (tagBlocks.isEmpty) {
-    currentSection = SectionElement();
+    currentSection = SectionBlock();
     currentSection = currentSection.appendText(markdown);
     sections.add(currentSection);
 
@@ -46,7 +42,7 @@ List<SectionElement> parseSections(String markdown) {
   // If the first tag block is not at the start of the markdown,
   // we need to add a new section for the content before the first tag block.
   if (tagBlocks.first.startIndex > 0) {
-    currentSection = SectionElement();
+    currentSection = SectionBlock();
     currentSection = currentSection
         .appendText(markdown.substring(0, tagBlocks.first.startIndex));
   }
@@ -67,23 +63,22 @@ List<SectionElement> parseSections(String markdown) {
   // Parse the tag blocks into elements.
   for (var idx = 0; idx < tagBlocks.length; idx++) {
     final tag = tagBlocks[idx];
-    final element = _parseElement(tag);
+    final element = _parseBlock(tag);
 
     final content = tagBlockContents[idx];
 
-    if (element is SectionElement) {
+    if (element is SectionBlock) {
       // If we encounter a new SectionBlock, close off the previous one first.
       if (currentSection != null) {
         sections.add(currentSection);
       }
       currentSection = element;
-    } else if (element is BlockElement) {
-      currentSection ??= SectionElement();
-      currentSection = currentSection.appendElement(element);
-    }
+    } else
+      currentSection ??= SectionBlock();
+    currentSection = currentSection.appendElement(element);
 
     if (content.isNotEmpty) {
-      currentSection = currentSection!.appendText(content);
+      currentSection = currentSection.appendText(content);
     }
   }
 

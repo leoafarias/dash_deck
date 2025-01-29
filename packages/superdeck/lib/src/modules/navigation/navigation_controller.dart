@@ -59,7 +59,7 @@ class NavigationController extends ChangeNotifier {
   }
 
   static NavigationController of(BuildContext context) {
-    return Provider.ofType<NavigationController>(context);
+    return InheritedData.of<NavigationController>(context);
   }
 
   GoRouter _buildRouter(List<SlideConfiguration> slides) {

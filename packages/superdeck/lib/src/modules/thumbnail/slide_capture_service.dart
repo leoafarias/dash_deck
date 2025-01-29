@@ -6,14 +6,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:superdeck/src/modules/common/helpers/provider.dart';
 import 'package:superdeck/src/modules/deck/deck_configuration.dart';
 
 import '../../components/atoms/slide_view.dart';
 import '../../components/organisms/app_shell.dart';
 import '../common/helpers/constants.dart';
-import '../common/helpers/provider.dart';
 import '../deck/slide_configuration.dart';
-import 'slide_capture_provider.dart';
 
 enum SlideCaptureQuality {
   low(0.4),
@@ -47,8 +46,8 @@ class SlideCaptureService {
       _generationQueue.add(queueKey);
 
       final image = await _fromWidgetToImage(
-        Provider(
-          value: slide,
+        InheritedData(
+          data: slide,
           child: SlideView(slide),
         ),
         context: kScaffoldKey.currentContext!,
@@ -96,24 +95,20 @@ class SlideCaptureService {
     Size? targetSize,
   }) async {
     try {
-      final configuration = DeckConfiguration.of(context);
-
       final child = InheritedTheme.captureAll(
+        context,
+        DeckConfiguration.captureAsExporting(
           context,
-          Provider(
-            value: configuration,
-            child: Provider(
-              value: CapturingData(true),
-              child: MediaQuery(
-                data: MediaQuery.of(context),
-                child: MaterialApp(
-                  theme: Theme.of(context),
-                  debugShowCheckedModeBanner: false,
-                  home: Scaffold(body: widget),
-                ),
-              ),
+          MediaQuery(
+            data: MediaQuery.of(context),
+            child: MaterialApp(
+              theme: Theme.of(context),
+              debugShowCheckedModeBanner: false,
+              home: Scaffold(body: widget),
             ),
-          ));
+          ),
+        ),
+      );
 
       final repaintBoundary = RenderRepaintBoundary();
       final platformDispatcher = WidgetsBinding.instance.platformDispatcher;

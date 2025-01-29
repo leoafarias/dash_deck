@@ -18,6 +18,7 @@ class MeasureSize extends StatefulWidget {
 
 class _MeasureSizeState extends State<MeasureSize> {
   final GlobalKey _widgetKey = GlobalKey();
+  Size? _size;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,9 @@ class _MeasureSizeState extends State<MeasureSize> {
     final context = _widgetKey.currentContext;
     if (context == null) return;
     final renderBox = context.findRenderObject() as RenderBox?;
+    if (_size == renderBox?.size) return;
     if (renderBox != null && renderBox.hasSize) {
+      _size = renderBox.size;
       widget.onChange(renderBox.size);
     }
   }

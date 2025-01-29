@@ -10,6 +10,6 @@ export 'package:superdeck/src/modules/deck/deck_options.dart';
 export 'package:superdeck/src/modules/deck/deck_provider.dart';
 export 'package:superdeck/src/modules/deck/slide_configuration.dart';
 export 'package:superdeck/src/modules/slide/slide_parts.dart';
-export 'package:superdeck_core/superdeck_core.dart' show WidgetElement;
+export 'package:superdeck_core/superdeck_core.dart' show WidgetBlock;
 
 export 'src/components/organisms/app_shell.dart';

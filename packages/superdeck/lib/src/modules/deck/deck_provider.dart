@@ -41,8 +41,8 @@ class _DeckProviderBuilderState extends State<DeckProviderBuilder> {
         slides: snapshot.requireData,
         options: widget.options,
       );
-      current = Provider(
-        value: configuration,
+      current = InheritedData(
+        data: configuration,
         child: widget.builder(configuration),
       );
     } else if (snapshot.hasError) {

@@ -8,7 +8,7 @@ class Slide with SlideMappable {
   final String key;
   final SlideOptions? options;
   final String markdown;
-  final List<SectionElement> sections;
+  final List<SectionBlock> sections;
   final List<String> comments;
 
   const Slide({
@@ -25,7 +25,7 @@ class Slide with SlideMappable {
       "markdown": Schema.string(),
       "title": Schema.string(),
       'options': SlideOptions.schema,
-      'sections': Schema.list(SectionElement.schema),
+      'sections': Schema.list(SectionBlock.schema),
       'comments': Schema.list(Schema.string()),
     },
     required: ['key', 'markdown'],
@@ -36,20 +36,6 @@ class Slide with SlideMappable {
     schema.validateOrThrow(map);
     return SlideMapper.fromMap(map);
   }
-
-  factory Slide.noSlides() => Slide(
-        key: 'empty',
-        markdown: 'No slides found',
-        sections: [
-          SectionElement(
-            blocks: [
-              ContentElement(
-                'No slides found',
-              ),
-            ],
-          ),
-        ],
-      );
 }
 
 @MappableClass(

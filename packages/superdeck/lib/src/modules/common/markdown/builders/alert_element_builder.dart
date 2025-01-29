@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
 
-import '../styles/style_spec.dart';
+import '../../styles/style_spec.dart';
 
 enum AlertType {
   note,

@@ -2,10 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
 
-Offset getSizeWithoutSpacing(BoxSpec spec) {
-  return _calculateBlockOffset(spec);
-}
-
 Offset getTotalModifierSpacing(Spec spec) {
   final modifiers = spec.modifiers?.value ?? [];
   final padding = modifiers.firstWhereOrNull(
@@ -18,7 +14,7 @@ Offset getTotalModifierSpacing(Spec spec) {
   );
 }
 
-Offset _calculateBlockOffset(BoxSpec spec) {
+Offset calculateBlockOffset(BoxSpec spec) {
   // final outerContainer = spec.outerContainer;
   // final innerContainer = spec.innerContainer;
   final contentBlock = spec;

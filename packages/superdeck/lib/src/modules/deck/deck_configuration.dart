@@ -35,7 +35,22 @@ class DeckConfiguration with DeckConfigurationMappable {
   }
 
   static DeckConfiguration of(BuildContext context) {
-    return Provider.ofType<DeckConfiguration>(context);
+    return InheritedData.of<DeckConfiguration>(context);
+  }
+
+  static Widget captureAsExporting(BuildContext context, Widget child) {
+    final configuration = of(context);
+    final newConfiguration = configuration.copyWith(
+      slides: configuration.slides.map((slide) {
+        return slide.copyWith(
+          isExporting: true,
+        );
+      }).toList(),
+    );
+    return InheritedData(
+      data: newConfiguration,
+      child: child,
+    );
   }
 }
 
@@ -59,7 +74,7 @@ SlideConfiguration _convertSlide({
 }) {
   final widgetBlocks = slide.sections
       .expand((section) => section.blocks)
-      .whereType<WidgetElement>();
+      .whereType<WidgetBlock>();
 
   final slideWidgets = <String, WidgetBuilderWithOptions>{};
 
@@ -78,6 +93,7 @@ SlideConfiguration _convertSlide({
       debug: options.debug,
     ),
     slide: slide,
+    debug: options.debug,
     parts: options.parts,
     widgets: slideWidgets,
   );
@@ -98,5 +114,5 @@ Style _buildSlideConfigurationStyle({
 
 typedef WidgetBuilderWithOptions = Widget Function(
   BuildContext context,
-  WidgetElement options,
+  WidgetBlock options,
 );

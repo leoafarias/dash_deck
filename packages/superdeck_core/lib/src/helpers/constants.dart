@@ -8,7 +8,3 @@
 import 'dart:io';
 
 final kPubpsecFile = File('pubspec.yaml');
-
-// final kReferenceFile = File(join(kAssetsDir.path, 'slides.json'));
-// final kReferenceFileYaml = File(join(kAssetsDir.path, 'slides.yaml'));
-// final kReferenceMarkdownCopy = File(join(kAssetsDir.path, 'slides_copy.md'));

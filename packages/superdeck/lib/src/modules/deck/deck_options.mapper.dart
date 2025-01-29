@@ -26,12 +26,12 @@ class DeckOptionsMapper extends ClassMapperBase<DeckOptions> {
   static Map<String, DeckStyle> _$styles(DeckOptions v) => v.styles;
   static const Field<DeckOptions, Map<String, DeckStyle>> _f$styles =
       Field('styles', _$styles, opt: true, def: const <String, DeckStyle>{});
-  static Map<String, Widget Function(BuildContext, WidgetElement)> _$widgets(
+  static Map<String, Widget Function(BuildContext, WidgetBlock)> _$widgets(
           DeckOptions v) =>
       v.widgets;
   static const Field<DeckOptions,
-          Map<String, Widget Function(BuildContext, WidgetElement)>>
-      _f$widgets = Field('widgets', _$widgets,
+          Map<String, Widget Function(BuildContext, WidgetBlock)>> _f$widgets =
+      Field('widgets', _$widgets,
           opt: true, def: const <String, WidgetBuilderWithOptions>{});
   static SlideParts _$parts(DeckOptions v) => v.parts;
   static const Field<DeckOptions, SlideParts> _f$parts =
@@ -114,13 +114,13 @@ abstract class DeckOptionsCopyWith<$R, $In extends DeckOptions, $Out>
   MapCopyWith<
       $R,
       String,
-      Widget Function(BuildContext, WidgetElement),
-      ObjectCopyWith<$R, Widget Function(BuildContext, WidgetElement),
-          Widget Function(BuildContext, WidgetElement)>> get widgets;
+      Widget Function(BuildContext, WidgetBlock),
+      ObjectCopyWith<$R, Widget Function(BuildContext, WidgetBlock),
+          Widget Function(BuildContext, WidgetBlock)>> get widgets;
   $R call(
       {DeckStyle? baseStyle,
       Map<String, DeckStyle>? styles,
-      Map<String, Widget Function(BuildContext, WidgetElement)>? widgets,
+      Map<String, Widget Function(BuildContext, WidgetBlock)>? widgets,
       SlideParts? parts,
       bool? debug});
   DeckOptionsCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
@@ -142,16 +142,16 @@ class _DeckOptionsCopyWithImpl<$R, $Out>
   MapCopyWith<
       $R,
       String,
-      Widget Function(BuildContext, WidgetElement),
-      ObjectCopyWith<$R, Widget Function(BuildContext, WidgetElement),
-          Widget Function(BuildContext, WidgetElement)>> get widgets =>
+      Widget Function(BuildContext, WidgetBlock),
+      ObjectCopyWith<$R, Widget Function(BuildContext, WidgetBlock),
+          Widget Function(BuildContext, WidgetBlock)>> get widgets =>
       MapCopyWith($value.widgets, (v, t) => ObjectCopyWith(v, $identity, t),
           (v) => call(widgets: v));
   @override
   $R call(
           {DeckStyle? baseStyle,
           Map<String, DeckStyle>? styles,
-          Map<String, Widget Function(BuildContext, WidgetElement)>? widgets,
+          Map<String, Widget Function(BuildContext, WidgetBlock)>? widgets,
           SlideParts? parts,
           bool? debug}) =>
       $apply(FieldCopyWithData({

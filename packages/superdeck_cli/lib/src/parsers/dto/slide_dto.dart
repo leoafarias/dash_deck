@@ -5,7 +5,7 @@ class RawSlide {
   String markdown;
   Map<String, dynamic> options;
   List<String> comments;
-  List<SectionElement> sections;
+  List<SectionBlock> sections;
 
   RawSlide({
     required this.key,

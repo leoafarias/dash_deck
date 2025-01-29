@@ -416,6 +416,6 @@ Header content.
   });
 }
 
-extension on BlockElement {
-  String get content => (this as ContentElement).content;
+extension on Block {
+  String get content => (this as ColumnBlock).content;
 }

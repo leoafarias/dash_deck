@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:superdeck/src/components/atoms/slide_thumbnail.dart';
 import 'package:superdeck/src/components/organisms/thumbnail_panel.dart';
+import 'package:superdeck/src/modules/common/helpers/constants.dart';
 
 import '../../modules/deck/deck_configuration.dart';
 import '../../modules/navigation/navigation_controller.dart';
@@ -172,7 +173,10 @@ class _SplitViewState extends State<SplitView> with TickerProviderStateMixin {
               child: const SdBottomBar(),
             ),
             body: Center(
-              child: ScaledWidget(child: widget.child),
+              child: ScaledWidget(
+                targetSize: kResolution,
+                child: widget.child,
+              ),
             ),
           ),
         )

@@ -33,15 +33,18 @@ class SlideConfigurationMapper extends ClassMapperBase<SlideConfiguration> {
   static bool _$debug(SlideConfiguration v) => v.debug;
   static const Field<SlideConfiguration, bool> _f$debug =
       Field('debug', _$debug, opt: true, def: false);
-  static SlideParts _$parts(SlideConfiguration v) => v.parts;
+  static SlideParts? _$parts(SlideConfiguration v) => v.parts;
   static const Field<SlideConfiguration, SlideParts> _f$parts =
-      Field('parts', _$parts);
-  static Map<String, Widget Function(BuildContext, WidgetElement)> _$widgets(
+      Field('parts', _$parts, opt: true);
+  static Map<String, Widget Function(BuildContext, WidgetBlock)> _$widgets(
           SlideConfiguration v) =>
       v.widgets;
   static const Field<SlideConfiguration,
-          Map<String, Widget Function(BuildContext, WidgetElement)>>
-      _f$widgets = Field('widgets', _$widgets, opt: true, def: const {});
+          Map<String, Widget Function(BuildContext, WidgetBlock)>> _f$widgets =
+      Field('widgets', _$widgets, opt: true, def: const {});
+  static bool _$isExporting(SlideConfiguration v) => v.isExporting;
+  static const Field<SlideConfiguration, bool> _f$isExporting =
+      Field('isExporting', _$isExporting, opt: true, def: false);
 
   @override
   final MappableFields<SlideConfiguration> fields = const {
@@ -51,6 +54,7 @@ class SlideConfigurationMapper extends ClassMapperBase<SlideConfiguration> {
     #debug: _f$debug,
     #parts: _f$parts,
     #widgets: _f$widgets,
+    #isExporting: _f$isExporting,
   };
 
   static SlideConfiguration _instantiate(DecodingData data) {
@@ -60,7 +64,8 @@ class SlideConfigurationMapper extends ClassMapperBase<SlideConfiguration> {
         slide: data.dec(_f$_slide),
         debug: data.dec(_f$debug),
         parts: data.dec(_f$parts),
-        widgets: data.dec(_f$widgets));
+        widgets: data.dec(_f$widgets),
+        isExporting: data.dec(_f$isExporting));
   }
 
   @override
@@ -122,16 +127,17 @@ abstract class SlideConfigurationCopyWith<$R, $In extends SlideConfiguration,
   MapCopyWith<
       $R,
       String,
-      Widget Function(BuildContext, WidgetElement),
-      ObjectCopyWith<$R, Widget Function(BuildContext, WidgetElement),
-          Widget Function(BuildContext, WidgetElement)>> get widgets;
+      Widget Function(BuildContext, WidgetBlock),
+      ObjectCopyWith<$R, Widget Function(BuildContext, WidgetBlock),
+          Widget Function(BuildContext, WidgetBlock)>> get widgets;
   $R call(
       {int? slideIndex,
       Style? style,
       Slide? slide,
       bool? debug,
       SlideParts? parts,
-      Map<String, Widget Function(BuildContext, WidgetElement)>? widgets});
+      Map<String, Widget Function(BuildContext, WidgetBlock)>? widgets,
+      bool? isExporting});
   SlideConfigurationCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -151,9 +157,9 @@ class _SlideConfigurationCopyWithImpl<$R, $Out>
   MapCopyWith<
       $R,
       String,
-      Widget Function(BuildContext, WidgetElement),
-      ObjectCopyWith<$R, Widget Function(BuildContext, WidgetElement),
-          Widget Function(BuildContext, WidgetElement)>> get widgets =>
+      Widget Function(BuildContext, WidgetBlock),
+      ObjectCopyWith<$R, Widget Function(BuildContext, WidgetBlock),
+          Widget Function(BuildContext, WidgetBlock)>> get widgets =>
       MapCopyWith($value.widgets, (v, t) => ObjectCopyWith(v, $identity, t),
           (v) => call(widgets: v));
   @override
@@ -162,16 +168,17 @@ class _SlideConfigurationCopyWithImpl<$R, $Out>
           Style? style,
           Slide? slide,
           bool? debug,
-          SlideParts? parts,
-          Map<String, Widget Function(BuildContext, WidgetElement)>?
-              widgets}) =>
+          Object? parts = $none,
+          Map<String, Widget Function(BuildContext, WidgetBlock)>? widgets,
+          bool? isExporting}) =>
       $apply(FieldCopyWithData({
         if (slideIndex != null) #slideIndex: slideIndex,
         if (style != null) #style: style,
         if (slide != null) #slide: slide,
         if (debug != null) #debug: debug,
-        if (parts != null) #parts: parts,
-        if (widgets != null) #widgets: widgets
+        if (parts != $none) #parts: parts,
+        if (widgets != null) #widgets: widgets,
+        if (isExporting != null) #isExporting: isExporting
       }));
   @override
   SlideConfiguration $make(CopyWithData data) => SlideConfiguration(
@@ -180,7 +187,8 @@ class _SlideConfigurationCopyWithImpl<$R, $Out>
       slide: data.get(#slide, or: $value._slide),
       debug: data.get(#debug, or: $value.debug),
       parts: data.get(#parts, or: $value.parts),
-      widgets: data.get(#widgets, or: $value.widgets));
+      widgets: data.get(#widgets, or: $value.widgets),
+      isExporting: data.get(#isExporting, or: $value.isExporting));
 
   @override
   SlideConfigurationCopyWith<$R2, SlideConfiguration, $Out2> $chain<$R2, $Out2>(

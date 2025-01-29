@@ -5,10 +5,12 @@ import '../../modules/common/helpers/constants.dart';
 
 class ScaledWidget extends StatelessWidget {
   final Widget child;
+  final Size targetSize;
 
   const ScaledWidget({
     super.key,
     required this.child,
+    required this.targetSize,
   });
 
   @override
@@ -24,8 +26,8 @@ class ScaledWidget extends StatelessWidget {
           width = height * kAspectRatio;
         }
 
-        final scaleWidth = width / kResolution.width;
-        final scaleHeight = height / kResolution.height;
+        final scaleWidth = width / targetSize.width;
+        final scaleHeight = height / targetSize.height;
 
         return SizedBox(
           width: width,
@@ -36,15 +38,15 @@ class ScaledWidget extends StatelessWidget {
               children: [
                 const Center(),
                 Positioned(
-                  top: (kResolution.height - height) / -2,
-                  left: (kResolution.width - width) / -2,
-                  width: kResolution.width.toDouble(),
-                  height: kResolution.height.toDouble(),
+                  top: (targetSize.height - height) / -2,
+                  left: (targetSize.width - width) / -2,
+                  width: targetSize.width.toDouble(),
+                  height: targetSize.height.toDouble(),
                   child: Transform.scale(
                     scaleY: scaleHeight,
                     scaleX: scaleWidth,
                     child: MediaQuery(
-                      data: MediaQuery.of(context).copyWith(size: kResolution),
+                      data: MediaQuery.of(context).copyWith(size: targetSize),
                       child: ScaledWidgetProvider(
                         scale: scaleWidth,
                         child: child,
