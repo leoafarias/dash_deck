@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -39,8 +40,12 @@ class _ThumbnailPanelState extends State<ThumbnailPanel> {
   }
 
   void _listener() {
+    final newVisibleItems = _itemPositionsListener.itemPositions.value.toList();
+
+    if (listEquals(newVisibleItems, _visibleItems)) return;
+
     setState(() {
-      _visibleItems = _itemPositionsListener.itemPositions.value.toList();
+      _visibleItems = newVisibleItems;
     });
   }
 

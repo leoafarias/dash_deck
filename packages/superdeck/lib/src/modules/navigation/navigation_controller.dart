@@ -10,7 +10,7 @@ import '../navigation/routes.dart';
 
 class NavigationController extends ChangeNotifier {
   late final GoRouter _router;
-  int _currentSlideIndex = 0;
+
   bool _isMenuOpen = false;
   late SlideConfiguration _currentSlide;
   late List<SlideConfiguration> _slides;
@@ -45,11 +45,11 @@ class NavigationController extends ChangeNotifier {
           : '0';
       final slideIndex = int.tryParse(pathParam) ?? 0;
 
-      if (slideIndex != _currentSlideIndex) {
-        _currentSlideIndex = slideIndex;
+      if (slideIndex != _currentSlide.slideIndex) {
+        _currentSlide = _slides[slideIndex];
+        notifyListeners();
       }
     });
-    notifyListeners();
   }
 
   @override
@@ -58,8 +58,15 @@ class NavigationController extends ChangeNotifier {
     super.dispose();
   }
 
+  Widget provide({required Widget child}) {
+    return InheritedNotifierData(
+      data: this,
+      child: child,
+    );
+  }
+
   static NavigationController of(BuildContext context) {
-    return InheritedData.of<NavigationController>(context);
+    return InheritedNotifierData.of<NavigationController>(context);
   }
 
   GoRouter _buildRouter(List<SlideConfiguration> slides) {
@@ -103,9 +110,9 @@ class NavigationController extends ChangeNotifier {
     _router.go(SDPaths.slides.slide.define(index.toString()).path);
   }
 
-  void nextSlide() => goToSlide(_currentSlideIndex + 1);
+  void nextSlide() => goToSlide(_currentSlide.slideIndex + 1);
 
-  void previousSlide() => goToSlide(_currentSlideIndex - 1);
+  void previousSlide() => goToSlide(_currentSlide.slideIndex - 1);
 
   void toggleMenu() {
     _isMenuOpen = !_isMenuOpen;

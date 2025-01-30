@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
-import '../common/helpers/provider.dart';
 import '../deck/deck_configuration.dart';
 import 'navigation_controller.dart';
 
@@ -10,11 +9,11 @@ class NavigationProviderBuilder extends StatefulWidget {
   final Widget Function(GoRouter router) builder;
   const NavigationProviderBuilder({
     super.key,
-    required DeckConfiguration configuration,
+    required DeckController configuration,
     required this.builder,
   }) : _configuration = configuration;
 
-  final DeckConfiguration _configuration;
+  final DeckController _configuration;
 
   @override
   State<NavigationProviderBuilder> createState() =>
@@ -59,15 +58,9 @@ class _NavigationProviderBuilderState extends State<NavigationProviderBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return InheritedData(
-      data: _navigationController,
-      child: ListenableBuilder(
-        listenable: _navigationController,
-        builder: (context, _) {
-          return widget.builder(
-            _navigationController.router,
-          );
-        },
+    return _navigationController.provide(
+      child: widget.builder(
+        _navigationController.router,
       ),
     );
   }

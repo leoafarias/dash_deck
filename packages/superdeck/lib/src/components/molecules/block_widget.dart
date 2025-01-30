@@ -59,8 +59,6 @@ ${size.width.toStringAsFixed(2)} x ${size.height.toStringAsFixed(2)}''';
 
     final configuration = SlideConfiguration.of(context);
 
-    final isDebug = configuration.debug;
-
     return Stack(
       children: section.blocks.mapIndexed((index, block) {
         final widthPercentage = block.flex / section.totalBlockFlex;
@@ -100,7 +98,7 @@ ${size.width.toStringAsFixed(2)} x ${size.height.toStringAsFixed(2)}''';
                   ),
                 _ => const SizedBox.shrink(),
               },
-              if (isDebug) _renderDebugInfo(block, blockSize),
+              if (configuration.debug) _renderDebugInfo(block, blockSize),
             ],
           ),
         );
@@ -167,13 +165,17 @@ class _BlockWidgetState<T extends Block> extends State<_BlockWidget<T>> {
             );
           }
 
+          final decoration = widget.configuration.debug
+              ? BoxDecoration(
+                  border: Border.all(
+                    color: Colors.cyan,
+                    width: 2,
+                  ),
+                )
+              : null;
+
           return Container(
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.cyan,
-                width: 2,
-              ),
-            ),
+            decoration: decoration,
             child: ConstrainedBox(
               constraints: BoxConstraints.loose(widget.size),
               child: Stack(

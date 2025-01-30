@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:superdeck/src/modules/common/helpers/provider.dart';
-import 'package:superdeck/src/modules/deck/deck_configuration.dart';
 
 import '../../components/atoms/slide_view.dart';
 import '../../components/organisms/app_shell.dart';
@@ -45,10 +44,15 @@ class SlideCaptureService {
 
       _generationQueue.add(queueKey);
 
+      final exportingSlide = slide.copyWith(
+        debug: false,
+        isExporting: true,
+      );
+
       final image = await _fromWidgetToImage(
         InheritedData(
-          data: slide,
-          child: SlideView(slide),
+          data: exportingSlide,
+          child: SlideView(exportingSlide),
         ),
         context: kScaffoldKey.currentContext!,
         pixelRatio: quality.pixelRatio,
@@ -97,15 +101,12 @@ class SlideCaptureService {
     try {
       final child = InheritedTheme.captureAll(
         context,
-        DeckConfiguration.captureAsExporting(
-          context,
-          MediaQuery(
-            data: MediaQuery.of(context),
-            child: MaterialApp(
-              theme: Theme.of(context),
-              debugShowCheckedModeBanner: false,
-              home: Scaffold(body: widget),
-            ),
+        MediaQuery(
+          data: MediaQuery.of(context),
+          child: MaterialApp(
+            theme: Theme.of(context),
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(body: widget),
           ),
         ),
       );

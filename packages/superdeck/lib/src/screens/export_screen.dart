@@ -17,7 +17,7 @@ class ExportScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
     // Retrieve slides and current slide index using custom hooks or context
-    final slides = DeckConfiguration.of(context).slides;
+    final slides = DeckController.of(context).slides;
     final currentSlideIndex = useState(0);
 
     // Initialize PageController with the initial index

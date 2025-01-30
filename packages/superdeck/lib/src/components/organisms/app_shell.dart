@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:superdeck/src/components/atoms/slide_thumbnail.dart';
 import 'package:superdeck/src/components/organisms/thumbnail_panel.dart';
 import 'package:superdeck/src/modules/common/helpers/constants.dart';
@@ -15,7 +14,7 @@ final kScaffoldKey = GlobalKey<ScaffoldState>();
 
 /// Builds the "shell" for the app by building a Scaffold with a
 /// BottomNavigationBar, where [child] is placed in the body of the Scaffold.
-class AppShell extends HookWidget {
+class AppShell extends StatelessWidget {
   const AppShell({
     super.key,
     required this.child,
@@ -28,7 +27,7 @@ class AppShell extends HookWidget {
   Widget build(BuildContext context) {
     final navigation = NavigationController.of(context);
 
-    final slides = DeckConfiguration.of(context).slides;
+    final slides = DeckController.of(context).slides;
 
     final currentSlide = navigation.currentSlide;
     final isMenuOpen = navigation.isMenuOpen;
@@ -58,41 +57,30 @@ class AppShell extends HookWidget {
 
     return CallbackShortcuts(
       bindings: bindings,
-      child: Scaffold(
-        key: kScaffoldKey,
-        backgroundColor: const Color.fromARGB(255, 9, 9, 9),
-        floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
-        floatingActionButton: isMenuOpen
-            ? IconButton(
-                onPressed: navigation.openMenu,
-                icon: const Icon(Icons.menu),
-              )
-            : null,
-        body: SplitView(
-          isOpen: isMenuOpen,
-          sideWidget: Column(
-            children: [
-              Expanded(
-                flex: 3,
-                child: ThumbnailPanel(
-                  onItemTap: navigation.goToSlide,
-                  activeIndex: currentSlide.slideIndex,
-                  itemBuilder: (index, selected) {
-                    return SlideThumbnail(
-                      selected: selected,
-                      slide: slides[index],
-                    );
-                  },
-                  itemCount: slides.length,
-                ),
+      child: SplitView(
+        isOpen: isMenuOpen,
+        sideWidget: Column(
+          children: [
+            Expanded(
+              flex: 3,
+              child: ThumbnailPanel(
+                onItemTap: navigation.goToSlide,
+                activeIndex: currentSlide.slideIndex,
+                itemBuilder: (index, selected) {
+                  return SlideThumbnail(
+                    selected: selected,
+                    slide: slides[index],
+                  );
+                },
+                itemCount: slides.length,
               ),
-              IntrinsicHeight(
-                child: NotePanel(notes: currentSlide.comments),
-              ),
-            ],
-          ),
-          child: child,
+            ),
+            IntrinsicHeight(
+              child: NotePanel(notes: currentSlide.comments),
+            ),
+          ],
         ),
+        child: child,
       ),
     );
   }
@@ -149,6 +137,9 @@ class _SplitViewState extends State<SplitView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final navigation = NavigationController.of(context);
+    final isMenuOpen = navigation.isMenuOpen;
+
     return Row(
       children: [
         SizeTransition(
@@ -164,6 +155,16 @@ class _SplitViewState extends State<SplitView> with TickerProviderStateMixin {
         ),
         Expanded(
           child: Scaffold(
+            key: kScaffoldKey,
+            backgroundColor: const Color.fromARGB(255, 9, 9, 9),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.miniEndFloat,
+            floatingActionButton: !isMenuOpen
+                ? IconButton(
+                    onPressed: navigation.openMenu,
+                    icon: const Icon(Icons.menu),
+                  )
+                : null,
             bottomNavigationBar: SizeTransition(
               sizeFactor: CurvedAnimation(
                 parent: _animationController,

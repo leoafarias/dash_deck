@@ -53,13 +53,25 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
   }) async {
     final thumbnailFile = _getThumbnailFile(slide);
 
-    if (await thumbnailFile.exists() && !force) {
+    final isValid =
+        await thumbnailFile.exists() && (await thumbnailFile.length()) > 0;
+
+    if (isValid && !force) {
       return thumbnailFile;
     }
 
     final imageData = await _slideCaptureService.generate(slide: slide);
 
-    return await thumbnailFile.writeAsBytes(imageData, flush: true);
+    await thumbnailFile.writeAsBytes(imageData, flush: true);
+
+    final fileLength = await thumbnailFile.length();
+
+    if (fileLength == 0) {
+      await thumbnailFile.delete();
+      return _generateThumbnail(slide, force: true);
+    }
+
+    return thumbnailFile;
   }
 
   // Future<void> _handleAction(_PopMenuAction action) async {

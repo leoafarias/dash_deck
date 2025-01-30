@@ -1,31 +1,46 @@
 import 'package:collection/collection.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:flutter/widgets.dart';
-import 'package:mix/mix.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 import '../common/helpers/provider.dart';
-import '../common/styles/style.dart';
 import 'deck_options.dart';
 import 'slide_configuration.dart';
 
 part 'deck_configuration.mapper.dart';
 
 @MappableClass()
-class DeckConfiguration with DeckConfigurationMappable {
-  final DeckOptions options;
-  final List<SlideConfiguration> slides;
+class DeckController with ChangeNotifier {
+  DeckOptions options;
+  List<SlideConfiguration> slides;
 
-  DeckConfiguration({
+  DeckController({
     required this.options,
     required this.slides,
   });
 
-  factory DeckConfiguration.build({
+  void update({
+    List<Slide>? slides,
+    DeckOptions? options,
+  }) {
+    if (slides != null || options != null) {
+      this.options = options ?? this.options;
+      final newSlides =
+          slides ?? this.slides.map((slide) => slide.data).toList();
+      this.slides = _buildSlides(
+        slides: newSlides,
+        options: this.options,
+      );
+
+      notifyListeners();
+    }
+  }
+
+  factory DeckController.build({
     required List<Slide> slides,
     required DeckOptions options,
   }) {
-    return DeckConfiguration(
+    return DeckController(
       options: options,
       slides: _buildSlides(
         slides: slides,
@@ -34,23 +49,15 @@ class DeckConfiguration with DeckConfigurationMappable {
     );
   }
 
-  static DeckConfiguration of(BuildContext context) {
-    return InheritedData.of<DeckConfiguration>(context);
-  }
-
-  static Widget captureAsExporting(BuildContext context, Widget child) {
-    final configuration = of(context);
-    final newConfiguration = configuration.copyWith(
-      slides: configuration.slides.map((slide) {
-        return slide.copyWith(
-          isExporting: true,
-        );
-      }).toList(),
-    );
-    return InheritedData(
-      data: newConfiguration,
+  Widget provide({required Widget child}) {
+    return InheritedNotifierData(
+      data: this,
       child: child,
     );
+  }
+
+  static DeckController of(BuildContext context) {
+    return InheritedNotifierData.of<DeckController>(context);
   }
 }
 
@@ -84,32 +91,18 @@ SlideConfiguration _convertSlide({
       slideWidgets[block.name] = widgetBuilder;
     }
   }
+  final styles = options.styles;
+  final styleName = slide.options?.style;
+  final baseStyle = options.baseStyle;
+  final style = baseStyle.build().merge(styles[styleName]?.build());
   return SlideConfiguration(
     slideIndex: slideIndex,
-    style: _buildSlideConfigurationStyle(
-      name: slide.options?.style,
-      baseStyle: options.baseStyle,
-      styles: options.styles,
-      debug: options.debug,
-    ),
+    style: style,
     slide: slide,
     debug: options.debug,
     parts: options.parts,
     widgets: slideWidgets,
   );
-}
-
-/// Retrieves the [Style] registered with the given [name].
-///
-/// If no match is found, returns the default [_baseStyle].
-Style _buildSlideConfigurationStyle({
-  required String? name,
-  required DeckStyle baseStyle,
-  required Map<String, DeckStyle> styles,
-  required bool debug,
-}) {
-  final style = baseStyle.build().merge(styles[name]?.build());
-  return debug ? style.applyVariant(const Variant('debug')) : style;
 }
 
 typedef WidgetBuilderWithOptions = Widget Function(

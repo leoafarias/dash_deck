@@ -6,13 +6,13 @@
 
 part of 'deck_configuration.dart';
 
-class DeckConfigurationMapper extends ClassMapperBase<DeckConfiguration> {
-  DeckConfigurationMapper._();
+class DeckControllerMapper extends ClassMapperBase<DeckController> {
+  DeckControllerMapper._();
 
-  static DeckConfigurationMapper? _instance;
-  static DeckConfigurationMapper ensureInitialized() {
+  static DeckControllerMapper? _instance;
+  static DeckControllerMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals.use(_instance = DeckConfigurationMapper._());
+      MapperContainer.globals.use(_instance = DeckControllerMapper._());
       DeckOptionsMapper.ensureInitialized();
       SlideConfigurationMapper.ensureInitialized();
     }
@@ -20,81 +20,79 @@ class DeckConfigurationMapper extends ClassMapperBase<DeckConfiguration> {
   }
 
   @override
-  final String id = 'DeckConfiguration';
+  final String id = 'DeckController';
 
-  static DeckOptions _$options(DeckConfiguration v) => v.options;
-  static const Field<DeckConfiguration, DeckOptions> _f$options =
+  static DeckOptions _$options(DeckController v) => v.options;
+  static const Field<DeckController, DeckOptions> _f$options =
       Field('options', _$options);
-  static List<SlideConfiguration> _$slides(DeckConfiguration v) => v.slides;
-  static const Field<DeckConfiguration, List<SlideConfiguration>> _f$slides =
+  static List<SlideConfiguration> _$slides(DeckController v) => v.slides;
+  static const Field<DeckController, List<SlideConfiguration>> _f$slides =
       Field('slides', _$slides);
 
   @override
-  final MappableFields<DeckConfiguration> fields = const {
+  final MappableFields<DeckController> fields = const {
     #options: _f$options,
     #slides: _f$slides,
   };
 
-  static DeckConfiguration _instantiate(DecodingData data) {
-    return DeckConfiguration(
+  static DeckController _instantiate(DecodingData data) {
+    return DeckController(
         options: data.dec(_f$options), slides: data.dec(_f$slides));
   }
 
   @override
   final Function instantiate = _instantiate;
 
-  static DeckConfiguration fromMap(Map<String, dynamic> map) {
-    return ensureInitialized().decodeMap<DeckConfiguration>(map);
+  static DeckController fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<DeckController>(map);
   }
 
-  static DeckConfiguration fromJson(String json) {
-    return ensureInitialized().decodeJson<DeckConfiguration>(json);
+  static DeckController fromJson(String json) {
+    return ensureInitialized().decodeJson<DeckController>(json);
   }
 }
 
-mixin DeckConfigurationMappable {
+mixin DeckControllerMappable {
   String toJson() {
-    return DeckConfigurationMapper.ensureInitialized()
-        .encodeJson<DeckConfiguration>(this as DeckConfiguration);
+    return DeckControllerMapper.ensureInitialized()
+        .encodeJson<DeckController>(this as DeckController);
   }
 
   Map<String, dynamic> toMap() {
-    return DeckConfigurationMapper.ensureInitialized()
-        .encodeMap<DeckConfiguration>(this as DeckConfiguration);
+    return DeckControllerMapper.ensureInitialized()
+        .encodeMap<DeckController>(this as DeckController);
   }
 
-  DeckConfigurationCopyWith<DeckConfiguration, DeckConfiguration,
-          DeckConfiguration>
-      get copyWith => _DeckConfigurationCopyWithImpl(
-          this as DeckConfiguration, $identity, $identity);
+  DeckControllerCopyWith<DeckController, DeckController, DeckController>
+      get copyWith => _DeckControllerCopyWithImpl(
+          this as DeckController, $identity, $identity);
   @override
   String toString() {
-    return DeckConfigurationMapper.ensureInitialized()
-        .stringifyValue(this as DeckConfiguration);
+    return DeckControllerMapper.ensureInitialized()
+        .stringifyValue(this as DeckController);
   }
 
   @override
   bool operator ==(Object other) {
-    return DeckConfigurationMapper.ensureInitialized()
-        .equalsValue(this as DeckConfiguration, other);
+    return DeckControllerMapper.ensureInitialized()
+        .equalsValue(this as DeckController, other);
   }
 
   @override
   int get hashCode {
-    return DeckConfigurationMapper.ensureInitialized()
-        .hashValue(this as DeckConfiguration);
+    return DeckControllerMapper.ensureInitialized()
+        .hashValue(this as DeckController);
   }
 }
 
-extension DeckConfigurationValueCopy<$R, $Out>
-    on ObjectCopyWith<$R, DeckConfiguration, $Out> {
-  DeckConfigurationCopyWith<$R, DeckConfiguration, $Out>
-      get $asDeckConfiguration =>
-          $base.as((v, t, t2) => _DeckConfigurationCopyWithImpl(v, t, t2));
+extension DeckControllerValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, DeckController, $Out> {
+  DeckControllerCopyWith<$R, DeckController, $Out> get $asDeckController =>
+      $base.as((v, t, t2) => _DeckControllerCopyWithImpl(v, t, t2));
 }
 
-abstract class DeckConfigurationCopyWith<$R, $In extends DeckConfiguration,
-    $Out> implements ClassCopyWith<$R, $In, $Out> {
+abstract class DeckControllerCopyWith<$R, $In extends DeckController, $Out>
+    implements ClassCopyWith<$R, $In, $Out> {
   DeckOptionsCopyWith<$R, DeckOptions, DeckOptions> get options;
   ListCopyWith<
       $R,
@@ -102,18 +100,18 @@ abstract class DeckConfigurationCopyWith<$R, $In extends DeckConfiguration,
       SlideConfigurationCopyWith<$R, SlideConfiguration,
           SlideConfiguration>> get slides;
   $R call({DeckOptions? options, List<SlideConfiguration>? slides});
-  DeckConfigurationCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+  DeckControllerCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
 
-class _DeckConfigurationCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, DeckConfiguration, $Out>
-    implements DeckConfigurationCopyWith<$R, DeckConfiguration, $Out> {
-  _DeckConfigurationCopyWithImpl(super.value, super.then, super.then2);
+class _DeckControllerCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, DeckController, $Out>
+    implements DeckControllerCopyWith<$R, DeckController, $Out> {
+  _DeckControllerCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<DeckConfiguration> $mapper =
-      DeckConfigurationMapper.ensureInitialized();
+  late final ClassMapperBase<DeckController> $mapper =
+      DeckControllerMapper.ensureInitialized();
   @override
   DeckOptionsCopyWith<$R, DeckOptions, DeckOptions> get options =>
       $value.options.copyWith.$chain((v) => call(options: v));
@@ -131,12 +129,12 @@ class _DeckConfigurationCopyWithImpl<$R, $Out>
         if (slides != null) #slides: slides
       }));
   @override
-  DeckConfiguration $make(CopyWithData data) => DeckConfiguration(
+  DeckController $make(CopyWithData data) => DeckController(
       options: data.get(#options, or: $value.options),
       slides: data.get(#slides, or: $value.slides));
 
   @override
-  DeckConfigurationCopyWith<$R2, DeckConfiguration, $Out2> $chain<$R2, $Out2>(
+  DeckControllerCopyWith<$R2, DeckController, $Out2> $chain<$R2, $Out2>(
           Then<$Out2, $R2> t) =>
-      _DeckConfigurationCopyWithImpl($value, $cast, t);
+      _DeckControllerCopyWithImpl($value, $cast, t);
 }

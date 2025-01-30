@@ -20,7 +20,7 @@ class SuperDeckApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DeckProviderBuilder(
+    return DeckControllerBuilder(
       options: options,
       builder: (configuration) {
         return NavigationProviderBuilder(
