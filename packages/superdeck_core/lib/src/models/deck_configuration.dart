@@ -9,7 +9,7 @@ import '../schema/schema.dart';
 part 'deck_configuration.mapper.dart';
 
 @MappableClass(includeCustomMappers: [DirectoryMapper(), FileMapper()])
-class DeckConfiguration {
+class DeckConfiguration with DeckConfigurationMappable {
   late final Directory assetDir;
   late final File deckFile;
   late final Directory generatedDir;

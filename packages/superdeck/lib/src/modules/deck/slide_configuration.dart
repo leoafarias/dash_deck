@@ -5,7 +5,7 @@ import 'package:superdeck_core/superdeck_core.dart';
 
 import '../common/helpers/provider.dart';
 import '../slide/slide_parts.dart';
-import 'deck_configuration.dart';
+import 'deck_controller.dart';
 
 part 'slide_configuration.mapper.dart';
 

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:dart_mappable/dart_mappable.dart';
 import 'package:flutter/widgets.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
@@ -9,9 +8,6 @@ import '../common/helpers/provider.dart';
 import 'deck_options.dart';
 import 'slide_configuration.dart';
 
-part 'deck_configuration.mapper.dart';
-
-@MappableClass()
 class DeckController with ChangeNotifier {
   DeckOptions options;
   List<SlideConfiguration> slides;

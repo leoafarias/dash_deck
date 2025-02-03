@@ -4,7 +4,7 @@ import 'package:superdeck/src/components/atoms/slide_thumbnail.dart';
 import 'package:superdeck/src/components/organisms/thumbnail_panel.dart';
 import 'package:superdeck/src/modules/common/helpers/constants.dart';
 
-import '../../modules/deck/deck_configuration.dart';
+import '../../modules/deck/deck_controller.dart';
 import '../../modules/navigation/navigation_controller.dart';
 import '../molecules/bottom_bar.dart';
 import '../molecules/scaled_app.dart';

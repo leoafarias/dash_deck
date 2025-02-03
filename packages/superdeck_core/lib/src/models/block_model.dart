@@ -91,7 +91,6 @@ class SectionBlock extends Block with SectionBlockMappable {
     {
       'blocks': Schema.list(Block.typeSchema),
     },
-    required: ['blocks'],
   );
 
   SectionBlock appendElement(Block part) {
@@ -119,7 +118,6 @@ class ColumnBlock extends Block with ColumnBlockMappable {
     {
       'content': Schema.string(),
     },
-    required: ['content'],
   );
 }
 

@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
-import '../deck/deck_configuration.dart';
+import '../deck/deck_controller.dart';
 import 'navigation_controller.dart';
 
 class NavigationProviderBuilder extends StatefulWidget {

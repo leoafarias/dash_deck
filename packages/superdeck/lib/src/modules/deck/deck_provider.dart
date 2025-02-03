@@ -5,7 +5,7 @@ import 'package:superdeck_core/superdeck_core.dart';
 
 import '../../components/atoms/loading_indicator.dart';
 import '../common/helpers/constants.dart';
-import 'deck_configuration.dart';
+import 'deck_controller.dart';
 import 'deck_options.dart';
 
 class _RootBundleDataStore extends LocalDataStore {
@@ -29,9 +29,16 @@ class DeckControllerBuilder extends StatelessWidget {
   final Widget Function(DeckController controller) builder;
 
   Future<DeckConfiguration> _loadConfiguration() async {
-    final contents =
-        await YamlUtils.loadYamlFile(DeckConfiguration.defaultFile);
-    return DeckConfiguration.parse(contents);
+    final file = DeckConfiguration.defaultFile;
+
+    if (await file.exists()) {
+      final contents = await YamlUtils.loadYamlFile(file);
+      if (contents.isNotEmpty) {
+        return DeckConfiguration.parse(contents);
+      }
+    }
+
+    return DeckConfiguration();
   }
 
   @override

@@ -6,44 +6,40 @@
 
 part of 'deck_reference.dart';
 
-class DeckReferenceMapper extends RecordMapperBase<DeckReference> {
-  static DeckReferenceMapper? _instance;
+class DeckReferenceMapper extends ClassMapperBase<DeckReference> {
   DeckReferenceMapper._();
 
+  static DeckReferenceMapper? _instance;
   static DeckReferenceMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = DeckReferenceMapper._());
-      MapperBase.addType(<A, B>(f) => f<({A configuration, B slides})>());
+      SlideMapper.ensureInitialized();
+      DeckConfigurationMapper.ensureInitialized();
     }
     return _instance!;
   }
 
+  @override
+  final String id = 'DeckReference';
+
   static List<Slide> _$slides(DeckReference v) => v.slides;
   static const Field<DeckReference, List<Slide>> _f$slides =
       Field('slides', _$slides);
-  static DeckConfiguration _$configuration(DeckReference v) => v.configuration;
-  static const Field<DeckReference, DeckConfiguration> _f$configuration =
-      Field('configuration', _$configuration);
+  static DeckConfiguration _$config(DeckReference v) => v.config;
+  static const Field<DeckReference, DeckConfiguration> _f$config =
+      Field('config', _$config);
 
   @override
   final MappableFields<DeckReference> fields = const {
     #slides: _f$slides,
-    #configuration: _f$configuration,
+    #config: _f$config,
   };
-
   @override
-  Function get typeFactory => (f) => f<DeckReference>();
+  final bool ignoreNull = true;
 
-  @override
-  List<Type> apply(MappingContext context) {
-    return [];
-  }
-
-  static DeckReference _instantiate(DecodingData<DeckReference> data) {
-    return (
-      slides: data.dec(_f$slides),
-      configuration: data.dec(_f$configuration)
-    );
+  static DeckReference _instantiate(DecodingData data) {
+    return DeckReference(
+        slides: data.dec(_f$slides), config: data.dec(_f$config));
   }
 
   @override
@@ -58,52 +54,82 @@ class DeckReferenceMapper extends RecordMapperBase<DeckReference> {
   }
 }
 
-extension DeckReferenceMappable on DeckReference {
-  Map<String, dynamic> toMap() {
-    return DeckReferenceMapper.ensureInitialized().encodeMap(this);
-  }
-
+mixin DeckReferenceMappable {
   String toJson() {
-    return DeckReferenceMapper.ensureInitialized().encodeJson(this);
+    return DeckReferenceMapper.ensureInitialized()
+        .encodeJson<DeckReference>(this as DeckReference);
   }
 
-  DeckReferenceCopyWith<DeckReference> get copyWith =>
-      _DeckReferenceCopyWithImpl(this, $identity, $identity);
+  Map<String, dynamic> toMap() {
+    return DeckReferenceMapper.ensureInitialized()
+        .encodeMap<DeckReference>(this as DeckReference);
+  }
+
+  DeckReferenceCopyWith<DeckReference, DeckReference, DeckReference>
+      get copyWith => _DeckReferenceCopyWithImpl(
+          this as DeckReference, $identity, $identity);
+  @override
+  String toString() {
+    return DeckReferenceMapper.ensureInitialized()
+        .stringifyValue(this as DeckReference);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return DeckReferenceMapper.ensureInitialized()
+        .equalsValue(this as DeckReference, other);
+  }
+
+  @override
+  int get hashCode {
+    return DeckReferenceMapper.ensureInitialized()
+        .hashValue(this as DeckReference);
+  }
 }
 
-extension DeckReferenceValueCopy<$R>
-    on ObjectCopyWith<$R, DeckReference, DeckReference> {
-  DeckReferenceCopyWith<$R> get $asDeckReference =>
+extension DeckReferenceValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, DeckReference, $Out> {
+  DeckReferenceCopyWith<$R, DeckReference, $Out> get $asDeckReference =>
       $base.as((v, t, t2) => _DeckReferenceCopyWithImpl(v, t, t2));
 }
 
-abstract class DeckReferenceCopyWith<$R>
-    implements RecordCopyWith<$R, DeckReference> {
-  $R call({List<Slide>? slides, DeckConfiguration? configuration});
-  DeckReferenceCopyWith<$R2> $chain<$R2>(Then<DeckReference, $R2> t);
+abstract class DeckReferenceCopyWith<$R, $In extends DeckReference, $Out>
+    implements ClassCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, Slide, SlideCopyWith<$R, Slide, Slide>> get slides;
+  DeckConfigurationCopyWith<$R, DeckConfiguration, DeckConfiguration>
+      get config;
+  $R call({List<Slide>? slides, DeckConfiguration? config});
+  DeckReferenceCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _DeckReferenceCopyWithImpl<$R>
-    extends RecordCopyWithBase<$R, DeckReference>
-    implements DeckReferenceCopyWith<$R> {
+class _DeckReferenceCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, DeckReference, $Out>
+    implements DeckReferenceCopyWith<$R, DeckReference, $Out> {
   _DeckReferenceCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final RecordMapperBase<DeckReference> $mapper =
+  late final ClassMapperBase<DeckReference> $mapper =
       DeckReferenceMapper.ensureInitialized();
   @override
-  $R call({List<Slide>? slides, DeckConfiguration? configuration}) =>
+  ListCopyWith<$R, Slide, SlideCopyWith<$R, Slide, Slide>> get slides =>
+      ListCopyWith($value.slides, (v, t) => v.copyWith.$chain(t),
+          (v) => call(slides: v));
+  @override
+  DeckConfigurationCopyWith<$R, DeckConfiguration, DeckConfiguration>
+      get config => $value.config.copyWith.$chain((v) => call(config: v));
+  @override
+  $R call({List<Slide>? slides, DeckConfiguration? config}) =>
       $apply(FieldCopyWithData({
         if (slides != null) #slides: slides,
-        if (configuration != null) #configuration: configuration
+        if (config != null) #config: config
       }));
   @override
-  DeckReference $make(CopyWithData data) => (
-        slides: data.get(#slides, or: $value.slides),
-        configuration: data.get(#configuration, or: $value.configuration)
-      );
+  DeckReference $make(CopyWithData data) => DeckReference(
+      slides: data.get(#slides, or: $value.slides),
+      config: data.get(#config, or: $value.config));
 
   @override
-  DeckReferenceCopyWith<$R2> $chain<$R2>(Then<DeckReference, $R2> t) =>
+  DeckReferenceCopyWith<$R2, DeckReference, $Out2> $chain<$R2, $Out2>(
+          Then<$Out2, $R2> t) =>
       _DeckReferenceCopyWithImpl($value, $cast, t);
 }

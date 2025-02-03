@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:superdeck/src/components/atoms/slide_view.dart';
 import 'package:superdeck/src/modules/common/helpers/provider.dart';
 import 'package:superdeck/src/modules/common/styles/style.dart';
-import 'package:superdeck/src/modules/deck/deck_configuration.dart';
+import 'package:superdeck/src/modules/deck/deck_controller.dart';
 import 'package:superdeck/src/modules/deck/slide_configuration.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 

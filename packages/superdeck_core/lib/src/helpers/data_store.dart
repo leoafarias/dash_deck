@@ -56,7 +56,7 @@ class FileSystemDataStore extends LocalDataStore {
 
   final List<GeneratedAsset> _generatedAssets = [];
 
-  List<GeneratedAsset> get generatedAssets => _generatedAssets;
+  List<GeneratedAsset> get generatedAssets => [..._generatedAssets];
 
   @override
   Future<void> initialize() async {

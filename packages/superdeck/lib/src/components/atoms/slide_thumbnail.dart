@@ -5,7 +5,7 @@ import 'package:mix/mix.dart';
 import 'package:superdeck/src/modules/thumbnail/slide_capture_service.dart';
 
 import '../../modules/common/helpers/constants.dart';
-import '../../modules/deck/deck_configuration.dart';
+import '../../modules/deck/deck_controller.dart';
 import '../../modules/deck/slide_configuration.dart';
 import 'cache_image_widget.dart';
 import 'loading_indicator.dart';

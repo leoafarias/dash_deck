@@ -7,7 +7,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:superdeck/src/components/atoms/slide_view.dart';
 import 'package:superdeck/src/modules/thumbnail/slide_capture_service.dart';
 
-import '../modules/deck/deck_configuration.dart';
+import '../modules/deck/deck_controller.dart';
 
 enum _ExportStatus { idle, capturing, building, complete }
 

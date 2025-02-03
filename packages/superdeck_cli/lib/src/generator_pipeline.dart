@@ -121,15 +121,6 @@ class TaskPipeline {
 
     List<File> generatedFiles = [];
 
-    for (final slide in finalizedSlides) {
-      final generatedFile = dataStore.getGeneratedAssetFile(
-        GeneratedAsset.thumbnail(slide.key),
-      );
-      if (await generatedFile.exists()) {
-        generatedFiles.add(generatedFile);
-      }
-    }
-
     for (final asset in dataStore.generatedAssets) {
       final generatedFile = dataStore.getGeneratedAssetFile(asset);
       if (await generatedFile.exists()) {
@@ -152,7 +143,7 @@ class TaskPipeline {
 
     // Save the processed slides back to the repository.
     await dataStore.saveReference(
-      (configuration: configuration, slides: slides.toList()),
+      DeckReference(slides: slides.toList(), config: configuration),
     );
 
     return slides;
@@ -197,20 +188,4 @@ abstract class Task {
   FutureOr<void> dispose() {
     return Future.value();
   }
-}
-
-/// Abstract class for pre-processing tasks that modify raw markdown.
-abstract class PreProcessingTask extends Task {
-  PreProcessingTask(super.name);
-
-  /// Executes the pre-processing task, modifying the raw markdown.
-  FutureOr<void> runPreProcessing(TaskContext context);
-}
-
-/// Abstract class for post-processing tasks that operate on finalized slides.
-abstract class PostProcessingTask extends Task {
-  PostProcessingTask(super.name);
-
-  /// Executes the post-processing task, modifying the finalized slides.
-  FutureOr<void> runPostProcessing(TaskContext context);
 }
