@@ -107,7 +107,7 @@ List<ParsedTagBlock> parseTagBlocks(String text) {
       final startIndex = match.start;
       final endIndex = match.end;
 
-      final optionsMap = convertYamlToMap(options);
+      final optionsMap = YamlUtils.convertYamlToMap(options);
 
       parsedBlocks.add(ParsedTagBlock(
         tag: tag,

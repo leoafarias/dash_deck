@@ -135,7 +135,8 @@ class MermaidConverterTask extends Task {
     for (final mermaidBlock in mermaidBlocks) {
       final mermaidAsset = GeneratedAsset.mermaid(mermaidBlock.content);
 
-      final assetFile = await context.dataStore.getAssetFile(mermaidAsset);
+      final assetFile =
+          await context.dataStore.getGeneratedAssetFile(mermaidAsset);
 
       if (await assetFile.exists()) {
         logger.info(

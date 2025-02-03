@@ -17,6 +17,7 @@ class SlideConfiguration with SlideConfigurationMappable {
   final bool debug;
   final SlideParts? parts;
   final Map<String, WidgetBuilderWithOptions> widgets;
+
   final bool isExporting;
   SlideConfiguration({
     required this.slideIndex,

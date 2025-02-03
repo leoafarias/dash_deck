@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
 import 'package:superdeck/src/modules/thumbnail/slide_capture_service.dart';
-import 'package:superdeck_core/superdeck_core.dart';
 
 import '../../modules/common/helpers/constants.dart';
+import '../../modules/deck/deck_configuration.dart';
 import '../../modules/deck/slide_configuration.dart';
 import 'cache_image_widget.dart';
 import 'loading_indicator.dart';
@@ -24,12 +24,12 @@ enum _PopMenuAction {
 
 class SlideThumbnail extends StatefulWidget {
   final bool selected;
-  final SlideConfiguration slide;
+  final SlideConfiguration slideConfig;
 
   const SlideThumbnail({
     super.key,
     required this.selected,
-    required this.slide,
+    required this.slideConfig,
   });
 
   @override
@@ -39,19 +39,15 @@ class SlideThumbnail extends StatefulWidget {
 class _SlideThumbnailState extends State<SlideThumbnail> {
   final _slideCaptureService = SlideCaptureService();
 
-  File _getThumbnailFile(SlideConfiguration slide) {
-    final asset = GeneratedAsset.thumbnail(slide.data.key);
-    return File(asset.path);
-  }
-
   /// Generates the thumbnail for the given [slide].
   ///
   /// If [force] is true, it regenerates the thumbnail even if it already exists.
-  Future<File> _generateThumbnail(
-    SlideConfiguration slide, {
+  Future<File> _generateThumbnail({
+    required SlideConfiguration slide,
+    required DeckController controller,
     bool force = false,
   }) async {
-    final thumbnailFile = _getThumbnailFile(slide);
+    final thumbnailFile = controller.getSlideThumbnailFile(slide);
 
     final isValid =
         await thumbnailFile.exists() && (await thumbnailFile.length()) > 0;
@@ -68,7 +64,11 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
 
     if (fileLength == 0) {
       await thumbnailFile.delete();
-      return _generateThumbnail(slide, force: true);
+      return _generateThumbnail(
+        slide: slide,
+        controller: controller,
+        force: true,
+      );
     }
 
     return thumbnailFile;
@@ -86,10 +86,14 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
   //   }
   // }
 
-  Future<File> _load() async {
+  Future<File> _load(BuildContext context) async {
+    final controller = DeckController.of(context);
     return kCanRunProcess
-        ? await _generateThumbnail(widget.slide)
-        : _getThumbnailFile(widget.slide);
+        ? await _generateThumbnail(
+            slide: widget.slideConfig,
+            controller: controller,
+          )
+        : controller.getSlideThumbnailFile(widget.slideConfig);
   }
 
   @override
@@ -101,7 +105,7 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
           AspectRatio(
             aspectRatio: kAspectRatio,
             child: FutureBuilder(
-              future: _load(),
+              future: _load(context),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Image(
@@ -138,6 +142,7 @@ class _PreviewContainer extends StatelessWidget {
         blurRadius: 4,
         spreadRadius: 1,
       ),
+      $with.aspectRatio(kAspectRatio),
       selected ? $box.wrap.scale(1.05) : $box.wrap.scale(1),
       selected ? $box.wrap.opacity(1) : $box.wrap.opacity(0.5),
       selected ? $box.border.color.cyan() : $box.border.color.transparent(),
@@ -145,7 +150,7 @@ class _PreviewContainer extends StatelessWidget {
 
     return Box(
       style: style,
-      child: AspectRatio(aspectRatio: kAspectRatio, child: child),
+      child: child,
     );
   }
 }

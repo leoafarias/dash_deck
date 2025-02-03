@@ -44,9 +44,19 @@ class BuildCommand extends Command<int> {
 
   @override
   Future<int> run() async {
+    final configFile = DeckConfiguration.defaultFile;
+    DeckConfiguration deckConfig;
+    if (!await configFile.exists()) {
+      deckConfig = DeckConfiguration();
+    } else {
+      final yamlConfig = await YamlUtils.loadYamlFile(configFile);
+      deckConfig = DeckConfiguration.parse(yamlConfig);
+    }
+
     final _pipeline = TaskPipeline(
       tasks: [MermaidConverterTask(), DartFormatterTask()],
-      dataStore: FileSystemDataStoreImpl(SuperdeckConfig()),
+      configuration: deckConfig,
+      dataStore: FileSystemDataStore(deckConfig),
     );
     final watch = boolArg('watch');
 

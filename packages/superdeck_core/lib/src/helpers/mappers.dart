@@ -18,6 +18,20 @@ class FileMapper extends SimpleMapper<File> {
   }
 }
 
+class DirectoryMapper extends SimpleMapper<Directory> {
+  const DirectoryMapper();
+
+  @override
+  Directory decode(Object value) {
+    return Directory(value as String);
+  }
+
+  @override
+  String encode(Directory self) {
+    return self.path;
+  }
+}
+
 class DurationMapper extends SimpleMapper<Duration> {
   const DurationMapper();
 

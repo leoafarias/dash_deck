@@ -27,7 +27,7 @@ class AppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final navigation = NavigationController.of(context);
 
-    final slides = DeckController.of(context).slides;
+    final deckController = DeckController.of(context);
 
     final currentSlide = navigation.currentSlide;
     final isMenuOpen = navigation.isMenuOpen;
@@ -69,10 +69,10 @@ class AppShell extends StatelessWidget {
                 itemBuilder: (index, selected) {
                   return SlideThumbnail(
                     selected: selected,
-                    slide: slides[index],
+                    slideConfig: deckController.slides[index],
                   );
                 },
-                itemCount: slides.length,
+                itemCount: deckController.slides.length,
               ),
             ),
             IntrinsicHeight(

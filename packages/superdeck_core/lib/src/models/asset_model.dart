@@ -33,21 +33,19 @@ enum AssetType {
 
 @MappableClass()
 class GeneratedAsset with GeneratedAssetMappable {
-  final String fileName;
+  final String _fileName;
   final AssetExtension extension;
   final AssetType type;
 
   GeneratedAsset._({
-    required this.fileName,
+    required String fileName,
     required this.extension,
     required this.type,
-  });
+  }) : _fileName = fileName;
 
-  String get src => '${type.name}_$fileName.${extension.name}';
+  String get fileName => '${type.name}_$_fileName.${extension.name}';
 
   static String buildKey(String valueToHash) => generateValueHash(valueToHash);
-
-  String get path => src;
 
   static final schema = Schema.object(
     {

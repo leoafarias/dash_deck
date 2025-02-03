@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:superdeck/src/components/atoms/async_snapshot_widget.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 import '../../components/atoms/loading_indicator.dart';
@@ -8,14 +8,18 @@ import '../common/helpers/constants.dart';
 import 'deck_configuration.dart';
 import 'deck_options.dart';
 
-final _localDataStore = LocalAssetDataStoreImpl(
-  SuperdeckConfig(),
-  fileReader: rootBundle.loadString,
-);
-final _fileSystemDataStore = FileSystemDataStoreImpl(SuperdeckConfig());
+class _RootBundleDataStore extends LocalDataStore {
+  _RootBundleDataStore(super.configuration);
+
+  @override
+  Future<String> fileReader(String path) async {
+    return rootBundle.loadString(path);
+  }
+}
 
 class DeckControllerBuilder extends StatelessWidget {
   final DeckOptions options;
+
   const DeckControllerBuilder({
     super.key,
     required this.builder,
@@ -24,89 +28,92 @@ class DeckControllerBuilder extends StatelessWidget {
 
   final Widget Function(DeckController controller) builder;
 
-  Widget _buildSnapshot(
-    BuildContext context,
-    AsyncSnapshot<List<Slide>> snapshot,
-  ) {
-    Widget current;
-    if (snapshot.hasData) {
-      current = _DeckControllerProvider(
-        options: options,
-        slides: snapshot.requireData,
-        builder: builder,
-      );
-    } else if (snapshot.hasError) {
-      current = Center(
-        child: Text('Error loading presentation ${snapshot.error}'),
-      );
-    } else {
-      current = const SizedBox.shrink();
-    }
-    return Stack(
-      children: [
-        current,
-        LoadingOverlay(
-          isLoading: snapshot.connectionState == ConnectionState.waiting,
-        ),
-      ],
-    );
+  Future<DeckConfiguration> _loadConfiguration() async {
+    final contents =
+        await YamlUtils.loadYamlFile(DeckConfiguration.defaultFile);
+    return DeckConfiguration.parse(contents);
   }
 
   @override
   Widget build(BuildContext context) {
-    final dataStore = kCanRunProcess ? _fileSystemDataStore : _localDataStore;
-    if (dataStore is FileSystemDataStoreImpl) {
-      return StreamBuilder(
-        stream: dataStore.watchSlides(),
-        builder: _buildSnapshot,
-      );
-    } else {
-      return FutureBuilder(
-        future: dataStore.loadSlides(),
-        builder: _buildSnapshot,
-      );
-    }
+    return FutureBuilder<DeckConfiguration>(
+      future: _loadConfiguration(),
+      builder: (context, snapshot) {
+        return AsyncSnapshotWidget(
+          snapshot: snapshot,
+          builder: (configuration) {
+            final dataStore = kCanRunProcess
+                ? FileSystemDataStore(configuration)
+                : _RootBundleDataStore(configuration);
+            return StreamBuilder<DeckReference>(
+              stream: dataStore.loadDeckReferenceStream(),
+              builder: (context, snapshot) {
+                return AsyncSnapshotWidget(
+                  snapshot: snapshot,
+                  builder: (reference) {
+                    return Stack(
+                      children: [
+                        _DeckControllerProvider(
+                          options: options,
+                          reference: snapshot.requireData,
+                          builder: builder,
+                          dataStore: dataStore,
+                        ),
+                        LoadingOverlay(
+                          isLoading: snapshot.connectionState ==
+                              ConnectionState.waiting,
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            );
+          },
+        );
+      },
+    );
   }
 }
 
 class _DeckControllerProvider extends StatefulWidget {
   const _DeckControllerProvider({
     required this.options,
-    required this.slides,
+    required this.reference,
     required this.builder,
+    required this.dataStore,
   });
 
   final DeckOptions options;
-  final List<Slide> slides;
+  final DeckReference reference;
   final Widget Function(DeckController controller) builder;
+  final IDataStore dataStore;
   @override
   State<_DeckControllerProvider> createState() =>
       _DeckControllerProviderState();
 }
 
 class _DeckControllerProviderState extends State<_DeckControllerProvider> {
-  late final DeckController _controller;
+  late final DeckController controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = DeckController.build(
-      slides: widget.slides,
+    controller = DeckController.build(
+      slides: widget.reference.slides,
       options: widget.options,
+      dataStore: widget.dataStore,
     );
   }
 
   @override
   void didUpdateWidget(_DeckControllerProvider oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final slidesChanged = listEquals(
-      widget.slides,
-      oldWidget.slides,
-    );
+    final referenceChanged = widget.reference != oldWidget.reference;
     final optionsChanged = widget.options != oldWidget.options;
-    if (slidesChanged || optionsChanged) {
-      _controller.update(
-        slides: widget.slides,
+    if (referenceChanged || optionsChanged) {
+      controller.update(
+        slides: widget.reference.slides,
         options: widget.options,
       );
     }
@@ -115,13 +122,13 @@ class _DeckControllerProviderState extends State<_DeckControllerProvider> {
   @override
   void dispose() {
     super.dispose();
-    _controller.dispose();
+    controller.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _controller.provide(
-      child: widget.builder(_controller),
+    return controller.provide(
+      child: widget.builder(controller),
     );
   }
 }

@@ -25,7 +25,7 @@ class FrontmatterParser {
     Map<String, dynamic> yamlMap = {};
 
     try {
-      yamlMap = convertYamlToMap(yamlString);
+      yamlMap = YamlUtils.convertYamlToMap(yamlString);
     } catch (e) {
       logger.err('Cannot parse yaml frontmatter: $e');
       yamlMap = {};

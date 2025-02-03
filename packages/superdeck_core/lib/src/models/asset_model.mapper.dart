@@ -130,9 +130,6 @@ class GeneratedAssetMapper extends ClassMapperBase<GeneratedAsset> {
 
   static const Field<GeneratedAsset, String> _f$slideKey =
       Field('slideKey', null, key: 'slide_key', mode: FieldMode.param);
-  static String _$fileName(GeneratedAsset v) => v.fileName;
-  static const Field<GeneratedAsset, String> _f$fileName =
-      Field('fileName', _$fileName, key: 'file_name', mode: FieldMode.member);
   static AssetExtension _$extension(GeneratedAsset v) => v.extension;
   static const Field<GeneratedAsset, AssetExtension> _f$extension =
       Field('extension', _$extension, mode: FieldMode.member);
@@ -143,7 +140,6 @@ class GeneratedAssetMapper extends ClassMapperBase<GeneratedAsset> {
   @override
   final MappableFields<GeneratedAsset> fields = const {
     #slideKey: _f$slideKey,
-    #fileName: _f$fileName,
     #extension: _f$extension,
     #type: _f$type,
   };

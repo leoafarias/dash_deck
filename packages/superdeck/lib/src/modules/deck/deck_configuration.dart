@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:collection/collection.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:flutter/widgets.dart';
@@ -13,11 +15,13 @@ part 'deck_configuration.mapper.dart';
 class DeckController with ChangeNotifier {
   DeckOptions options;
   List<SlideConfiguration> slides;
+  IDataStore _dataStore;
 
   DeckController({
     required this.options,
     required this.slides,
-  });
+    required IDataStore dataStore,
+  }) : _dataStore = dataStore;
 
   void update({
     List<Slide>? slides,
@@ -36,9 +40,16 @@ class DeckController with ChangeNotifier {
     }
   }
 
+  File getSlideThumbnailFile(SlideConfiguration slide) {
+    return _dataStore.getGeneratedAssetFile(
+      GeneratedAsset.thumbnail(slide.key),
+    );
+  }
+
   factory DeckController.build({
     required List<Slide> slides,
     required DeckOptions options,
+    required IDataStore dataStore,
   }) {
     return DeckController(
       options: options,
@@ -46,6 +57,7 @@ class DeckController with ChangeNotifier {
         slides: slides,
         options: options,
       ),
+      dataStore: dataStore,
     );
   }
 

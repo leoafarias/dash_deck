@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:logging/logging.dart';
-import 'package:path/path.dart';
 import 'package:superdeck_cli/src/helpers/logger.dart';
 import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
 import 'package:superdeck_cli/src/parsers/parsers/block_extractor.dart';
@@ -13,7 +12,7 @@ import 'package:superdeck_core/superdeck_core.dart';
 class TaskContext {
   /// The index of the slide in the original list.
   final int slideIndex;
-  final FileSystemDataStoreImpl dataStore;
+  final FileSystemDataStore dataStore;
 
   /// The raw slide being processed.
   RawSlideMarkdown slide;
@@ -27,11 +26,13 @@ class TaskContext {
 class TaskPipeline {
   /// List of tasks to execute for each slide.
   final List<Task> tasks;
-
-  /// Repository for loading and saving slides.
-  final FileSystemDataStoreImpl dataStore;
-
-  const TaskPipeline({required this.tasks, required this.dataStore});
+  final DeckConfiguration configuration;
+  final FileSystemDataStore dataStore;
+  const TaskPipeline({
+    required this.tasks,
+    required this.configuration,
+    required this.dataStore,
+  });
 
   /// Processes an individual slide by executing all tasks sequentially.
   Future<TaskContext> _processSlide(TaskContext context) async {
@@ -53,13 +54,11 @@ class TaskPipeline {
   /// Cleans up generated files in [generatedDir] that are not present in [neededAssets].
   Future<void> _cleanupGeneratedFiles(
     Directory generatedDir,
-    List<GeneratedAsset> neededAssets,
+    List<File> neededFiles,
   ) async {
     final files = await _loadGeneratedFiles(generatedDir);
 
-    final generatedAssets = {
-      for (var asset in neededAssets) join(generatedDir.path, asset.path),
-    };
+    final generatedAssets = {for (var file in neededFiles) file.path};
 
     List<File> filesToDelete = [];
     for (var file in files) {
@@ -87,15 +86,10 @@ class TaskPipeline {
     return files;
   }
 
-  /// Runs the entire pipeline:
-  /// 1. Loads raw markdown content.
-  /// 2. Parses it into raw slides.
-  /// 3. Executes each task for every slide.
-  /// 4. Cleans up unneeded generated files.
-  /// 5. Saves the processed slides.
   Future<Iterable<Slide>> run() async {
     // Load raw markdown content from the repository.
-    final markdownRaw = await dataStore.getDeckMarkdown();
+
+    final markdownRaw = await dataStore.readDeckMarkdown();
 
     // Initialize the markdown parser with necessary extractors.
     final markdownParser = MarkdownParser();
@@ -125,16 +119,28 @@ class TaskPipeline {
 
     // Determine all assets that are still needed after processing.
 
-    List<GeneratedAsset> thumbnailAssets = [];
+    List<File> generatedFiles = [];
 
     for (final slide in finalizedSlides) {
-      thumbnailAssets.add(GeneratedAsset.thumbnail(slide.key));
+      final generatedFile = dataStore.getGeneratedAssetFile(
+        GeneratedAsset.thumbnail(slide.key),
+      );
+      if (await generatedFile.exists()) {
+        generatedFiles.add(generatedFile);
+      }
+    }
+
+    for (final asset in dataStore.generatedAssets) {
+      final generatedFile = dataStore.getGeneratedAssetFile(asset);
+      if (await generatedFile.exists()) {
+        generatedFiles.add(generatedFile);
+      }
     }
 
     // Clean up any generated files that are no longer needed.
     await _cleanupGeneratedFiles(
       dataStore.configuration.generatedDir,
-      [...dataStore.generatedAssets, ...thumbnailAssets],
+      generatedFiles,
     );
 
     // Dispose of all tasks after processing.
@@ -145,7 +151,9 @@ class TaskPipeline {
     // Convert the iterable of slides to a list for saving.
 
     // Save the processed slides back to the repository.
-    await dataStore.saveSlides(slides);
+    await dataStore.saveReference(
+      (configuration: configuration, slides: slides.toList()),
+    );
 
     return slides;
   }

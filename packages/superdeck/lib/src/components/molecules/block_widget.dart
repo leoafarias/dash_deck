@@ -226,7 +226,7 @@ class _ImageBlockWidget extends _BlockWidget<ImageBlock> {
     final spec = data.spec;
 
     return CachedImage(
-      uri: Uri.parse(data.block.asset.src),
+      uri: Uri.parse(data.block.asset.fileName),
       spec: spec.image.copyWith(
         fit: ConverterHelper.toBoxFit(imageFit),
         alignment: ConverterHelper.toAlignment(alignment),
