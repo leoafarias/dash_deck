@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:superdeck/src/components/atoms/async_snapshot_widget.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
-import '../../components/atoms/loading_indicator.dart';
 import '../common/helpers/constants.dart';
 import 'deck_controller.dart';
 import 'deck_options.dart';
@@ -43,38 +42,20 @@ class DeckControllerBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<DeckConfiguration>(
-      future: _loadConfiguration(),
-      builder: (context, snapshot) {
-        return AsyncSnapshotWidget(
-          snapshot: snapshot,
-          builder: (configuration) {
-            final dataStore = kCanRunProcess
-                ? FileSystemDataStore(configuration)
-                : _RootBundleDataStore(configuration);
-            return StreamBuilder<DeckReference>(
-              stream: dataStore.loadDeckReferenceStream(),
-              builder: (context, snapshot) {
-                return AsyncSnapshotWidget(
-                  snapshot: snapshot,
-                  builder: (reference) {
-                    return Stack(
-                      children: [
-                        _DeckControllerProvider(
-                          options: options,
-                          reference: snapshot.requireData,
-                          builder: builder,
-                          dataStore: dataStore,
-                        ),
-                        LoadingOverlay(
-                          isLoading: snapshot.connectionState ==
-                              ConnectionState.waiting,
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
+    return AsyncStreamWidget<DeckConfiguration>(
+      stream: Stream.fromFuture(_loadConfiguration()),
+      builder: (snapshot) {
+        final dataStore = kCanRunProcess
+            ? FileSystemDataStore(snapshot)
+            : _RootBundleDataStore(snapshot);
+        return AsyncStreamWidget(
+          stream: dataStore.loadDeckReferenceStream(),
+          builder: (snapshot) {
+            return _DeckControllerProvider(
+              options: options,
+              reference: snapshot,
+              builder: builder,
+              dataStore: dataStore,
             );
           },
         );

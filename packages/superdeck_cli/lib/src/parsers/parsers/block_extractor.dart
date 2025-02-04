@@ -9,8 +9,12 @@ Block _parseBlock(ParsedTagBlock tagBlock) {
     (ColumnBlock.key) => ColumnBlock.parse(options),
     (ImageBlock.key) => ImageBlock.parse(options),
     (DartPadBlock.key) => DartPadBlock.parse(options),
-    (WidgetBlock.key) => WidgetBlock.parse(options),
-    _ => WidgetBlock.parse({...options, 'name': tagBlock.tag}),
+    // If its a widget block, use the tag as the name
+    _ => WidgetBlock.parse({
+        ...options,
+        'name': tagBlock.tag,
+        'type': WidgetBlock.key,
+      }),
   };
 }
 

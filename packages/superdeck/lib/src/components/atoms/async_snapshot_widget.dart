@@ -1,24 +1,35 @@
 import 'package:flutter/material.dart';
 
-class AsyncSnapshotWidget<T> extends StatelessWidget {
-  final AsyncSnapshot<T> snapshot;
+class AsyncStreamWidget<T> extends StatelessWidget {
+  final Stream<T> stream;
   final Widget Function(T data) builder;
 
-  const AsyncSnapshotWidget({
+  const AsyncStreamWidget({
     super.key,
-    required this.snapshot,
+    required this.stream,
     required this.builder,
   });
 
   @override
   Widget build(BuildContext context) {
-    return switch (snapshot.connectionState) {
-      ConnectionState.waiting =>
-        const Center(child: CircularProgressIndicator()),
-      ConnectionState.done => snapshot.hasError
-          ? Center(child: Text('Error: ${snapshot.error}'))
-          : builder(snapshot.requireData),
-      _ => const Center(child: CircularProgressIndicator()),
-    };
+    return StreamBuilder<T>(
+      stream: stream,
+      builder: (context, snapshot) {
+        return _buildSnapshot(snapshot, builder);
+      },
+    );
   }
+}
+
+Widget _buildSnapshot<T>(
+  AsyncSnapshot<T> snapshot,
+  Widget Function(T data) builder,
+) {
+  if (snapshot.hasData) {
+    return builder(snapshot.requireData);
+  } else if (snapshot.hasError) {
+    return Center(child: Text('Error: ${snapshot.error}'));
+  }
+
+  return const Center(child: CircularProgressIndicator());
 }
