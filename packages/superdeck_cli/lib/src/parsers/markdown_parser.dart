@@ -75,7 +75,7 @@ class MarkdownParser {
     final _frontMatterExtractor = FrontmatterParser();
 
     for (final rawSlide in rawSlides) {
-      final frontmatter = _frontMatterExtractor.extract(rawSlide);
+      final frontmatter = _frontMatterExtractor.parse(rawSlide);
 
       slides.add(
         RawSlideMarkdown(

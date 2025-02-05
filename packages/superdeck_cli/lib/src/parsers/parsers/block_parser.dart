@@ -1,7 +1,9 @@
 import 'package:superdeck_cli/src/helpers/logger.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
-final codeFencePattern = RegExp(
+import 'base_parser.dart';
+
+final _codeFencePattern = RegExp(
   r'```(?<backtickInfo>[^`]*)[\s\S]*?```',
   multiLine: true,
 );
@@ -34,53 +36,77 @@ class ParsedFencedCode {
   }
 }
 
-List<ParsedFencedCode> parseFencedCode(String text) {
-  final matches = codeFencePattern.allMatches(text);
-  List<ParsedFencedCode> parsedBlocks = [];
+class FencedCodeParser extends BaseParser<List<ParsedFencedCode>> {
+  const FencedCodeParser();
 
-  for (final match in matches) {
-    final backtickInfo = match.namedGroup('backtickInfo');
+  @override
+  List<ParsedFencedCode> parse(String text) {
+    final matches = _codeFencePattern.allMatches(text);
+    List<ParsedFencedCode> parsedBlocks = [];
 
-    final lines = backtickInfo?.split('\n');
-    final firstLine = lines?.first ?? '';
-    final rest = lines?.sublist(1).join('\n') ?? '';
+    for (final match in matches) {
+      final backtickInfo = match.namedGroup('backtickInfo');
 
-    final language = firstLine.split(' ')[0];
-    final options = firstLine.replaceFirst(language, '').trim();
+      final lines = backtickInfo?.split('\n');
+      final firstLine = lines?.first ?? '';
+      final rest = lines?.sublist(1).join('\n') ?? '';
 
-    final content = rest;
+      final language = firstLine.split(' ')[0];
+      final options = firstLine.replaceFirst(language, '').trim();
 
-    final startIndex = match.start;
-    final endIndex = match.end;
+      final content = rest;
 
-    final Map<String, dynamic> optionsMap =
-        options.isNotEmpty ? extractStringMap(options) : {};
+      final startIndex = match.start;
+      final endIndex = match.end;
 
-    parsedBlocks.add(ParsedFencedCode(
-      options: optionsMap,
-      language: language,
-      content: content.trim(),
-      startIndex: startIndex,
-      endIndex: endIndex,
-    ));
+      print('options: $options');
+
+      final Map<String, dynamic> optionsMap =
+          options.isNotEmpty ? YamlUtils.convertYamlToMap(options) : {};
+
+      parsedBlocks.add(
+        ParsedFencedCode(
+          options: optionsMap,
+          language: language,
+          content: content.trim(),
+          startIndex: startIndex,
+          endIndex: endIndex,
+        ),
+      );
+    }
+
+    return parsedBlocks;
   }
-
-  return parsedBlocks;
 }
 
 class ParsedTagBlock {
   final String tag;
-  final Map<String, dynamic> options;
   final int startIndex;
-
   final int endIndex;
+  final Map<String, dynamic> _options;
 
   const ParsedTagBlock({
     required this.tag,
-    required this.options,
+    required Map<String, dynamic> options,
     required this.startIndex,
     required this.endIndex,
-  });
+  }) : _options = options;
+
+  Map<String, dynamic> get options {
+    final keys = [
+      SectionBlock.key,
+      ColumnBlock.key,
+      ImageBlock.key,
+      DartPadBlock.key,
+      WidgetBlock.key,
+    ];
+
+    if (!keys.contains(tag)) {
+      return {..._options, 'name': tag, 'type': WidgetBlock.key};
+    }
+
+    return {..._options, 'type': tag};
+  }
 }
 
 List<ParsedTagBlock> parseTagBlocks(String text) {
@@ -107,14 +133,14 @@ List<ParsedTagBlock> parseTagBlocks(String text) {
       final startIndex = match.start;
       final endIndex = match.end;
 
-      final optionsMap = YamlUtils.convertYamlToMap(options);
-
-      parsedBlocks.add(ParsedTagBlock(
-        tag: tag,
-        options: optionsMap,
-        startIndex: startIndex,
-        endIndex: endIndex,
-      ));
+      parsedBlocks.add(
+        ParsedTagBlock(
+          tag: tag,
+          options: YamlUtils.convertYamlToMap(options),
+          startIndex: startIndex,
+          endIndex: endIndex,
+        ),
+      );
     }
 
     return parsedBlocks;
@@ -124,42 +150,4 @@ List<ParsedTagBlock> parseTagBlocks(String text) {
 
     return [];
   }
-}
-
-/// Transforms a string of the format `{key1: value1, key2: value2}`
-/// into a JSON-like string with keys and string values properly quoted.
-Map<String, dynamic> extractStringMap(String input) {
-  String content = input.trim();
-  if (content.startsWith('{') && content.endsWith('}')) {
-    content = content.substring(1, content.length - 1);
-  }
-
-  // input will be valus like
-  // Boolean examples
-  // example 1: showLineNumbers=true
-  // output 1: {showLineNumbers: true}
-  // example 2: showLineNumbers=false
-  // output 2: {showLineNumbers: false}
-  // example 3: showLineNumbers // this equals to true
-  // output 3: {showLineNumbers: true}
-  // example 4: showLineNumbers="true"
-  // output 4: {showLineNumbers: true}
-  // example 5: showLineNumbers="false"
-  // output 5: {showLineNumbers: false}
-
-  // String examples
-  // example 1: fileName="example.dart"
-  // output 1: {fileName: "example.dart"}
-  // example 2: anotherOption="another_example.dart"
-  // output 2: {anotherOption: "another_example.dart"}
-
-  // List examples
-  // example 1: options=["option1", "option2", "option3"]
-  // output 1: {options: ["option1", "option2", "option3"]}
-  // example 2: otherOptions=["option1", "option2"]
-  // output 2: {otherOptions: ["option1", "option2"]}
-  // example 3: lines=[1, 2-3]
-  // output 3: {lines: ["1", "2-3"]}
-
-  return {};
 }

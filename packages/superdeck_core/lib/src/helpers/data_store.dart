@@ -54,10 +54,6 @@ class LocalDataStore extends IDataStore {
 class FileSystemDataStore extends LocalDataStore {
   FileSystemDataStore(super.configuration);
 
-  final List<GeneratedAsset> _generatedAssets = [];
-
-  List<GeneratedAsset> get generatedAssets => [..._generatedAssets];
-
   @override
   Future<void> initialize() async {
     if (!await configuration.generatedDir.exists()) {
@@ -65,7 +61,7 @@ class FileSystemDataStore extends LocalDataStore {
     }
 
     if (!await configuration.deckFile.exists()) {
-      await configuration.deckFile.writeAsString('[]');
+      await configuration.deckFile.writeAsString('{}');
     }
 
     if (!await configuration.markdownFile.exists()) {
@@ -77,8 +73,11 @@ class FileSystemDataStore extends LocalDataStore {
 
   @override
   File getGeneratedAssetFile(GeneratedAsset asset) {
-    _generatedAssets.add(asset);
-    return super.getGeneratedAssetFile(asset);
+    final file = super.getGeneratedAssetFile(asset);
+    if (file.existsSync()) {
+      file.setLastModifiedSync(DateTime.now());
+    }
+    return file;
   }
 
   Future<void> saveReference(DeckReference reference) async {
@@ -88,6 +87,21 @@ class FileSystemDataStore extends LocalDataStore {
 
   Future<String> readDeckMarkdown() async {
     return await configuration.markdownFile.readAsString();
+  }
+
+  Future<void> cleanupGeneratedAssets(DateTime lastModifiedTime) async {
+    final files = await configuration.generatedDir
+        .list(recursive: true)
+        .where((e) => e is File)
+        .map((e) => e as File)
+        .toList();
+
+    for (var file in files) {
+      final lastModified = await file.lastModified();
+      if (lastModified.isBefore(lastModifiedTime)) {
+        await file.delete();
+      }
+    }
   }
 
   @override

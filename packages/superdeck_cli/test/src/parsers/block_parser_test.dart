@@ -343,9 +343,10 @@ Test content 2
 
 void main() {
   group('parseFencedCode', () {
+    final fencedCodeParser = const FencedCodeParser();
     for (final testCase in testCaseCodeBlock) {
       test(testCase['description'], () {
-        final blocks = parseFencedCode(testCase['input']);
+        final blocks = fencedCodeParser.parse(testCase['input']);
         expect(blocks.length, testCase['expectedBlocks'].length,
             reason: 'Number of parsed blocks does not match expected.');
 

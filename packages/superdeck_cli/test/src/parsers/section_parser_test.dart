@@ -1,12 +1,13 @@
-import 'package:superdeck_cli/src/parsers/parsers/block_extractor.dart';
+import 'package:superdeck_cli/src/parsers/parsers/section_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 import 'package:test/test.dart';
 
 void main() {
+  final sectionParser = SectionParser();
   // 1. Basic Parsing Tests - Start with fundamental functionality
   group('Basic Parsing', () {
     test('Empty markdown returns no sections', () {
-      final sections = parseSections('');
+      final sections = sectionParser.parse('');
       expect(sections[0].blocks.isEmpty, isTrue);
     });
 
@@ -15,7 +16,7 @@ void main() {
       # Just some heading
       Some regular text.
       ''';
-      final sections = parseSections(markdown);
+      final sections = sectionParser.parse(markdown);
       expect(
         sections.length,
         1,
@@ -45,7 +46,7 @@ content column 2.
 
 ''';
 
-      final sections = parseSections(markdown);
+      final sections = sectionParser.parse(markdown);
       expect(sections[0].blocks.length, equals(3));
       expect(
         sections[0].blocks[0].content.trim(),
@@ -74,7 +75,7 @@ Content column 2.
 
 ''';
 
-      final sections = parseSections(markdown);
+      final sections = sectionParser.parse(markdown);
       expect(sections[0].blocks.length, equals(2));
       expect(sections[0].blocks[0].content.trim(), 'Content column 1.');
       expect(sections[0].blocks[1].content.trim(), 'Content column 2.');
@@ -93,7 +94,7 @@ This is some regular markdown content.
 Content inside the header.
 ''';
 
-      final sections = parseSections(markdown);
+      final sections = sectionParser.parse(markdown);
       expect(sections[0].blocks.length, equals(1));
       expect(sections[1].blocks.length, equals(2));
 
@@ -131,7 +132,7 @@ Footer content column.
 
 ''';
 
-      final sections = parseSections(markdown);
+      final sections = sectionParser.parse(markdown);
 
       expect(sections[0].blocks.length, equals(2));
       expect(sections[1].blocks.length, equals(2));
@@ -161,7 +162,7 @@ Header content column 1.
 Header content column 2.
 ''';
 
-        final sections = parseSections(markdown);
+        final sections = sectionParser.parse(markdown);
         expect(sections[0].blocks.length, equals(2));
         expect(
           sections[0].blocks[0].content.trim(),
@@ -198,7 +199,7 @@ Body content column 1.
 Body content column 2.
 ''';
 
-        final sections = parseSections(markdown);
+        final sections = sectionParser.parse(markdown);
         expect(sections[0].blocks.length, equals(2));
         expect(sections[0].blocks[0].content.trim(), 'Body content column 1.');
         expect(sections[0].blocks[1].content.trim(), 'Body content column 2.');
@@ -230,7 +231,7 @@ Footer content column 1.
 Footer content column 2.
 ''';
 
-          final sections = parseSections(markdown);
+          final sections = sectionParser.parse(markdown);
           expect(sections[0].blocks.length, equals(2));
 
           expect(
@@ -287,7 +288,7 @@ Footer content.
 
 ''';
 
-        final sections = parseSections(markdown);
+        final sections = sectionParser.parse(markdown);
 
         expect(sections[0].blocks.length, equals(1));
         expect(sections[1].blocks.length, equals(2));
@@ -348,7 +349,7 @@ Footer content.
 
 ''';
 
-        final sections = parseSections(markdown);
+        final sections = sectionParser.parse(markdown);
 
         expect(sections.length, equals(3));
 
@@ -390,7 +391,7 @@ Header content.
 
 ''';
         expect(
-          () => parseSections(markdown),
+          () => sectionParser.parse(markdown),
           throwsA(isA<SchemaValidationException>()),
           reason: 'Invalid flex value should throw FormatException.',
         );
@@ -407,7 +408,7 @@ Header content.
 ''';
 
         expect(
-          () => parseSections(markdown),
+          () => sectionParser.parse(markdown),
           throwsA(isA<SchemaValidationException>()),
           reason: 'Invalid alignment value should throw FormatException.',
         );

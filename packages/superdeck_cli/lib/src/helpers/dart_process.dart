@@ -37,7 +37,7 @@ class DartProcess {
   }
 }
 
-SDFormatException _handleFormattingError(String stderr, String source) {
+DeckFormatException _handleFormattingError(String stderr, String source) {
   final match =
       RegExp(r'line (\d+), column (\d+) of .*: (.+)').firstMatch(stderr);
 
@@ -57,12 +57,16 @@ SDFormatException _handleFormattingError(String stderr, String source) {
     // Create a point span at the error location
     final span = location.pointSpan();
 
-    return SDFormatException(
+    return DeckFormatException(
       'Dart code formatting error: $message',
       span,
       source,
     );
   }
 
-  return SDFormatException('Error formatting dart code: $stderr', null, source);
+  return DeckFormatException(
+    'Error formatting dart code: $stderr',
+    null,
+    source,
+  );
 }

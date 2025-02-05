@@ -30,6 +30,11 @@ sealed class Block with BlockMappable {
     required: ['type'],
   );
 
+  static Block parse(Map<String, dynamic> map) {
+    schema.validateOrThrow(map);
+    return BlockMapper.fromMap(map);
+  }
+
   static final typeSchema = DiscriminatedObjectSchema(
     discriminatorKey: 'type',
     schemas: {
@@ -93,7 +98,7 @@ class SectionBlock extends Block with SectionBlockMappable {
     },
   );
 
-  SectionBlock appendElement(Block part) {
+  SectionBlock appendBlock(Block part) {
     return copyWith(blocks: [...blocks, part]);
   }
 }

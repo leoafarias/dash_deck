@@ -140,14 +140,18 @@ class FrontMatterGrammarDefinition
       (ref(_delimiter) & ref(markdownContent).optional())
           .map((values) => (yaml: '', markdown: values[1]));
 
+  Parser<FrontMatterGrammarDefinitionResult> _noDelimiter() =>
+      ref(markdownContent).map((values) => (yaml: '', markdown: values[0]));
+
   Parser yamlString() => any().starLazy(ref(_delimiter)).flatten();
 
   Parser markdownContent() => any().star().flatten();
 
   @override
   Parser<FrontMatterGrammarDefinitionResult> start() =>
-      (ref(_doubleDelimiter) | ref(_singleDelimiter)).map((values) => (
-            yaml: (values.yaml ?? '').trim(),
-            markdown: (values.markdown ?? '').trim(),
-          ));
+      (ref(_doubleDelimiter) | ref(_singleDelimiter) | ref(_noDelimiter))
+          .map((values) => (
+                yaml: (values.yaml ?? '').trim(),
+                markdown: (values.markdown ?? '').trim(),
+              ));
 }

@@ -10,7 +10,7 @@ final logger = Logger(
 );
 
 extension LoggerX on Logger {
-  void formatError(SDFormatException exception) {
+  void formatError(DeckFormatException exception) {
     final message = exception.message;
     final sourceSpan = exception.source as SourceSpan;
     final source = sourceSpan.text;

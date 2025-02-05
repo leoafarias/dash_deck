@@ -56,14 +56,14 @@ class BuildCommand extends Command<int> {
     final _pipeline = TaskPipeline(
       tasks: [MermaidConverterTask(), DartFormatterTask()],
       configuration: deckConfig,
-      dataStore: FileSystemDataStore(deckConfig),
+      store: FileSystemDataStore(deckConfig),
     );
     final watch = boolArg('watch');
 
     await _runPipeline(_pipeline);
 
     if (watch) {
-      final subscription = _pipeline.dataStore.configuration.markdownFile
+      final subscription = _pipeline.store.configuration.markdownFile
           .watch(events: FileSystemEvent.modify)
           .listen((event) => _runPipeline(_pipeline));
     }

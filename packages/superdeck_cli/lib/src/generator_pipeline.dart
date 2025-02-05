@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:logging/logging.dart';
-import 'package:superdeck_cli/src/helpers/logger.dart';
 import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
-import 'package:superdeck_cli/src/parsers/parsers/block_extractor.dart';
+import 'package:superdeck_cli/src/parsers/parsers/section_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 /// Represents the context in which a slide is processed.
@@ -27,11 +25,11 @@ class TaskPipeline {
   /// List of tasks to execute for each slide.
   final List<Task> tasks;
   final DeckConfiguration configuration;
-  final FileSystemDataStore dataStore;
+  final FileSystemDataStore store;
   const TaskPipeline({
     required this.tasks,
     required this.configuration,
-    required this.dataStore,
+    required this.store,
   });
 
   /// Processes an individual slide by executing all tasks sequentially.
@@ -51,45 +49,11 @@ class TaskPipeline {
     return context;
   }
 
-  /// Cleans up generated files in [generatedDir] that are not present in [neededAssets].
-  Future<void> _cleanupGeneratedFiles(
-    Directory generatedDir,
-    List<File> neededFiles,
-  ) async {
-    final files = await _loadGeneratedFiles(generatedDir);
-
-    final generatedAssets = {for (var file in neededFiles) file.path};
-
-    List<File> filesToDelete = [];
-    for (var file in files) {
-      if (!generatedAssets.contains(file.path)) {
-        filesToDelete.add(file);
-      }
-    }
-
-    for (var file in filesToDelete) {
-      logger.info('Deleting generated file: ${file.path}');
-      await file.delete();
-    }
-  }
-
-  /// Loads all generated files from [generatedDir].
-  Future<List<File>> _loadGeneratedFiles(Directory generatedDir) async {
-    final files = <File>[];
-
-    await for (var entity in generatedDir.list()) {
-      if (entity is File) {
-        files.add(entity);
-      }
-    }
-
-    return files;
-  }
-
   Future<Iterable<Slide>> run() async {
+    final startTime = DateTime.now();
     // Load raw markdown content from the repository.
 
-    final markdownRaw = await dataStore.readDeckMarkdown();
+    final markdownRaw = await store.readDeckMarkdown();
 
     // Initialize the markdown parser with necessary extractors.
     final markdownParser = MarkdownParser();
@@ -101,11 +65,13 @@ class TaskPipeline {
     final futures = <Future<TaskContext>>[];
 
     for (var i = 0; i < rawSlides.length; i++) {
-      futures.add(_processSlide(TaskContext(i, rawSlides[i], dataStore)));
+      futures.add(_processSlide(TaskContext(i, rawSlides[i], store)));
     }
 
     // Await all slide processing tasks to complete.
     final results = await Future.wait(futures);
+
+    final sectionParser = SectionParser();
 
     // Extract the processed slides from the results.
     final finalizedSlides = results.map((result) => result.slide);
@@ -114,25 +80,10 @@ class TaskPipeline {
           key: slide.key,
           options: SlideOptions.parse(slide.frontmatter),
           markdown: slide.content,
-          sections: parseSections(slide.content),
+          sections: sectionParser.parse(slide.content),
         ));
 
-    // Determine all assets that are still needed after processing.
-
-    List<File> generatedFiles = [];
-
-    for (final asset in dataStore.generatedAssets) {
-      final generatedFile = dataStore.getGeneratedAssetFile(asset);
-      if (await generatedFile.exists()) {
-        generatedFiles.add(generatedFile);
-      }
-    }
-
-    // Clean up any generated files that are no longer needed.
-    await _cleanupGeneratedFiles(
-      dataStore.configuration.generatedDir,
-      generatedFiles,
-    );
+    await store.cleanupGeneratedAssets(startTime);
 
     // Dispose of all tasks after processing.
     for (var task in tasks) {
@@ -142,7 +93,7 @@ class TaskPipeline {
     // Convert the iterable of slides to a list for saving.
 
     // Save the processed slides back to the repository.
-    await dataStore.saveReference(
+    await store.saveReference(
       DeckReference(slides: slides.toList(), config: configuration),
     );
 

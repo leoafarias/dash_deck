@@ -1,5 +1,6 @@
 import 'package:petitparser/petitparser.dart';
 import 'package:superdeck_cli/src/helpers/logger.dart';
+import 'package:superdeck_cli/src/parsers/parsers/base_parser.dart';
 import 'package:superdeck_cli/src/parsers/parsers/grammar_definitions.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
@@ -8,10 +9,10 @@ typedef ExtractedFrontmatter = ({
   String? contents,
 });
 
-class FrontmatterParser {
+class FrontmatterParser extends BaseParser<ExtractedFrontmatter> {
   const FrontmatterParser();
 
-  ExtractedFrontmatter extract(String content) {
+  ExtractedFrontmatter parse(String content) {
     final parser = const FrontMatterGrammarDefinition()
         .build<FrontMatterGrammarDefinitionResult>();
     final result = parser.parse(content);

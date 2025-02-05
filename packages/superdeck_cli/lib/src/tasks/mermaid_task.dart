@@ -125,7 +125,9 @@ class MermaidConverterTask extends Task {
   Future<void> run(TaskContext context) async {
     final stopwatch = Stopwatch()..start();
 
-    final codeBlocks = parseFencedCode(context.slide.content);
+    final fencedCodeParser = const FencedCodeParser();
+
+    final codeBlocks = fencedCodeParser.parse(context.slide.content);
     final mermaidBlocks = codeBlocks.where((e) => e.language == 'mermaid');
 
     if (mermaidBlocks.isEmpty) {

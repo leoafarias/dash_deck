@@ -9,7 +9,8 @@ class DartFormatterTask extends Task {
 
   @override
   Future<void> run(TaskContext context) async {
-    final codeBlocks = parseFencedCode(context.slide.content);
+    final fencedCodeParser = const FencedCodeParser();
+    final codeBlocks = fencedCodeParser.parse(context.slide.content);
 
     final dartBlocks = codeBlocks.where((e) => e.language == 'dart');
 
