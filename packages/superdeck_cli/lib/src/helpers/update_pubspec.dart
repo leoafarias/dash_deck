@@ -1,3 +1,4 @@
+import 'package:superdeck_core/superdeck_core.dart';
 import 'package:yaml/yaml.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
@@ -9,9 +10,12 @@ import 'package:yaml_writer/yaml_writer.dart';
 /// key if they don't already exist, and returns the updated YAML as a string.
 ///
 /// Returns the updated pubspec YAML content as a string.
-String updatePubspecAssets(String yamlContent) {
+String updatePubspecAssets(
+  DeckConfiguration configuration,
+  String pubspecContents,
+) {
   // Parse the YAML content into a map
-  final parsedYaml = loadYaml(yamlContent);
+  final parsedYaml = loadYaml(pubspecContents);
 
   // Get the 'flutter' section from the parsed YAML, or an empty map if it doesn't exist
   final flutterSection =
@@ -21,14 +25,18 @@ String updatePubspecAssets(String yamlContent) {
   // Get the 'assets' list from the 'flutter' section, or an empty list if it doesn't exist
   final assets = flutterSection['assets']?.toList() ?? [];
 
+  final superDeckDirPath = configuration.superdeckDir.path;
+
   // Add the '.superdeck/' path to the assets list if it's not already present
-  if (!assets.contains('.superdeck/')) {
-    assets.add('.superdeck/');
+  if (!assets.contains('${superDeckDirPath}/')) {
+    assets.add('${superDeckDirPath}/');
   }
 
+  final assetsDirPath = configuration.assetsDir.path;
+
   // Add the '.superdeck/generated/' path to the assets list if it's not already present
-  if (!assets.contains('.superdeck/generated/')) {
-    assets.add('.superdeck/generated/');
+  if (!assets.contains('${assetsDirPath}/')) {
+    assets.add('${assetsDirPath}/');
   }
 
   // Update the 'assets' key in the 'flutter' section with the modified assets list

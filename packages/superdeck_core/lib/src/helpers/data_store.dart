@@ -18,7 +18,7 @@ abstract interface class IDataStore {
   Stream<DeckReference> loadDeckReferenceStream();
 
   File getGeneratedAssetFile(GeneratedAsset asset) {
-    return File(p.join(configuration.generatedAssetsDir.path, asset.fileName));
+    return File(p.join(configuration.assetsDir.path, asset.fileName));
   }
 
   Future<String> readAssetByPath(String path);
@@ -58,8 +58,8 @@ class FileSystemDataStore extends LocalDataStore {
 
   @override
   Future<void> initialize() async {
-    if (!await configuration.generatedAssetsDir.exists()) {
-      await configuration.generatedAssetsDir.create(recursive: true);
+    if (!await configuration.assetsDir.exists()) {
+      await configuration.assetsDir.create(recursive: true);
     }
 
     if (!await configuration.deckJson.exists()) {
@@ -82,28 +82,32 @@ class FileSystemDataStore extends LocalDataStore {
   Future<void> saveReferences(
     DeckReference reference,
   ) async {
+    // Save deck reference
     final deckJson = prettyJson(reference.toMap());
     await configuration.deckJson.writeAsString(deckJson);
 
+    // Generate the asset references for each slide thumbnail
     final thumbnails =
         reference.slides.map((slide) => GeneratedAsset.thumbnail(slide.key));
 
-    final assets = [
+    // Combine thumbnail and generated assets
+    final allAssets = [
       ...thumbnails,
       ..._generatedAssets,
     ];
 
-    final files = assets.map((asset) =>
-        File(p.join(configuration.generatedAssetsDir.path, asset.fileName)));
+// Map asset references to their corresponding file paths
+    final assetFiles = allAssets.map(
+        (asset) => File(p.join(configuration.assetsDir.path, asset.fileName)));
 
     final assetsRef = GeneratedAssetsReference(
       lastModified: DateTime.now(),
-      files: files.toList(),
+      files: assetFiles.toList(),
     );
 
+    // Save the assets reference
     final assetsJson = prettyJson(assetsRef.toMap());
-
-    await configuration.generatedAssetsRefJson.writeAsString(assetsJson);
+    await configuration.assetsRefJson.writeAsString(assetsJson);
 
     await _cleanupGeneratedAssets(assetsRef);
   }
@@ -115,7 +119,7 @@ class FileSystemDataStore extends LocalDataStore {
   Future<void> _cleanupGeneratedAssets(
     GeneratedAssetsReference assetsReference,
   ) async {
-    final existingFiles = await configuration.generatedAssetsDir
+    final existingFiles = await configuration.assetsDir
         .list(recursive: true)
         .where((e) => e is File)
         .map((e) => e as File)

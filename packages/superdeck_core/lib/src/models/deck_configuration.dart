@@ -15,22 +15,18 @@ part 'deck_configuration.mapper.dart';
   ],
 )
 class DeckConfiguration with DeckConfigurationMappable {
-  late final Directory _superdeckDir;
-  late final File deckJson;
-  late final Directory generatedAssetsDir;
-  late final File slidesMarkdown;
-  late final File generatedAssetsRefJson;
+  final superdeckDir = Directory('.superdeck');
+  late final deckJson = File(p.join(superdeckDir.path, 'superdeck.json'));
+  late final assetsDir = Directory(p.join(superdeckDir.path, 'assets'));
+  late final assetsRefJson =
+      File(p.join(superdeckDir.path, 'generated_assets.json'));
+  late final slidesMarkdown = File('slides.md');
 
   DeckConfiguration({
     File? slidesMarkdown,
-  }) {
-    _superdeckDir = Directory(p.join('.superdeck'));
-    deckJson = File(p.join(_superdeckDir.path, 'superdeck.json'));
-    generatedAssetsDir = Directory(p.join(_superdeckDir.path, 'assets'));
-    this.slidesMarkdown = slidesMarkdown ?? File('slides.md');
-    generatedAssetsRefJson =
-        File(p.join(_superdeckDir.path, 'generated_assets.json'));
-  }
+  });
+
+  File get pubspecFile => File('pubspec.yaml');
 
   static DeckConfiguration parse(Map<String, dynamic> map) {
     schema.validateOrThrow(map);

@@ -58,8 +58,8 @@ class SectionBlock extends Block with SectionBlockMappable {
 
   static const key = 'section';
 
-  SectionBlock({
-    this.blocks = const [],
+  SectionBlock(
+    this.blocks, {
     super.align,
     super.flex,
     super.scrollable,
@@ -82,12 +82,16 @@ class SectionBlock extends Block with SectionBlockMappable {
     } else {
       if (content.trim().isNotEmpty) {
         blocksCopy.add(
-          ColumnBlock(content: content),
+          ColumnBlock(content),
         );
       }
     }
 
     return copyWith(blocks: blocksCopy);
+  }
+
+  static SectionBlock text(String content) {
+    return SectionBlock([ColumnBlock(content)]);
   }
 
   static final schema = Block.schema.extend(
@@ -106,8 +110,8 @@ class SectionBlock extends Block with SectionBlockMappable {
 class ColumnBlock extends Block with ColumnBlockMappable {
   static const key = 'column';
   final String content;
-  ColumnBlock({
-    this.content = '',
+  ColumnBlock(
+    this.content, {
     super.align,
     super.flex,
     super.scrollable,
@@ -242,4 +246,24 @@ enum ContentAlignment {
   bottomLeft,
   bottomCenter,
   bottomRight;
+}
+
+extension StringColumnExt on String {
+  ColumnBlock column() => ColumnBlock(this);
+}
+
+extension BlockExt on Block {
+  Block alignCenter() => copyWith(align: ContentAlignment.center);
+  Block alignCenterLeft() => copyWith(align: ContentAlignment.centerLeft);
+  Block alignCenterRight() => copyWith(align: ContentAlignment.centerRight);
+  Block alignTopLeft() => copyWith(align: ContentAlignment.topLeft);
+  Block alignTopCenter() => copyWith(align: ContentAlignment.topCenter);
+  Block alignTopRight() => copyWith(align: ContentAlignment.topRight);
+  Block alignBottomLeft() => copyWith(align: ContentAlignment.bottomLeft);
+  Block alignBottomCenter() => copyWith(align: ContentAlignment.bottomCenter);
+  Block alignBottomRight() => copyWith(align: ContentAlignment.bottomRight);
+
+  Block flex(int flex) => copyWith(flex: flex);
+  Block scrollable([bool scrollable = true]) =>
+      copyWith(scrollable: scrollable);
 }

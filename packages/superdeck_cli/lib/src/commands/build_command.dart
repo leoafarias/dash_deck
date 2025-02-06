@@ -46,26 +46,49 @@ class BuildCommand extends Command<int> {
   Future<int> run() async {
     final configFile = DeckConfiguration.defaultFile;
     DeckConfiguration deckConfig;
+
+    // Load the configuration file or use defaults if it doesn't exist.
     if (!await configFile.exists()) {
+      logger.warn(
+        'Configuration file not found. Using default configuration.',
+      );
       deckConfig = DeckConfiguration();
     } else {
+      logger.info('Loading configuration from ${configFile.path}');
       final yamlConfig = await YamlUtils.loadYamlFile(configFile);
       deckConfig = DeckConfiguration.parse(yamlConfig);
+      logger.info('Configuration loaded successfully.');
     }
 
-    final _pipeline = TaskPipeline(
+    final pipeline = TaskPipeline(
       tasks: [MermaidConverterTask(), DartFormatterTask()],
       configuration: deckConfig,
       store: FileSystemDataStore(deckConfig),
     );
     final watch = boolArg('watch');
 
-    await _runPipeline(_pipeline);
+    // Update pubspec assets and log the update.
+    await _ensurePubspecAssets(deckConfig);
+    logger.info('Pubspec assets updated.');
 
+    // Run the pipeline initially.
+    await _runPipeline(pipeline);
+
+    // If watch mode is enabled, subscribe to file modifications.
     if (watch) {
-      final subscription = _pipeline.store.configuration.slidesMarkdown
+      logger.info(
+        'Watch mode enabled. Listening for changes in slides markdown file.',
+      );
+
+      await pipeline.store.configuration.slidesMarkdown
           .watch(events: FileSystemEvent.modify)
-          .listen((event) => _runPipeline(_pipeline));
+          .listen(
+        (event) {
+          logger.info('Detected modification in file: ${event.path}');
+          _runPipeline(pipeline);
+        },
+        onError: (error) => logger.err('Error watching file: $error'),
+      );
     }
 
     return ExitCode.success.code;
@@ -78,8 +101,9 @@ class BuildCommand extends Command<int> {
   String get name => 'build';
 }
 
-Future<void> prepareSuperdeck() async {
-  final file = File(kPubpsecFile.path);
-  final yamlContents = await file.readAsString();
-  updatePubspecAssets(yamlContents);
+Future<void> _ensurePubspecAssets(DeckConfiguration configuration) async {
+  final pubspecContents = await configuration.pubspecFile.readAsString();
+  final updatedPubspecContents =
+      await updatePubspecAssets(configuration, pubspecContents);
+  await configuration.pubspecFile.writeAsString(updatedPubspecContents);
 }

@@ -73,6 +73,15 @@ List<SlideConfiguration> _buildSlides({
   required List<Slide> slides,
   required DeckOptions options,
 }) {
+  if (slides.isEmpty) {
+    return [
+      _convertSlide(
+        slideIndex: 0,
+        slide: _emptySlide,
+        options: options,
+      )
+    ];
+  }
   return slides.mapIndexed((index, slide) {
     return _convertSlide(
       slideIndex: index,
@@ -116,4 +125,16 @@ SlideConfiguration _convertSlide({
 typedef WidgetBuilderWithOptions = Widget Function(
   BuildContext context,
   WidgetBlock options,
+);
+
+final _emptySlide = Slide(
+  key: 'empty',
+  sections: [
+    SectionBlock([
+      '## No slides found'.column().alignCenter(),
+      'Update the slides.md file to add slides to your deck.'
+          .column()
+          .alignBottomRight(),
+    ]),
+  ],
 );

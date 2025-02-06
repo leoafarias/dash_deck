@@ -7,27 +7,22 @@ class SectionParser extends BaseParser<List<SectionBlock>> {
 
   @override
   List<SectionBlock> parse(String content) {
-    final sections = <SectionBlock>[];
-    SectionBlock? currentSection;
+    final aggregator = _LayoutAggregator();
 
     final tagBlocks = parseTagBlocks(content);
     final tagBlockContents = List.generate(tagBlocks.length, (index) => '');
 
     // If there are no tag blocks, we can just add the entire markdown as a single section.
     if (tagBlocks.isEmpty) {
-      currentSection = SectionBlock();
-      currentSection = currentSection.appendText(content);
-      sections.add(currentSection);
-
-      return sections;
+      return [SectionBlock.text(content)];
     }
+
+    final sections = <SectionBlock>[];
 
     // If the first tag block is not at the start of the markdown,
     // we need to add a new section for the content before the first tag block.
     if (tagBlocks.first.startIndex > 0) {
-      currentSection = SectionBlock();
-      currentSection = currentSection
-          .appendText(content.substring(0, tagBlocks.first.startIndex));
+      aggregator.addText(content.substring(0, tagBlocks.first.startIndex));
     }
 
     // Extract the content between each tag block.
@@ -58,7 +53,7 @@ class SectionParser extends BaseParser<List<SectionBlock>> {
         }
         currentSection = block;
       } else {
-        currentSection ??= SectionBlock();
+        currentSection ??= SectionBlock([]);
         currentSection = currentSection.appendBlock(block);
       }
 
@@ -73,5 +68,31 @@ class SectionParser extends BaseParser<List<SectionBlock>> {
     }
 
     return sections;
+  }
+}
+
+class _LayoutAggregator {
+  List<SectionBlock> sections = [];
+
+  _LayoutAggregator();
+
+  void _ensureSection() {
+    if (sections.isEmpty) {
+      sections.add(SectionBlock([]));
+    }
+  }
+
+  void addSection(SectionBlock section) {
+    sections.add(section);
+  }
+
+  void addText(String text) {
+    _ensureSection();
+    sections.last.appendText(text);
+  }
+
+  void addBlock(Block block) {
+    _ensureSection();
+    sections.last.appendBlock(block);
   }
 }

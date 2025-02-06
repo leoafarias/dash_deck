@@ -9,11 +9,11 @@ class NavigationProviderBuilder extends StatefulWidget {
   final Widget Function(GoRouter router) builder;
   const NavigationProviderBuilder({
     super.key,
-    required DeckController configuration,
+    required DeckController deckController,
     required this.builder,
-  }) : _configuration = configuration;
+  }) : _deckController = deckController;
 
-  final DeckController _configuration;
+  final DeckController _deckController;
 
   @override
   State<NavigationProviderBuilder> createState() =>
@@ -28,7 +28,7 @@ class _NavigationProviderBuilderState extends State<NavigationProviderBuilder> {
     super.initState();
 
     _navigationController = NavigationController(
-      slides: widget._configuration.slides,
+      slides: widget._deckController.slides,
     );
   }
 
@@ -43,14 +43,14 @@ class _NavigationProviderBuilderState extends State<NavigationProviderBuilder> {
   void didUpdateWidget(NavigationProviderBuilder oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget._configuration != oldWidget._configuration) {
+    if (widget._deckController != oldWidget._deckController) {
       final slidesChanged = listEquals(
-        widget._configuration.slides,
-        oldWidget._configuration.slides,
+        widget._deckController.slides,
+        oldWidget._deckController.slides,
       );
       if (slidesChanged) {
         _navigationController.updateSlides(
-          widget._configuration.slides,
+          widget._deckController.slides,
         );
       }
     }

@@ -22,9 +22,14 @@ class SuperDeckApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return DeckControllerBuilder(
       options: options,
-      builder: (configuration) {
+      builder: (controller) {
+        if (controller.slides.isEmpty) {
+          return const Center(
+            child: Text('No slides found'),
+          );
+        }
         return NavigationProviderBuilder(
-          configuration: configuration,
+          deckController: controller,
           builder: (router) {
             return MaterialApp.router(
               debugShowCheckedModeBanner: false,

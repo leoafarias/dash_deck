@@ -1,6 +1,5 @@
 library superdeck_core;
 
-export 'src/helpers/constants.dart';
 export 'src/helpers/data_store.dart';
 export 'src/helpers/extensions.dart';
 export 'src/helpers/generate_hash.dart';

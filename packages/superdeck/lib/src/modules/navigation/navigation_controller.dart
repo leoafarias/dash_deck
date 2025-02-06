@@ -15,7 +15,9 @@ class NavigationController extends ChangeNotifier {
   late SlideConfiguration _currentSlide;
   late List<SlideConfiguration> _slides;
   bool _isNotesVisible = false;
-  NavigationController({required List<SlideConfiguration> slides}) {
+  NavigationController({
+    required List<SlideConfiguration> slides,
+  }) {
     _router = _buildRouter(slides);
     _registerListener(_router);
     _currentSlide = slides[0];

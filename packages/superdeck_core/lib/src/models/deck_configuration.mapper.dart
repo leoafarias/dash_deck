@@ -25,26 +25,29 @@ class DeckConfigurationMapper extends ClassMapperBase<DeckConfiguration> {
   static const Field<DeckConfiguration, File> _f$slidesMarkdown = Field(
       'slidesMarkdown', _$slidesMarkdown,
       key: 'slides_markdown', opt: true);
+  static Directory _$superdeckDir(DeckConfiguration v) => v.superdeckDir;
+  static const Field<DeckConfiguration, Directory> _f$superdeckDir = Field(
+      'superdeckDir', _$superdeckDir,
+      key: 'superdeck_dir', mode: FieldMode.member);
   static File _$deckJson(DeckConfiguration v) => v.deckJson;
   static const Field<DeckConfiguration, File> _f$deckJson =
       Field('deckJson', _$deckJson, key: 'deck_json', mode: FieldMode.member);
-  static Directory _$generatedAssetsDir(DeckConfiguration v) =>
-      v.generatedAssetsDir;
-  static const Field<DeckConfiguration, Directory> _f$generatedAssetsDir =
-      Field('generatedAssetsDir', _$generatedAssetsDir,
-          key: 'generated_assets_dir', mode: FieldMode.member);
-  static File _$generatedAssetsRefJson(DeckConfiguration v) =>
-      v.generatedAssetsRefJson;
-  static const Field<DeckConfiguration, File> _f$generatedAssetsRefJson = Field(
-      'generatedAssetsRefJson', _$generatedAssetsRefJson,
-      key: 'generated_assets_ref_json', mode: FieldMode.member);
+  static Directory _$assetsDir(DeckConfiguration v) => v.assetsDir;
+  static const Field<DeckConfiguration, Directory> _f$assetsDir = Field(
+      'assetsDir', _$assetsDir,
+      key: 'assets_dir', mode: FieldMode.member);
+  static File _$assetsRefJson(DeckConfiguration v) => v.assetsRefJson;
+  static const Field<DeckConfiguration, File> _f$assetsRefJson = Field(
+      'assetsRefJson', _$assetsRefJson,
+      key: 'assets_ref_json', mode: FieldMode.member);
 
   @override
   final MappableFields<DeckConfiguration> fields = const {
     #slidesMarkdown: _f$slidesMarkdown,
+    #superdeckDir: _f$superdeckDir,
     #deckJson: _f$deckJson,
-    #generatedAssetsDir: _f$generatedAssetsDir,
-    #generatedAssetsRefJson: _f$generatedAssetsRefJson,
+    #assetsDir: _f$assetsDir,
+    #assetsRefJson: _f$assetsRefJson,
   };
   @override
   final bool ignoreNull = true;

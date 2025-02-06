@@ -283,7 +283,7 @@ class SectionBlockMapper extends SubClassMapperBase<SectionBlock> {
 
   static List<Block> _$blocks(SectionBlock v) => v.blocks;
   static const Field<SectionBlock, List<Block>> _f$blocks =
-      Field('blocks', _$blocks, opt: true, def: const []);
+      Field('blocks', _$blocks);
   static ContentAlignment? _$align(SectionBlock v) => v.align;
   static const Field<SectionBlock, ContentAlignment> _f$align =
       Field('align', _$align, opt: true);
@@ -316,8 +316,7 @@ class SectionBlockMapper extends SubClassMapperBase<SectionBlock> {
   late final ClassMapperBase superMapper = BlockMapper.ensureInitialized();
 
   static SectionBlock _instantiate(DecodingData data) {
-    return SectionBlock(
-        blocks: data.dec(_f$blocks),
+    return SectionBlock(data.dec(_f$blocks),
         align: data.dec(_f$align),
         flex: data.dec(_f$flex),
         scrollable: data.dec(_f$scrollable));
@@ -410,11 +409,11 @@ class _SectionBlockCopyWithImpl<$R, $Out>
         if (scrollable != null) #scrollable: scrollable
       }));
   @override
-  SectionBlock $make(CopyWithData data) => SectionBlock(
-      blocks: data.get(#blocks, or: $value.blocks),
-      align: data.get(#align, or: $value.align),
-      flex: data.get(#flex, or: $value.flex),
-      scrollable: data.get(#scrollable, or: $value.scrollable));
+  SectionBlock $make(CopyWithData data) =>
+      SectionBlock(data.get(#blocks, or: $value.blocks),
+          align: data.get(#align, or: $value.align),
+          flex: data.get(#flex, or: $value.flex),
+          scrollable: data.get(#scrollable, or: $value.scrollable));
 
   @override
   SectionBlockCopyWith<$R2, SectionBlock, $Out2> $chain<$R2, $Out2>(
@@ -440,7 +439,7 @@ class ColumnBlockMapper extends SubClassMapperBase<ColumnBlock> {
 
   static String _$content(ColumnBlock v) => v.content;
   static const Field<ColumnBlock, String> _f$content =
-      Field('content', _$content, opt: true, def: '');
+      Field('content', _$content);
   static ContentAlignment? _$align(ColumnBlock v) => v.align;
   static const Field<ColumnBlock, ContentAlignment> _f$align =
       Field('align', _$align, opt: true);
@@ -473,8 +472,7 @@ class ColumnBlockMapper extends SubClassMapperBase<ColumnBlock> {
   late final ClassMapperBase superMapper = BlockMapper.ensureInitialized();
 
   static ColumnBlock _instantiate(DecodingData data) {
-    return ColumnBlock(
-        content: data.dec(_f$content),
+    return ColumnBlock(data.dec(_f$content),
         align: data.dec(_f$align),
         flex: data.dec(_f$flex),
         scrollable: data.dec(_f$scrollable));
@@ -558,11 +556,11 @@ class _ColumnBlockCopyWithImpl<$R, $Out>
         if (scrollable != null) #scrollable: scrollable
       }));
   @override
-  ColumnBlock $make(CopyWithData data) => ColumnBlock(
-      content: data.get(#content, or: $value.content),
-      align: data.get(#align, or: $value.align),
-      flex: data.get(#flex, or: $value.flex),
-      scrollable: data.get(#scrollable, or: $value.scrollable));
+  ColumnBlock $make(CopyWithData data) =>
+      ColumnBlock(data.get(#content, or: $value.content),
+          align: data.get(#align, or: $value.align),
+          flex: data.get(#flex, or: $value.flex),
+          scrollable: data.get(#scrollable, or: $value.scrollable));
 
   @override
   ColumnBlockCopyWith<$R2, ColumnBlock, $Out2> $chain<$R2, $Out2>(
