@@ -398,12 +398,12 @@ class _SectionBlockCopyWithImpl<$R, $Out>
           (v) => call(blocks: v));
   @override
   $R call(
-          {List<Block>? blocks,
+          {Object? blocks = $none,
           Object? align = $none,
           int? flex,
           bool? scrollable}) =>
       $apply(FieldCopyWithData({
-        if (blocks != null) #blocks: blocks,
+        if (blocks != $none) #blocks: blocks,
         if (align != $none) #align: align,
         if (flex != null) #flex: flex,
         if (scrollable != null) #scrollable: scrollable
@@ -545,12 +545,12 @@ class _ColumnBlockCopyWithImpl<$R, $Out>
       ColumnBlockMapper.ensureInitialized();
   @override
   $R call(
-          {String? content,
+          {Object? content = $none,
           Object? align = $none,
           int? flex,
           bool? scrollable}) =>
       $apply(FieldCopyWithData({
-        if (content != null) #content: content,
+        if (content != $none) #content: content,
         if (align != $none) #align: align,
         if (flex != null) #flex: flex,
         if (scrollable != null) #scrollable: scrollable

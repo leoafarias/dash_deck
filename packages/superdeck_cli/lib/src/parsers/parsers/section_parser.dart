@@ -7,92 +7,90 @@ class SectionParser extends BaseParser<List<SectionBlock>> {
 
   @override
   List<SectionBlock> parse(String content) {
-    final aggregator = _LayoutAggregator();
-
-    final tagBlocks = parseTagBlocks(content);
-    final tagBlockContents = List.generate(tagBlocks.length, (index) => '');
+    final parsedBlocks = const BlockParser().parse(content);
 
     // If there are no tag blocks, we can just add the entire markdown as a single section.
-    if (tagBlocks.isEmpty) {
+    if (parsedBlocks.isEmpty) {
       return [SectionBlock.text(content)];
     }
 
-    final sections = <SectionBlock>[];
+    final aggregator = _SectionAggregator();
 
-    // If the first tag block is not at the start of the markdown,
-    // we need to add a new section for the content before the first tag block.
-    if (tagBlocks.first.startIndex > 0) {
-      aggregator.addText(content.substring(0, tagBlocks.first.startIndex));
-    }
+    for (var idx = 0; idx < parsedBlocks.length; idx++) {
+      final parsedBlock = parsedBlocks[idx];
+      final isFirst = idx == 0;
+      final isLast = idx == parsedBlocks.length - 1;
 
-    // Extract the content between each tag block.
-    for (var idx = 0; idx < tagBlocks.length; idx++) {
-      final block = tagBlocks[idx];
-      if (idx == tagBlocks.length - 1) {
-        tagBlockContents[idx] = content.substring(block.endIndex).trim();
+      final startIndex = parsedBlock.startIndex;
+      final endIndex = parsedBlock.endIndex;
+
+      String blockContent;
+      // If the first tag block is not at the start of the markdown,
+      // we need to add a new section for the content before the first tag block.
+      if (isFirst && startIndex > 0) {
+        blockContent = content.substring(0, startIndex);
+      } else if (isLast) {
+        blockContent = content.substring(endIndex).trim();
       } else {
-        final nextBlock = tagBlocks[idx + 1];
-
-        tagBlockContents[idx] =
-            content.substring(block.endIndex, nextBlock.startIndex).trim();
-      }
-    }
-
-    // Parse the tag blocks into elements.
-    for (var idx = 0; idx < tagBlocks.length; idx++) {
-      final tag = tagBlocks[idx];
-
-      final block = Block.parse(tag.options);
-
-      final content = tagBlockContents[idx];
-
-      if (block is SectionBlock) {
-        // If we encounter a new SectionBlock, close off the previous one first.
-        if (currentSection != null) {
-          sections.add(currentSection);
-        }
-        currentSection = block;
-      } else {
-        currentSection ??= SectionBlock([]);
-        currentSection = currentSection.appendBlock(block);
+        final nextBlock = parsedBlocks[idx + 1];
+        blockContent = content.substring(endIndex, nextBlock.startIndex);
       }
 
-      if (content.isNotEmpty) {
-        currentSection = currentSection.appendText(content);
-      }
+      final block = Block.parse(parsedBlock.data);
+
+      aggregator
+        ..addBlock(block)
+        ..addContent(blockContent);
     }
 
-    // If we ended with an open section, add it to the sections list.
-    if (currentSection != null) {
-      sections.add(currentSection);
-    }
+    // print(aggregator.sections);
 
-    return sections;
+    return aggregator.sections;
   }
 }
 
-class _LayoutAggregator {
+class _SectionAggregator {
   List<SectionBlock> sections = [];
 
-  _LayoutAggregator();
+  _SectionAggregator();
 
-  void _ensureSection() {
+  SectionBlock _getSection() {
     if (sections.isEmpty) {
       sections.add(SectionBlock([]));
     }
+
+    return sections.last;
   }
 
-  void addSection(SectionBlock section) {
-    sections.add(section);
-  }
+  void addContent(String content) {
+    final section = _getSection();
+    final block = section.blocks.lastOrNull;
+    final blocks = [...section.blocks];
 
-  void addText(String text) {
-    _ensureSection();
-    sections.last.appendText(text);
+    if (content.trim().isEmpty) {
+      return;
+    }
+
+    if (block is ColumnBlock) {
+      final newContent =
+          block.content.isEmpty ? content : '${block.content}\n$content';
+
+      blocks.last = block.copyWith(content: newContent);
+    } else {
+      blocks.add(ColumnBlock(content));
+    }
+
+    sections.last = section.copyWith(blocks: blocks);
   }
 
   void addBlock(Block block) {
-    _ensureSection();
-    sections.last.appendBlock(block);
+    if (block is SectionBlock) {
+      sections.add(block);
+    } else {
+      final lastSection = _getSection();
+      final blocks = [...lastSection.blocks, block];
+
+      sections.last = lastSection.copyWith(blocks: blocks);
+    }
   }
 }

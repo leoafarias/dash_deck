@@ -80,7 +80,7 @@ class BuildCommand extends Command<int> {
         'Watch mode enabled. Listening for changes in slides markdown file.',
       );
 
-      await pipeline.store.configuration.slidesMarkdown
+      await pipeline.store.configuration.slidesFile
           .watch(events: FileSystemEvent.modify)
           .listen(
         (event) {

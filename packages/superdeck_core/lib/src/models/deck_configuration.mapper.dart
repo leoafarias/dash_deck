@@ -21,10 +21,9 @@ class DeckConfigurationMapper extends ClassMapperBase<DeckConfiguration> {
   @override
   final String id = 'DeckConfiguration';
 
-  static File _$slidesMarkdown(DeckConfiguration v) => v.slidesMarkdown;
   static const Field<DeckConfiguration, File> _f$slidesMarkdown = Field(
-      'slidesMarkdown', _$slidesMarkdown,
-      key: 'slides_markdown', opt: true);
+      'slidesMarkdown', null,
+      key: 'slides_markdown', mode: FieldMode.param, opt: true);
   static Directory _$superdeckDir(DeckConfiguration v) => v.superdeckDir;
   static const Field<DeckConfiguration, Directory> _f$superdeckDir = Field(
       'superdeckDir', _$superdeckDir,
@@ -40,6 +39,10 @@ class DeckConfigurationMapper extends ClassMapperBase<DeckConfiguration> {
   static const Field<DeckConfiguration, File> _f$assetsRefJson = Field(
       'assetsRefJson', _$assetsRefJson,
       key: 'assets_ref_json', mode: FieldMode.member);
+  static File _$slidesFile(DeckConfiguration v) => v.slidesFile;
+  static const Field<DeckConfiguration, File> _f$slidesFile = Field(
+      'slidesFile', _$slidesFile,
+      key: 'slides_file', mode: FieldMode.member);
 
   @override
   final MappableFields<DeckConfiguration> fields = const {
@@ -48,6 +51,7 @@ class DeckConfigurationMapper extends ClassMapperBase<DeckConfiguration> {
     #deckJson: _f$deckJson,
     #assetsDir: _f$assetsDir,
     #assetsRefJson: _f$assetsRefJson,
+    #slidesFile: _f$slidesFile,
   };
   @override
   final bool ignoreNull = true;
@@ -125,11 +129,11 @@ class _DeckConfigurationCopyWithImpl<$R, $Out>
   late final ClassMapperBase<DeckConfiguration> $mapper =
       DeckConfigurationMapper.ensureInitialized();
   @override
-  $R call({Object? slidesMarkdown = $none}) => $apply(FieldCopyWithData(
-      {if (slidesMarkdown != $none) #slidesMarkdown: slidesMarkdown}));
+  $R call({File? slidesMarkdown}) =>
+      $apply(FieldCopyWithData({#slidesMarkdown: slidesMarkdown}));
   @override
-  DeckConfiguration $make(CopyWithData data) => DeckConfiguration(
-      slidesMarkdown: data.get(#slidesMarkdown, or: $value.slidesMarkdown));
+  DeckConfiguration $make(CopyWithData data) =>
+      DeckConfiguration(slidesMarkdown: data.get(#slidesMarkdown));
 
   @override
   DeckConfigurationCopyWith<$R2, DeckConfiguration, $Out2> $chain<$R2, $Out2>(

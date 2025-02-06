@@ -66,8 +66,8 @@ class FileSystemDataStore extends LocalDataStore {
       await configuration.deckJson.writeAsString('{}');
     }
 
-    if (!await configuration.slidesMarkdown.exists()) {
-      await configuration.slidesMarkdown.writeAsString('');
+    if (!await configuration.slidesFile.exists()) {
+      await configuration.slidesFile.writeAsString('');
     }
 
     await super.initialize();
@@ -113,7 +113,7 @@ class FileSystemDataStore extends LocalDataStore {
   }
 
   Future<String> readDeckMarkdown() async {
-    return await configuration.slidesMarkdown.readAsString();
+    return await configuration.slidesFile.readAsString();
   }
 
   Future<void> _cleanupGeneratedAssets(

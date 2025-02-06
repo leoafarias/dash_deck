@@ -54,40 +54,21 @@ sealed class Block with BlockMappable {
   discriminatorValue: SectionBlock.key,
 )
 class SectionBlock extends Block with SectionBlockMappable {
-  final List<Block> blocks;
+  late final List<Block> blocks;
 
   static const key = 'section';
 
   SectionBlock(
-    this.blocks, {
+    List<Block>? blocks, {
     super.align,
     super.flex,
     super.scrollable,
-  }) : super(type: key);
+  }) : super(type: key) {
+    this.blocks = blocks ?? [];
+  }
 
   int get totalBlockFlex {
     return blocks.fold(0, (total, block) => total + block.flex);
-  }
-
-  SectionBlock appendText(String content) {
-    final lastPart = blocks.lastOrNull;
-    final blocksCopy = [...blocks];
-
-    if (lastPart is ColumnBlock) {
-      blocksCopy.last = lastPart.copyWith(
-        content: lastPart.content.isEmpty
-            ? content
-            : '${lastPart.content}\n$content',
-      );
-    } else {
-      if (content.trim().isNotEmpty) {
-        blocksCopy.add(
-          ColumnBlock(content),
-        );
-      }
-    }
-
-    return copyWith(blocks: blocksCopy);
   }
 
   static SectionBlock text(String content) {
@@ -100,22 +81,20 @@ class SectionBlock extends Block with SectionBlockMappable {
       'blocks': Schema.list(Block.typeSchema),
     },
   );
-
-  SectionBlock appendBlock(Block part) {
-    return copyWith(blocks: [...blocks, part]);
-  }
 }
 
 @MappableClass(discriminatorValue: ColumnBlock.key)
 class ColumnBlock extends Block with ColumnBlockMappable {
   static const key = 'column';
-  final String content;
+  late final String content;
   ColumnBlock(
-    this.content, {
+    String? content, {
     super.align,
     super.flex,
     super.scrollable,
-  }) : super(type: key);
+  }) : super(type: key) {
+    this.content = content ?? '';
+  }
 
   static final schema = Block.schema.extend(
     name: 'ColumnBlock',

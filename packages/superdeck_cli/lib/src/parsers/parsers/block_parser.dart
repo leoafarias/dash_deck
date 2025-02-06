@@ -3,94 +3,20 @@ import 'package:superdeck_core/superdeck_core.dart';
 
 import 'base_parser.dart';
 
-final _codeFencePattern = RegExp(
-  r'```(?<backtickInfo>[^`]*)[\s\S]*?```',
-  multiLine: true,
-);
-
-// ```<language> {<key1>: <value1>, <key2>: <value2>, ...}
-// <code content>
-// ```
-
-// Data class to hold code block details
-class ParsedFencedCode {
-  final Map<String, dynamic> options;
-  final String language;
-  final String content;
-  // The first index of the opening fence
-  final int startIndex;
-  // The last index of the closing fence
-  final int endIndex;
-
-  const ParsedFencedCode({
-    required this.options,
-    required this.language,
-    required this.content,
-    required this.startIndex,
-    required this.endIndex,
-  });
-
-  @override
-  String toString() {
-    return 'ParsedCodeBlock(language: $language, content: $content, startIndex: $startIndex, endIndex: $endIndex)';
-  }
-}
-
-class FencedCodeParser extends BaseParser<List<ParsedFencedCode>> {
-  const FencedCodeParser();
-
-  @override
-  List<ParsedFencedCode> parse(String text) {
-    final matches = _codeFencePattern.allMatches(text);
-    List<ParsedFencedCode> parsedBlocks = [];
-
-    for (final match in matches) {
-      final backtickInfo = match.namedGroup('backtickInfo');
-
-      final lines = backtickInfo?.split('\n');
-      final firstLine = lines?.first ?? '';
-      final rest = lines?.sublist(1).join('\n') ?? '';
-
-      final language = firstLine.split(' ')[0];
-      final options = firstLine.replaceFirst(language, '').trim();
-
-      final content = rest;
-
-      final startIndex = match.start;
-      final endIndex = match.end;
-
-      final Map<String, dynamic> optionsMap =
-          options.isNotEmpty ? YamlUtils.convertYamlToMap(options) : {};
-
-      parsedBlocks.add(
-        ParsedFencedCode(
-          options: optionsMap,
-          language: language,
-          content: content.trim(),
-          startIndex: startIndex,
-          endIndex: endIndex,
-        ),
-      );
-    }
-
-    return parsedBlocks;
-  }
-}
-
-class ParsedTagBlock {
-  final String tag;
+class ParsedBlock {
+  final String type;
   final int startIndex;
   final int endIndex;
-  final Map<String, dynamic> _options;
+  final Map<String, dynamic> _data;
 
-  const ParsedTagBlock({
-    required this.tag,
-    required Map<String, dynamic> options,
+  const ParsedBlock({
+    required this.type,
+    required Map<String, dynamic> data,
     required this.startIndex,
     required this.endIndex,
-  }) : _options = options;
+  }) : _data = data;
 
-  Map<String, dynamic> get options {
+  Map<String, dynamic> get data {
     final keys = [
       SectionBlock.key,
       ColumnBlock.key,
@@ -99,53 +25,48 @@ class ParsedTagBlock {
       WidgetBlock.key,
     ];
 
-    if (!keys.contains(tag)) {
-      return {..._options, 'name': tag, 'type': WidgetBlock.key};
-    }
-
-    return {..._options, 'type': tag};
+    return !keys.contains(type)
+        ? {..._data, 'name': type, 'type': WidgetBlock.key}
+        : {..._data, 'type': type};
   }
 }
 
-List<ParsedTagBlock> parseTagBlocks(String text) {
-  // @tag
-  // @tag {key: value}
-  // @tag{key: value, key2: value2}
-  // @tag {key: value, key2: value2, key3: value3}
-  // @tag{
-  //   key: value
-  //   key2: value2
-  //   key3: value3
-  // }
+class BlockParser extends BaseParser<List<ParsedBlock>> {
+  const BlockParser();
 
-  // Get the "tag", which could be any word, and also maybe it does not have space
-  final tagRegex = RegExp(r'(?<!\S)@(\w+)(?:\s*{([^{}]*)})?');
+  @override
+  List<ParsedBlock> parse(String text) {
+    // @tag
+    // @tag {key: value}
+    // @tag{key: value, key2: value2}
+    // @tag {key: value, key2: value2, key3: value3}
+    // @tag{
+    //   key: value
+    //   key2: value2
+    //   key3: value3
+    // }
 
-  final matches = tagRegex.allMatches(text);
-  List<ParsedTagBlock> parsedBlocks = [];
-  try {
-    for (final match in matches) {
-      final tag = match.group(1) ?? '';
-      final options = match.group(2) ?? '';
+    // Get the "tag", which could be any word, and also maybe it does not have space
+    final tagRegex = RegExp(r'(?<!\S)@(\w+)(?:\s*{([^{}]*)})?');
 
-      final startIndex = match.start;
-      final endIndex = match.end;
+    final matches = tagRegex.allMatches(text);
 
-      parsedBlocks.add(
-        ParsedTagBlock(
-          tag: tag,
-          options: YamlUtils.convertYamlToMap(options),
-          startIndex: startIndex,
-          endIndex: endIndex,
-        ),
-      );
+    try {
+      return matches.map((match) {
+        final type = match.group(1) ?? '';
+        final options = match.group(2) ?? '';
+
+        return ParsedBlock(
+          type: type,
+          data: YamlUtils.convertYamlToMap(options),
+          startIndex: match.start,
+          endIndex: match.end,
+        );
+      }).toList();
+    } catch (e) {
+      logger.err('Failed to parse tag blocks: $e');
+
+      return [];
     }
-
-    return parsedBlocks;
-  } catch (e) {
-    logger.err('Failed to parse tag blocks: $e');
-    // print(text);
-
-    return [];
   }
 }

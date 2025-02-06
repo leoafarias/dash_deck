@@ -20,7 +20,7 @@ class DeckConfiguration with DeckConfigurationMappable {
   late final assetsDir = Directory(p.join(superdeckDir.path, 'assets'));
   late final assetsRefJson =
       File(p.join(superdeckDir.path, 'generated_assets.json'));
-  late final slidesMarkdown = File('slides.md');
+  late final slidesFile = File('slides.md');
 
   DeckConfiguration({
     File? slidesMarkdown,

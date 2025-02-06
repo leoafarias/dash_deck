@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:superdeck_cli/src/generator_pipeline.dart';
 import 'package:superdeck_cli/src/helpers/logger.dart';
-import 'package:superdeck_cli/src/parsers/parsers/block_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
+
+import '../parsers/parsers/fenced_code_parser.dart';
 
 class MermaidConverterTask extends Task {
   Browser? _browser;

@@ -1,4 +1,5 @@
 import 'package:superdeck_cli/src/parsers/parsers/block_parser.dart';
+import 'package:superdeck_cli/src/parsers/parsers/fenced_code_parser.dart';
 import 'package:test/test.dart';
 
 final List<Map<String, dynamic>> testCaseCodeBlock = [
@@ -172,9 +173,9 @@ final List<Map<String, dynamic>> testCaseTagBlock = [
 @tag
 ''',
     'expectedBlocks': [
-      ParsedTagBlock(
-        tag: 'tag',
-        options: {},
+      ParsedBlock(
+        type: 'tag',
+        data: {},
         startIndex: 0,
         endIndex: 4,
       )
@@ -186,9 +187,9 @@ final List<Map<String, dynamic>> testCaseTagBlock = [
 @tag {key: value}
 ''',
     'expectedBlocks': [
-      ParsedTagBlock(
-        tag: 'tag',
-        options: {'key': 'value'},
+      ParsedBlock(
+        type: 'tag',
+        data: {'key': 'value'},
         startIndex: 0,
         endIndex: 17,
       )
@@ -204,9 +205,9 @@ final List<Map<String, dynamic>> testCaseTagBlock = [
 Test content
 ''',
     'expectedBlocks': [
-      ParsedTagBlock(
-        tag: 'tag',
-        options: {'key': 'value', 'key2': 'value2'},
+      ParsedBlock(
+        type: 'tag',
+        data: {'key': 'value', 'key2': 'value2'},
         startIndex: 0,
         endIndex: 36,
       )
@@ -219,9 +220,9 @@ Test content
 @tag{key: value}
 ''',
     'expectedBlocks': [
-      ParsedTagBlock(
-        tag: 'tag',
-        options: {'key': 'value'},
+      ParsedBlock(
+        type: 'tag',
+        data: {'key': 'value'},
         startIndex: 0,
         endIndex: 16,
       )
@@ -239,9 +240,9 @@ Test content
 ## Test content 2
 ''',
     'expectedBlocks': [
-      ParsedTagBlock(
-        tag: 'tag',
-        options: {'key': 'value', 'key2': 'value2'},
+      ParsedBlock(
+        type: 'tag',
+        data: {'key': 'value', 'key2': 'value2'},
         startIndex: 0,
         endIndex: 35,
       ),
@@ -257,9 +258,9 @@ Test content
 }
 ''',
     'expectedBlocks': [
-      ParsedTagBlock(
-        tag: 'tag',
-        options: {'key': 'value', 'key2': 'value2'},
+      ParsedBlock(
+        type: 'tag',
+        data: {'key': 'value', 'key2': 'value2'},
         startIndex: 0,
         endIndex: 36,
       )
@@ -276,9 +277,9 @@ Test content
 }
 ''',
     'expectedBlocks': [
-      ParsedTagBlock(
-        tag: 'tag',
-        options: {'key': 1, 'key2': 2.0, 'key3': true},
+      ParsedBlock(
+        type: 'tag',
+        data: {'key': 1, 'key2': 2.0, 'key3': true},
         startIndex: 0,
         endIndex: 42,
       ),
@@ -296,15 +297,15 @@ Test content 1
 Test content 2
 ''',
     'expectedBlocks': [
-      ParsedTagBlock(
-        tag: 'tag1',
-        options: {'key': 'value'},
+      ParsedBlock(
+        type: 'tag1',
+        data: {'key': 'value'},
         startIndex: 0,
         endIndex: 18,
       ),
-      ParsedTagBlock(
-        tag: 'tag2',
-        options: {'key2': 'value2'},
+      ParsedBlock(
+        type: 'tag2',
+        data: {'key2': 'value2'},
         startIndex: 35,
         endIndex: 55,
       )
@@ -317,15 +318,15 @@ Test content 2
 @tag1 {key: value} @tag2 {key2: value2}
 ''',
     'expectedBlocks': [
-      ParsedTagBlock(
-        tag: 'tag1',
-        options: {'key': 'value'},
+      ParsedBlock(
+        type: 'tag1',
+        data: {'key': 'value'},
         startIndex: 0,
         endIndex: 18,
       ),
-      ParsedTagBlock(
-        tag: 'tag2',
-        options: {'key2': 'value2'},
+      ParsedBlock(
+        type: 'tag2',
+        data: {'key2': 'value2'},
         startIndex: 19,
         endIndex: 39,
       )
@@ -369,17 +370,17 @@ void main() {
     for (final testCase in testCaseTagBlock) {
       final description = testCase['description'];
       test(description, () {
-        final blocks = parseTagBlocks(testCase['input']);
+        final blocks = const BlockParser().parse(testCase['input']);
         expect(blocks.length, testCase['expectedBlocks'].length,
             reason: 'Number of parsed blocks does not match expected.');
 
         for (int i = 0; i < testCase['expectedBlocks'].length; i++) {
-          final expected = testCase['expectedBlocks'][i] as ParsedTagBlock;
+          final expected = testCase['expectedBlocks'][i] as ParsedBlock;
           final actual = blocks[i];
 
-          expect(actual.tag, expected.tag,
+          expect(actual.type, expected.type,
               reason: '$description - Block ${i + 1}: Tag mismatch.');
-          expect(actual.options, expected.options,
+          expect(actual.data, expected.data,
               reason: '$description - Block ${i + 1}: Options mismatch.');
           expect(actual.startIndex, expected.startIndex,
               reason: '$description - Block ${i + 1}: Start index mismatch.');
