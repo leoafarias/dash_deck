@@ -16,6 +16,14 @@ void main() async {
         home: SuperDeckApp(
           options: DeckOptions(
             baseStyle: BaseStyle(),
+            widgets: {
+              'twitter': (args) {
+                return TwitterWidget(
+                  username: args['username'] as String,
+                  tweetId: args['tweetId'] as String,
+                );
+              },
+            },
             debug: true,
             styles: {
               'announcement': AnnouncementStyle(),
@@ -31,4 +39,20 @@ void main() async {
       );
     }),
   );
+}
+
+class TwitterWidget extends StatelessWidget {
+  final String username;
+  final String tweetId;
+
+  const TwitterWidget(
+      {super.key, required this.username, required this.tweetId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.red,
+      child: Text('Twitter: $username'),
+    );
+  }
 }

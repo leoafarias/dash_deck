@@ -100,14 +100,15 @@ SlideConfiguration _convertSlide({
       .expand((section) => section.blocks)
       .whereType<WidgetBlock>();
 
-  final slideWidgets = <String, WidgetBuilderWithOptions>{};
+  final slideWidgets = <String, WidgetBlockBuilder>{};
 
   for (final block in widgetBlocks) {
-    final widgetBuilder = options.widgets[block.type];
+    final widgetBuilder = options.widgets[block.name];
     if (widgetBuilder != null) {
       slideWidgets[block.name] = widgetBuilder;
     }
   }
+
   final styles = options.styles;
   final styleName = slide.options?.style;
   final baseStyle = options.baseStyle;
@@ -121,11 +122,6 @@ SlideConfiguration _convertSlide({
     widgets: slideWidgets,
   );
 }
-
-typedef WidgetBuilderWithOptions = Widget Function(
-  BuildContext context,
-  WidgetBlock options,
-);
 
 final _emptySlide = Slide(
   key: 'empty',

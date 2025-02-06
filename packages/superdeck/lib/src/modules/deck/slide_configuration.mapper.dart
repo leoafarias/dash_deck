@@ -36,12 +36,12 @@ class SlideConfigurationMapper extends ClassMapperBase<SlideConfiguration> {
   static SlideParts? _$parts(SlideConfiguration v) => v.parts;
   static const Field<SlideConfiguration, SlideParts> _f$parts =
       Field('parts', _$parts, opt: true);
-  static Map<String, Widget Function(BuildContext, WidgetBlock)> _$widgets(
+  static Map<String, Widget Function(Map<String, dynamic>)> _$_widgets(
           SlideConfiguration v) =>
-      v.widgets;
+      v._widgets;
   static const Field<SlideConfiguration,
-          Map<String, Widget Function(BuildContext, WidgetBlock)>> _f$widgets =
-      Field('widgets', _$widgets, opt: true, def: const {});
+          Map<String, Widget Function(Map<String, dynamic>)>> _f$_widgets =
+      Field('_widgets', _$_widgets, key: 'widgets', opt: true, def: const {});
   static bool _$isExporting(SlideConfiguration v) => v.isExporting;
   static const Field<SlideConfiguration, bool> _f$isExporting =
       Field('isExporting', _$isExporting, opt: true, def: false);
@@ -53,7 +53,7 @@ class SlideConfigurationMapper extends ClassMapperBase<SlideConfiguration> {
     #_slide: _f$_slide,
     #debug: _f$debug,
     #parts: _f$parts,
-    #widgets: _f$widgets,
+    #_widgets: _f$_widgets,
     #isExporting: _f$isExporting,
   };
 
@@ -64,7 +64,7 @@ class SlideConfigurationMapper extends ClassMapperBase<SlideConfiguration> {
         slide: data.dec(_f$_slide),
         debug: data.dec(_f$debug),
         parts: data.dec(_f$parts),
-        widgets: data.dec(_f$widgets),
+        widgets: data.dec(_f$_widgets),
         isExporting: data.dec(_f$isExporting));
   }
 
@@ -127,16 +127,16 @@ abstract class SlideConfigurationCopyWith<$R, $In extends SlideConfiguration,
   MapCopyWith<
       $R,
       String,
-      Widget Function(BuildContext, WidgetBlock),
-      ObjectCopyWith<$R, Widget Function(BuildContext, WidgetBlock),
-          Widget Function(BuildContext, WidgetBlock)>> get widgets;
+      Widget Function(Map<String, dynamic>),
+      ObjectCopyWith<$R, Widget Function(Map<String, dynamic>),
+          Widget Function(Map<String, dynamic>)>> get _widgets;
   $R call(
       {int? slideIndex,
       Style? style,
       Slide? slide,
       bool? debug,
       SlideParts? parts,
-      Map<String, Widget Function(BuildContext, WidgetBlock)>? widgets,
+      Map<String, Widget Function(Map<String, dynamic>)>? widgets,
       bool? isExporting});
   SlideConfigurationCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
@@ -157,11 +157,12 @@ class _SlideConfigurationCopyWithImpl<$R, $Out>
   MapCopyWith<
       $R,
       String,
-      Widget Function(BuildContext, WidgetBlock),
-      ObjectCopyWith<$R, Widget Function(BuildContext, WidgetBlock),
-          Widget Function(BuildContext, WidgetBlock)>> get widgets =>
-      MapCopyWith($value.widgets, (v, t) => ObjectCopyWith(v, $identity, t),
-          (v) => call(widgets: v));
+      Widget Function(Map<String, dynamic>),
+      ObjectCopyWith<$R, Widget Function(Map<String, dynamic>),
+          Widget Function(Map<String, dynamic>)>> get _widgets => MapCopyWith(
+      $value._widgets,
+      (v, t) => ObjectCopyWith(v, $identity, t),
+      (v) => call(widgets: v));
   @override
   $R call(
           {int? slideIndex,
@@ -169,7 +170,7 @@ class _SlideConfigurationCopyWithImpl<$R, $Out>
           Slide? slide,
           bool? debug,
           Object? parts = $none,
-          Map<String, Widget Function(BuildContext, WidgetBlock)>? widgets,
+          Map<String, Widget Function(Map<String, dynamic>)>? widgets,
           bool? isExporting}) =>
       $apply(FieldCopyWithData({
         if (slideIndex != null) #slideIndex: slideIndex,
@@ -187,7 +188,7 @@ class _SlideConfigurationCopyWithImpl<$R, $Out>
       slide: data.get(#slide, or: $value._slide),
       debug: data.get(#debug, or: $value.debug),
       parts: data.get(#parts, or: $value.parts),
-      widgets: data.get(#widgets, or: $value.widgets),
+      widgets: data.get(#widgets, or: $value._widgets),
       isExporting: data.get(#isExporting, or: $value.isExporting));
 
   @override

@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:superdeck/src/components/atoms/slide_view.dart';
 import 'package:superdeck/src/modules/common/helpers/provider.dart';
 import 'package:superdeck/src/modules/common/styles/style.dart';
-import 'package:superdeck/src/modules/deck/deck_controller.dart';
+import 'package:superdeck/src/modules/deck/deck_options.dart';
 import 'package:superdeck/src/modules/deck/slide_configuration.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
@@ -16,7 +16,7 @@ extension WidgetTesterX on WidgetTester {
     SlideConfiguration slide, {
     bool isSnapshot = false,
     DeckStyle? style,
-    Map<String, WidgetBuilderWithOptions> widgets = const {},
+    Map<String, WidgetBlockBuilder> widgets = const {},
     List<GeneratedAsset> assets = const [],
   }) async {
     return pumpWithScaffold(

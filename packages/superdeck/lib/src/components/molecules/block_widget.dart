@@ -247,7 +247,7 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetBlock> {
   Widget build(context, data) {
     final slide = SlideConfiguration.of(context);
 
-    final widgetBuilder = slide.getWidget(data.block.type);
+    final widgetBuilder = slide.getWidget(data.block.name);
 
     if (widgetBuilder == null) {
       return Container(
@@ -263,13 +263,26 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetBlock> {
         try {
           return SizedBox(
             height: data.size.height,
-            child: widgetBuilder(context, data.block),
+            child: widgetBuilder(data.block.args),
           );
         } catch (e) {
           return Container(
             color: Colors.red,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.red,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Center(
-              child: Text('Error building widget: ${data.block.type}\n$e'),
+              child: Text('''
+Error building widget: ${data.block.name}
+
+${e.toString()}
+
+'''),
             ),
           );
         }

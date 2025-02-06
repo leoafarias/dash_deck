@@ -5,7 +5,7 @@ import 'package:superdeck_core/superdeck_core.dart';
 
 import '../common/helpers/provider.dart';
 import '../slide/slide_parts.dart';
-import 'deck_controller.dart';
+import 'deck_options.dart';
 
 part 'slide_configuration.mapper.dart';
 
@@ -16,7 +16,7 @@ class SlideConfiguration with SlideConfigurationMappable {
   final Slide _slide;
   final bool debug;
   final SlideParts? parts;
-  final Map<String, WidgetBuilderWithOptions> widgets;
+  final Map<String, WidgetBlockBuilder> _widgets;
 
   final bool isExporting;
   SlideConfiguration({
@@ -25,16 +25,10 @@ class SlideConfiguration with SlideConfigurationMappable {
     required Slide slide,
     this.debug = false,
     this.parts,
-    this.widgets = const {},
+    Map<String, WidgetBlockBuilder> widgets = const {},
     this.isExporting = false,
-  }) : _slide = slide;
-
-  double get totalPartsHeight {
-    final headerHeight = parts?.header?.preferredSize.height ?? 0;
-    final footerHeight = parts?.footer?.preferredSize.height ?? 0;
-
-    return headerHeight + footerHeight;
-  }
+  })  : _slide = slide,
+        _widgets = widgets;
 
   SlideOptions get options => _slide.options ?? const SlideOptions();
 
@@ -46,9 +40,7 @@ class SlideConfiguration with SlideConfigurationMappable {
 
   List<String> get comments => _slide.comments;
 
-  WidgetBuilderWithOptions? getWidget(String name) {
-    return widgets[name];
-  }
+  WidgetBlockBuilder? getWidget(String name) => _widgets[name];
 
   static SlideConfiguration of(BuildContext context) {
     return InheritedData.of(context);
