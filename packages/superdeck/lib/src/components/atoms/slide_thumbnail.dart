@@ -58,18 +58,7 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
 
     final imageData = await _slideCaptureService.generate(slide: slide);
 
-    await thumbnailFile.writeAsBytes(imageData, flush: true);
-
-    final fileLength = await thumbnailFile.length();
-
-    if (fileLength == 0) {
-      await thumbnailFile.delete();
-      return _generateThumbnail(
-        slide: slide,
-        controller: controller,
-        force: true,
-      );
-    }
+    await thumbnailFile.writeAsBytes(imageData, flush: false);
 
     return thumbnailFile;
   }
