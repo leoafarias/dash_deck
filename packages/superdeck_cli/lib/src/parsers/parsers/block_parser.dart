@@ -59,8 +59,6 @@ class FencedCodeParser extends BaseParser<List<ParsedFencedCode>> {
       final startIndex = match.start;
       final endIndex = match.end;
 
-      print('options: $options');
-
       final Map<String, dynamic> optionsMap =
           options.isNotEmpty ? YamlUtils.convertYamlToMap(options) : {};
 

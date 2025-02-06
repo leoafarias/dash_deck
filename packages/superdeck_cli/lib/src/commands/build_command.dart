@@ -63,7 +63,7 @@ class BuildCommand extends Command<int> {
     await _runPipeline(_pipeline);
 
     if (watch) {
-      final subscription = _pipeline.store.configuration.markdownFile
+      final subscription = _pipeline.store.configuration.slidesMarkdown
           .watch(events: FileSystemEvent.modify)
           .listen((event) => _runPipeline(_pipeline));
     }

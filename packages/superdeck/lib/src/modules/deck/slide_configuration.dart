@@ -46,8 +46,6 @@ class SlideConfiguration with SlideConfigurationMappable {
 
   List<String> get comments => _slide.comments;
 
-  String get markdown => _slide.markdown;
-
   WidgetBuilderWithOptions? getWidget(String name) {
     return widgets[name];
   }

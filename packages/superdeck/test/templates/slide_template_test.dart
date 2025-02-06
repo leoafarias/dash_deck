@@ -11,7 +11,7 @@ void main() {
     const rawMarkdown = '''
 # Hello
 ''';
-    const slide = Slide(markdown: rawMarkdown, key: 'simple-slide');
+    const slide = Slide(key: 'simple-slide');
     final config = SlideConfiguration(
       slide: slide,
       slideIndex: 0,

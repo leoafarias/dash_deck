@@ -1,17 +1,27 @@
 part of 'schema.dart';
 
 class ValidationResult {
+  final String schemaName;
   final List<String> path;
   final List<ValidationError> errors;
+  final Object? value;
 
   const ValidationResult(
+    this.schemaName,
     this.path, {
     required this.errors,
+    required this.value,
   });
 
   bool get isValid => errors.isEmpty;
 
-  const ValidationResult.valid(this.path) : errors = const [];
+  const ValidationResult.valid(this.schemaName, this.path, this.value)
+      : errors = const [];
+
+  @override
+  String toString() {
+    return 'ValidationResult(schemaName: $schemaName, path: $path, errors: $errors, value: $value)';
+  }
 }
 
 sealed class ValidationError {
@@ -108,6 +118,17 @@ class SchemaValidationException implements Exception {
     final location = result.path.isNotEmpty
         ? 'Location: ${result.path.join('.')}'
         : 'No specific location in schema.';
-    return 'SchemaValidationException:\n$errorMessages\n$location';
+    // return 'SchemaValidationException:\nSchema: ${result.schemaName}\n$errorMessages\n$location';
+    return '''
+Validation Failed:
+
+Schema: ${result.schemaName}
+Value: ${result.value}
+
+Errors:
+$errorMessages
+
+Location: $location
+''';
   }
 }

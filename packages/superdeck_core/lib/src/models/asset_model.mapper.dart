@@ -64,56 +64,6 @@ extension AssetExtensionMapperExtension on AssetExtension {
   }
 }
 
-class AssetTypeMapper extends EnumMapper<AssetType> {
-  AssetTypeMapper._();
-
-  static AssetTypeMapper? _instance;
-  static AssetTypeMapper ensureInitialized() {
-    if (_instance == null) {
-      MapperContainer.globals.use(_instance = AssetTypeMapper._());
-    }
-    return _instance!;
-  }
-
-  static AssetType fromValue(dynamic value) {
-    ensureInitialized();
-    return MapperContainer.globals.fromValue(value);
-  }
-
-  @override
-  AssetType decode(dynamic value) {
-    switch (value) {
-      case 'image':
-        return AssetType.image;
-      case 'thumnail':
-        return AssetType.thumnail;
-      case 'mermaid':
-        return AssetType.mermaid;
-      default:
-        throw MapperException.unknownEnumValue(value);
-    }
-  }
-
-  @override
-  dynamic encode(AssetType self) {
-    switch (self) {
-      case AssetType.image:
-        return 'image';
-      case AssetType.thumnail:
-        return 'thumnail';
-      case AssetType.mermaid:
-        return 'mermaid';
-    }
-  }
-}
-
-extension AssetTypeMapperExtension on AssetType {
-  String toValue() {
-    AssetTypeMapper.ensureInitialized();
-    return MapperContainer.globals.toValue<AssetType>(this) as String;
-  }
-}
-
 class GeneratedAssetMapper extends ClassMapperBase<GeneratedAsset> {
   GeneratedAssetMapper._();
 
@@ -121,6 +71,7 @@ class GeneratedAssetMapper extends ClassMapperBase<GeneratedAsset> {
   static GeneratedAssetMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = GeneratedAssetMapper._());
+      AssetExtensionMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -128,18 +79,17 @@ class GeneratedAssetMapper extends ClassMapperBase<GeneratedAsset> {
   @override
   final String id = 'GeneratedAsset';
 
-  static const Field<GeneratedAsset, String> _f$slideKey =
-      Field('slideKey', null, key: 'slide_key', mode: FieldMode.param);
+  static String _$name(GeneratedAsset v) => v.name;
+  static const Field<GeneratedAsset, String> _f$name = Field('name', _$name);
   static AssetExtension _$extension(GeneratedAsset v) => v.extension;
   static const Field<GeneratedAsset, AssetExtension> _f$extension =
-      Field('extension', _$extension, mode: FieldMode.member);
-  static AssetType _$type(GeneratedAsset v) => v.type;
-  static const Field<GeneratedAsset, AssetType> _f$type =
-      Field('type', _$type, mode: FieldMode.member);
+      Field('extension', _$extension);
+  static String _$type(GeneratedAsset v) => v.type;
+  static const Field<GeneratedAsset, String> _f$type = Field('type', _$type);
 
   @override
   final MappableFields<GeneratedAsset> fields = const {
-    #slideKey: _f$slideKey,
+    #name: _f$name,
     #extension: _f$extension,
     #type: _f$type,
   };
@@ -147,7 +97,10 @@ class GeneratedAssetMapper extends ClassMapperBase<GeneratedAsset> {
   final bool ignoreNull = true;
 
   static GeneratedAsset _instantiate(DecodingData data) {
-    return GeneratedAsset.thumbnail(data.dec(_f$slideKey));
+    return GeneratedAsset(
+        name: data.dec(_f$name),
+        extension: data.dec(_f$extension),
+        type: data.dec(_f$type));
   }
 
   @override
@@ -203,7 +156,7 @@ extension GeneratedAssetValueCopy<$R, $Out>
 
 abstract class GeneratedAssetCopyWith<$R, $In extends GeneratedAsset, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({required String slideKey});
+  $R call({String? name, AssetExtension? extension, String? type});
   GeneratedAssetCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -217,14 +170,150 @@ class _GeneratedAssetCopyWithImpl<$R, $Out>
   late final ClassMapperBase<GeneratedAsset> $mapper =
       GeneratedAssetMapper.ensureInitialized();
   @override
-  $R call({required String slideKey}) =>
-      $apply(FieldCopyWithData({#slideKey: slideKey}));
+  $R call({String? name, AssetExtension? extension, String? type}) =>
+      $apply(FieldCopyWithData({
+        if (name != null) #name: name,
+        if (extension != null) #extension: extension,
+        if (type != null) #type: type
+      }));
   @override
-  GeneratedAsset $make(CopyWithData data) =>
-      GeneratedAsset.thumbnail(data.get(#slideKey));
+  GeneratedAsset $make(CopyWithData data) => GeneratedAsset(
+      name: data.get(#name, or: $value.name),
+      extension: data.get(#extension, or: $value.extension),
+      type: data.get(#type, or: $value.type));
 
   @override
   GeneratedAssetCopyWith<$R2, GeneratedAsset, $Out2> $chain<$R2, $Out2>(
           Then<$Out2, $R2> t) =>
       _GeneratedAssetCopyWithImpl($value, $cast, t);
+}
+
+class GeneratedAssetsReferenceMapper
+    extends ClassMapperBase<GeneratedAssetsReference> {
+  GeneratedAssetsReferenceMapper._();
+
+  static GeneratedAssetsReferenceMapper? _instance;
+  static GeneratedAssetsReferenceMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals
+          .use(_instance = GeneratedAssetsReferenceMapper._());
+      MapperContainer.globals.useAll([DateTimeMapper(), FileMapper()]);
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'GeneratedAssetsReference';
+
+  static DateTime _$lastModified(GeneratedAssetsReference v) => v.lastModified;
+  static const Field<GeneratedAssetsReference, DateTime> _f$lastModified =
+      Field('lastModified', _$lastModified, key: 'last_modified');
+  static List<File> _$files(GeneratedAssetsReference v) => v.files;
+  static const Field<GeneratedAssetsReference, List<File>> _f$files =
+      Field('files', _$files);
+
+  @override
+  final MappableFields<GeneratedAssetsReference> fields = const {
+    #lastModified: _f$lastModified,
+    #files: _f$files,
+  };
+  @override
+  final bool ignoreNull = true;
+
+  static GeneratedAssetsReference _instantiate(DecodingData data) {
+    return GeneratedAssetsReference(
+        lastModified: data.dec(_f$lastModified), files: data.dec(_f$files));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static GeneratedAssetsReference fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<GeneratedAssetsReference>(map);
+  }
+
+  static GeneratedAssetsReference fromJson(String json) {
+    return ensureInitialized().decodeJson<GeneratedAssetsReference>(json);
+  }
+}
+
+mixin GeneratedAssetsReferenceMappable {
+  String toJson() {
+    return GeneratedAssetsReferenceMapper.ensureInitialized()
+        .encodeJson<GeneratedAssetsReference>(this as GeneratedAssetsReference);
+  }
+
+  Map<String, dynamic> toMap() {
+    return GeneratedAssetsReferenceMapper.ensureInitialized()
+        .encodeMap<GeneratedAssetsReference>(this as GeneratedAssetsReference);
+  }
+
+  GeneratedAssetsReferenceCopyWith<GeneratedAssetsReference,
+          GeneratedAssetsReference, GeneratedAssetsReference>
+      get copyWith => _GeneratedAssetsReferenceCopyWithImpl(
+          this as GeneratedAssetsReference, $identity, $identity);
+  @override
+  String toString() {
+    return GeneratedAssetsReferenceMapper.ensureInitialized()
+        .stringifyValue(this as GeneratedAssetsReference);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return GeneratedAssetsReferenceMapper.ensureInitialized()
+        .equalsValue(this as GeneratedAssetsReference, other);
+  }
+
+  @override
+  int get hashCode {
+    return GeneratedAssetsReferenceMapper.ensureInitialized()
+        .hashValue(this as GeneratedAssetsReference);
+  }
+}
+
+extension GeneratedAssetsReferenceValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, GeneratedAssetsReference, $Out> {
+  GeneratedAssetsReferenceCopyWith<$R, GeneratedAssetsReference, $Out>
+      get $asGeneratedAssetsReference => $base
+          .as((v, t, t2) => _GeneratedAssetsReferenceCopyWithImpl(v, t, t2));
+}
+
+abstract class GeneratedAssetsReferenceCopyWith<
+    $R,
+    $In extends GeneratedAssetsReference,
+    $Out> implements ClassCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, File, ObjectCopyWith<$R, File, File>> get files;
+  $R call({DateTime? lastModified, List<File>? files});
+  GeneratedAssetsReferenceCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+      Then<$Out2, $R2> t);
+}
+
+class _GeneratedAssetsReferenceCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, GeneratedAssetsReference, $Out>
+    implements
+        GeneratedAssetsReferenceCopyWith<$R, GeneratedAssetsReference, $Out> {
+  _GeneratedAssetsReferenceCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<GeneratedAssetsReference> $mapper =
+      GeneratedAssetsReferenceMapper.ensureInitialized();
+  @override
+  ListCopyWith<$R, File, ObjectCopyWith<$R, File, File>> get files =>
+      ListCopyWith($value.files, (v, t) => ObjectCopyWith(v, $identity, t),
+          (v) => call(files: v));
+  @override
+  $R call({DateTime? lastModified, List<File>? files}) =>
+      $apply(FieldCopyWithData({
+        if (lastModified != null) #lastModified: lastModified,
+        if (files != null) #files: files
+      }));
+  @override
+  GeneratedAssetsReference $make(CopyWithData data) => GeneratedAssetsReference(
+      lastModified: data.get(#lastModified, or: $value.lastModified),
+      files: data.get(#files, or: $value.files));
+
+  @override
+  GeneratedAssetsReferenceCopyWith<$R2, GeneratedAssetsReference, $Out2>
+      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+          _GeneratedAssetsReferenceCopyWithImpl($value, $cast, t);
 }

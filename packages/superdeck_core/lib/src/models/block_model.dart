@@ -21,6 +21,7 @@ sealed class Block with BlockMappable {
   });
 
   static final schema = Schema.object(
+    name: 'Block',
     {
       'type': Schema.string(),
       'align': Schema.enumValue(ContentAlignment.values),
@@ -28,6 +29,7 @@ sealed class Block with BlockMappable {
       'scrollable': Schema.boolean(),
     },
     required: ['type'],
+    additionalProperties: true,
   );
 
   static Block parse(Map<String, dynamic> map) {
@@ -36,6 +38,7 @@ sealed class Block with BlockMappable {
   }
 
   static final typeSchema = DiscriminatedObjectSchema(
+    name: 'BlockDiscriminator',
     discriminatorKey: 'type',
     schemas: {
       ColumnBlock.key: ColumnBlock.schema,
@@ -87,12 +90,8 @@ class SectionBlock extends Block with SectionBlockMappable {
     return copyWith(blocks: blocksCopy);
   }
 
-  static SectionBlock parse(Map<String, dynamic> map) {
-    schema.validateOrThrow(map);
-    return SectionBlockMapper.fromMap(map);
-  }
-
   static final schema = Block.schema.extend(
+    name: 'SectionBlock',
     {
       'blocks': Schema.list(Block.typeSchema),
     },
@@ -114,12 +113,8 @@ class ColumnBlock extends Block with ColumnBlockMappable {
     super.scrollable,
   }) : super(type: key);
 
-  static ColumnBlock parse(Map<String, dynamic> map) {
-    schema.validateOrThrow(map);
-    return ColumnBlockMapper.fromMap(map);
-  }
-
   static final schema = Block.schema.extend(
+    name: 'ColumnBlock',
     {
       'content': Schema.string(),
     },
@@ -152,6 +147,7 @@ class DartPadBlock extends Block with DartPadBlockMappable {
   }) : super(type: key);
 
   static final schema = Block.schema.extend(
+    name: 'DartPadBlock',
     {
       'id': Schema.string(),
       'theme': Schema.enumValue(DartPadTheme.values),
@@ -162,11 +158,6 @@ class DartPadBlock extends Block with DartPadBlockMappable {
       "id",
     ],
   );
-
-  static DartPadBlock parse(Map<String, dynamic> map) {
-    schema.validateOrThrow(map);
-    return DartPadBlockMapper.fromMap(map);
-  }
 }
 
 @MappableClass(discriminatorValue: ImageBlock.key)
@@ -187,6 +178,7 @@ class ImageBlock extends Block with ImageBlockMappable {
   }) : super(type: key);
 
   static final schema = Block.schema.extend(
+    name: 'ImageBlock',
     {
       "fit": Schema.enumValue(ImageFit.values),
       "asset": GeneratedAsset.schema,
@@ -197,11 +189,6 @@ class ImageBlock extends Block with ImageBlockMappable {
       "asset",
     ],
   );
-
-  static ImageBlock parse(Map<String, dynamic> map) {
-    schema.validateOrThrow(map);
-    return ImageBlockMapper.fromMap(map);
-  }
 }
 
 @MappableEnum()
@@ -233,6 +220,7 @@ class WidgetBlock extends Block with WidgetBlockMappable {
   }) : super(type: key);
 
   static final schema = Block.schema.extend(
+    name: 'WidgetBlock',
     {
       "name": Schema.string(),
     },
@@ -241,11 +229,6 @@ class WidgetBlock extends Block with WidgetBlockMappable {
     ],
     additionalProperties: true,
   );
-
-  static WidgetBlock parse(Map<String, dynamic> map) {
-    schema.validateOrThrow(map);
-    return WidgetBlockMapper.fromMap(map);
-  }
 }
 
 @MappableEnum()

@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:superdeck_core/superdeck_core.dart';
-import 'package:yaml_writer/yaml_writer.dart';
 
 extension FileExt on File {
   Future<void> ensureWrite(String content) async {
@@ -28,23 +26,23 @@ extension DirectoryExt on Directory {
   }
 }
 
-extension SlideX on Slide {
-  String toMarkdown() {
-    final buffer = StringBuffer();
+// extension SlideX on Slide {
+//   String toMarkdown() {
+//     final buffer = StringBuffer();
 
-    final options = this.options?.toMap();
+//     final options = this.options?.toMap();
 
-    buffer.writeln('---');
-    if (options != null && options.isNotEmpty) {
-      buffer.write(YamlWriter().write(options));
-    }
-    buffer.writeln('---');
+//     buffer.writeln('---');
+//     if (options != null && options.isNotEmpty) {
+//       buffer.write(YamlWriter().write(options));
+//     }
+//     buffer.writeln('---');
 
-    buffer.writeln(markdown);
+//     buffer.writeln(markdown);
 
-    return buffer.toString();
-  }
-}
+//     return buffer.toString();
+//   }
+// }
 
 extension CommandExtension on Command {
   /// Checks if the command-line option named [name] was parsed,

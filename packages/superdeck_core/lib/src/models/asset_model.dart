@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:collection/collection.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:superdeck_core/superdeck_core.dart';
+
+import '../helpers/mappers.dart';
 
 part 'asset_model.mapper.dart';
 
@@ -17,75 +21,76 @@ enum AssetExtension {
   static AssetExtension? tryParse(String value) {
     final extension = value.toLowerCase();
 
-    if (extension == 'jpg') {
-      return AssetExtension.jpeg;
-    }
-    return AssetExtension.values.firstWhereOrNull((e) => e.name == extension);
+    return extension == 'jpg'
+        ? AssetExtension.jpeg
+        : AssetExtension.values.firstWhereOrNull((e) => e.name == extension);
   }
-}
-
-@MappableEnum()
-enum AssetType {
-  image,
-  thumnail,
-  mermaid,
 }
 
 @MappableClass()
 class GeneratedAsset with GeneratedAssetMappable {
-  final String _fileName;
+  final String name;
   final AssetExtension extension;
-  final AssetType type;
+  final String type;
 
-  GeneratedAsset._({
-    required String fileName,
+  GeneratedAsset({
+    required this.name,
     required this.extension,
     required this.type,
-  }) : _fileName = fileName;
+  });
 
-  String get fileName => '${type.name}_$_fileName.${extension.name}';
+  String get fileName => '${type}_$name.${extension.name}';
 
   static String buildKey(String valueToHash) => generateValueHash(valueToHash);
 
   static final schema = Schema.object(
     {
-      "file_name": Schema.string(),
+      "name": Schema.string(),
       "extension": AssetExtension.schema,
-      "type": Schema.enumValue(AssetType.values),
+      "type": Schema.string(),
     },
     required: [
-      "file_name",
+      "name",
       "extension",
       "type",
     ],
   );
 
-  static GeneratedAsset parse(Map<String, dynamic> map) {
-    schema.validateOrThrow(map);
-    return GeneratedAssetMapper.fromMap(map);
-  }
-
-  factory GeneratedAsset.thumbnail(String slideKey) {
-    return GeneratedAsset._(
-      fileName: slideKey,
+  static GeneratedAsset thumbnail(String slideKey) {
+    return GeneratedAsset(
+      name: slideKey,
       extension: AssetExtension.png,
-      type: AssetType.thumnail,
+      type: 'thumbnail',
     );
   }
 
-  factory GeneratedAsset.mermaid(String syntax) {
-    return GeneratedAsset._(
-      fileName: GeneratedAsset.buildKey(syntax),
+  static GeneratedAsset mermaid(String syntax) {
+    return GeneratedAsset(
+      name: GeneratedAsset.buildKey(syntax),
       extension: AssetExtension.png,
-      type: AssetType.mermaid,
+      type: 'mermaid',
     );
   }
 
-  factory GeneratedAsset.image(String url, AssetExtension extension) {
-    return GeneratedAsset._(
-      fileName: GeneratedAsset.buildKey(url),
+  static GeneratedAsset image(String url, AssetExtension extension) {
+    return GeneratedAsset(
+      name: GeneratedAsset.buildKey(url),
       extension: extension,
-      type: AssetType.image,
+      type: 'image',
     );
   }
+}
+
+@MappableClass(includeCustomMappers: [
+  DateTimeMapper(),
+  FileMapper(),
+])
+class GeneratedAssetsReference with GeneratedAssetsReferenceMappable {
+  final DateTime lastModified;
+  final List<File> files;
+
+  GeneratedAssetsReference({
+    required this.lastModified,
+    required this.files,
+  });
 }

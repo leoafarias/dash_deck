@@ -18,7 +18,7 @@ abstract interface class IDataStore {
   Stream<DeckReference> loadDeckReferenceStream();
 
   File getGeneratedAssetFile(GeneratedAsset asset) {
-    return File(p.join(configuration.generatedDir.path, asset.fileName));
+    return File(p.join(configuration.generatedAssetsDir.path, asset.fileName));
   }
 
   Future<String> readAssetByPath(String path);
@@ -36,12 +36,12 @@ class LocalDataStore extends IDataStore {
 
   @override
   Future<String> readAssetByPath(String path) async {
-    return fileReader(p.join(configuration.assetDir.path, path));
+    return fileReader(path);
   }
 
   @override
   Future<DeckReference> loadDeckReference() async {
-    final content = await fileReader(configuration.deckFile.path);
+    final content = await fileReader(configuration.deckJson.path);
     return DeckReferenceMapper.fromJson(content);
   }
 
@@ -54,18 +54,20 @@ class LocalDataStore extends IDataStore {
 class FileSystemDataStore extends LocalDataStore {
   FileSystemDataStore(super.configuration);
 
+  final List<GeneratedAsset> _generatedAssets = [];
+
   @override
   Future<void> initialize() async {
-    if (!await configuration.generatedDir.exists()) {
-      await configuration.generatedDir.create(recursive: true);
+    if (!await configuration.generatedAssetsDir.exists()) {
+      await configuration.generatedAssetsDir.create(recursive: true);
     }
 
-    if (!await configuration.deckFile.exists()) {
-      await configuration.deckFile.writeAsString('{}');
+    if (!await configuration.deckJson.exists()) {
+      await configuration.deckJson.writeAsString('{}');
     }
 
-    if (!await configuration.markdownFile.exists()) {
-      await configuration.markdownFile.writeAsString('');
+    if (!await configuration.slidesMarkdown.exists()) {
+      await configuration.slidesMarkdown.writeAsString('');
     }
 
     await super.initialize();
@@ -73,35 +75,60 @@ class FileSystemDataStore extends LocalDataStore {
 
   @override
   File getGeneratedAssetFile(GeneratedAsset asset) {
-    final file = super.getGeneratedAssetFile(asset);
-    if (file.existsSync()) {
-      file.setLastModifiedSync(DateTime.now());
-    }
-    return file;
+    _generatedAssets.add(asset);
+    return super.getGeneratedAssetFile(asset);
   }
 
-  Future<void> saveReference(DeckReference reference) async {
-    final json = prettyJson(reference.toMap());
-    await configuration.deckFile.writeAsString(json);
+  Future<void> saveReferences(
+    DeckReference reference,
+  ) async {
+    final deckJson = prettyJson(reference.toMap());
+    await configuration.deckJson.writeAsString(deckJson);
+
+    final thumbnails =
+        reference.slides.map((slide) => GeneratedAsset.thumbnail(slide.key));
+
+    final assets = [
+      ...thumbnails,
+      ..._generatedAssets,
+    ];
+
+    final files = assets.map((asset) =>
+        File(p.join(configuration.generatedAssetsDir.path, asset.fileName)));
+
+    final assetsRef = GeneratedAssetsReference(
+      lastModified: DateTime.now(),
+      files: files.toList(),
+    );
+
+    final assetsJson = prettyJson(assetsRef.toMap());
+
+    await configuration.generatedAssetsRefJson.writeAsString(assetsJson);
+
+    await _cleanupGeneratedAssets(assetsRef);
   }
 
   Future<String> readDeckMarkdown() async {
-    return await configuration.markdownFile.readAsString();
+    return await configuration.slidesMarkdown.readAsString();
   }
 
-  Future<void> cleanupGeneratedAssets(DateTime lastModifiedTime) async {
-    final files = await configuration.generatedDir
+  Future<void> _cleanupGeneratedAssets(
+    GeneratedAssetsReference assetsReference,
+  ) async {
+    final existingFiles = await configuration.generatedAssetsDir
         .list(recursive: true)
         .where((e) => e is File)
         .map((e) => e as File)
         .toList();
 
-    for (var file in files) {
-      final lastModified = await file.lastModified();
-      if (lastModified.isBefore(lastModifiedTime)) {
+    final referencedFiles =
+        assetsReference.files.map((file) => file.path).toSet();
+
+    await Future.forEach(existingFiles, (File file) async {
+      if (!referencedFiles.contains(file.path)) {
         await file.delete();
       }
-    }
+    });
   }
 
   @override
@@ -117,7 +144,7 @@ class FileSystemDataStore extends LocalDataStore {
 
       // Listen for file modifications
       final subscription =
-          configuration.deckFile.watch(events: FileSystemEvent.modify).listen(
+          configuration.deckJson.watch(events: FileSystemEvent.modify).listen(
         (event) async {
           try {
             final reference = await loadDeckReference();

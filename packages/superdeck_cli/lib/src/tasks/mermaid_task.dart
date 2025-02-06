@@ -18,8 +18,31 @@ class MermaidConverterTask extends Task {
       import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
       mermaid.initialize({
         startOnLoad: true,
-        theme: 'dark',
-        flowchart: {},
+        // Using 'base' gives you a clean slate
+        theme: 'base',
+        themeVariables: {
+          // Background settings
+          background: '#000000',
+          primaryColor: '#000000',
+          secondaryColor: '#000000',
+          tertiaryColor: '#000000',
+
+          // Text colors
+          primaryTextColor: '#FFFF00',
+          secondaryTextColor: '#FFFF00',
+          tertiaryTextColor: '#FFFF00',
+          defaultFontColor: '#FFFF00',
+
+          // Border and line colors
+          primaryBorderColor: '#FFFF00',
+          secondaryBorderColor: '#FFFF00',
+          tertiaryBorderColor: '#FFFF00',
+          lineColor: '#FFFF00'
+        },
+        flowchart: {
+          // Enable HTML labels (if needed) so you can style them via CSS as well
+          htmlLabels: true,
+        }
       });
       mermaid.run({ querySelector: 'pre.mermaid' });
     </script>
@@ -144,18 +167,17 @@ class MermaidConverterTask extends Task {
         logger.info(
           'Mermaid asset already exists for slide index: ${context.slideIndex}',
         );
-        continue;
+      } else {
+        final browser = await _getBrowser();
+
+        logger.info(
+          'Generating mermaid graph image for slide index: ${context.slideIndex}',
+        );
+        final imageData =
+            await _generateMermaidGraphImage(browser, mermaidBlock.content);
+
+        await assetFile.writeAsBytes(imageData);
       }
-
-      final browser = await _getBrowser();
-
-      logger.info(
-        'Generating mermaid graph image for slide index: ${context.slideIndex}',
-      );
-      final imageData =
-          await _generateMermaidGraphImage(browser, mermaidBlock.content);
-
-      await assetFile.writeAsBytes(imageData);
 
       final mermaidImageSyntax = '![mermaid_graph](${assetFile.path})';
       final updatedMarkdown = context.slide.content.replaceRange(

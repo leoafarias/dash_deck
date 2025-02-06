@@ -1,9 +1,13 @@
 part of 'schema.dart';
 
 sealed class Schema<T> {
+  final String? _name;
   const Schema({
     this.validators = const [],
-  });
+    String? name,
+  }) : _name = name;
+
+  String get name => _name ?? runtimeType.toString();
 
   Schema<T> copyWith({
     List<Validator<T>>? validators,
@@ -16,7 +20,7 @@ sealed class Schema<T> {
   static const double = DoubleSchema.new;
   static const int = IntSchema.new;
   static const boolean = BooleanSchema.new;
-  static const any = ObjectSchema({}, additionalProperties: true);
+
   static const list = SchemaList.new;
   static final enumValue = StringSchema.enumString;
 
@@ -41,7 +45,9 @@ sealed class Schema<T> {
     final typedValue = tryParse(value);
     if (typedValue == null) {
       return ValidationResult(
+        name,
         path,
+        value: value,
         errors: [
           InvalidTypeValidationError(value: value.runtimeType, expectedType: T)
         ],
@@ -56,7 +62,7 @@ sealed class Schema<T> {
       }
     }
     if (allErrors.isNotEmpty) {
-      return ValidationResult(path, errors: allErrors);
+      return ValidationResult(name, path, errors: allErrors, value: value);
     }
 
     // Now let the subclass validate the typed value specifically
@@ -65,7 +71,7 @@ sealed class Schema<T> {
 
   @protected
   ValidationResult validateValue(List<String> path, T value) {
-    return ValidationResult.valid(path);
+    return ValidationResult.valid(name, path, value);
   }
 }
 
@@ -96,7 +102,7 @@ class BooleanSchema extends Schema<bool> {
 }
 
 final class StringSchema extends Schema<String> {
-  const StringSchema({super.validators = const []});
+  const StringSchema({super.validators = const [], super.name});
 
   @override
   StringSchema copyWith({
@@ -170,7 +176,7 @@ final class StringSchema extends Schema<String> {
 }
 
 final class IntSchema extends Schema<int> {
-  const IntSchema({super.validators = const []});
+  const IntSchema({super.validators = const [], super.name});
 
   @override
   IntSchema copyWith({
@@ -188,7 +194,7 @@ final class IntSchema extends Schema<int> {
 }
 
 final class DoubleSchema extends Schema<double> {
-  const DoubleSchema({super.validators = const []});
+  const DoubleSchema({super.validators = const [], super.name});
 
   @override
   DoubleSchema copyWith({
@@ -207,20 +213,23 @@ class DiscriminatedObjectSchema extends Schema<Map<String, dynamic>> {
   final String discriminatorKey;
   final Map<String, Schema> schemas;
 
-  DiscriminatedObjectSchema({
+  const DiscriminatedObjectSchema({
     required this.discriminatorKey,
     required this.schemas,
     super.validators,
+    super.name,
   });
 
   @override
   DiscriminatedObjectSchema copyWith({
     List<Validator<Map<String, dynamic>>>? validators,
+    String? name,
   }) {
     return DiscriminatedObjectSchema(
       discriminatorKey: discriminatorKey,
       schemas: schemas,
       validators: validators ?? this.validators,
+      name: name,
     );
   }
 
@@ -243,7 +252,9 @@ class DiscriminatedObjectSchema extends Schema<Map<String, dynamic>> {
     final discriminatedSchema = getDiscriminatedKeyValue(value);
     if (discriminatedSchema == null) {
       return ValidationResult(
+        name,
         path,
+        value: value,
         errors: [
           RequiredPropMissingValidationError(property: discriminatorKey),
           DiscriminatorMissingValidationError(propertyKey: discriminatorKey),
@@ -266,6 +277,7 @@ class ObjectSchema extends Schema<Map<String, dynamic>> {
     this.additionalProperties = false,
     super.validators = const [],
     this.required = const [],
+    super.name,
   });
 
   @override
@@ -274,12 +286,14 @@ class ObjectSchema extends Schema<Map<String, dynamic>> {
     List<String>? required,
     Map<String, Schema>? properties,
     List<Validator<Map<String, dynamic>>>? validators,
+    String? name,
   }) {
     return ObjectSchema(
       properties ?? this.properties,
       additionalProperties: additionalProperties ?? this.additionalProperties,
       required: required ?? this.required,
       validators: validators ?? this.validators,
+      name: name,
     );
   }
 
@@ -297,6 +311,7 @@ class ObjectSchema extends Schema<Map<String, dynamic>> {
     bool? additionalProperties,
     List<String>? required,
     List<Validator<Map<String, dynamic>>>? validators,
+    String? name,
   }) {
     // if property SchemaValue is of SchemaMap, we need to merge them
     final mergedProperties = {...this.properties};
@@ -324,6 +339,7 @@ class ObjectSchema extends Schema<Map<String, dynamic>> {
       additionalProperties: additionalProperties,
       validators: validators,
       required: required,
+      name: name,
     );
   }
 
@@ -375,10 +391,11 @@ class ObjectSchema extends Schema<Map<String, dynamic>> {
     }
 
     if (validationErrors.isNotEmpty) {
-      return ValidationResult(path, errors: validationErrors);
+      return ValidationResult(name, path,
+          errors: validationErrors, value: value);
     }
 
-    return ValidationResult.valid(path);
+    return ValidationResult.valid(name, path, value);
   }
 }
 
@@ -387,16 +404,19 @@ class SchemaList<T extends Schema<V>, V> extends Schema<List<V>> {
   const SchemaList(
     this.itemSchema, {
     super.validators = const [],
+    super.name,
   });
 
   @override
   SchemaList<T, V> copyWith({
     bool? required,
     List<Validator<List<V>>>? validators,
+    String? name,
   }) {
     return SchemaList(
       itemSchema,
       validators: validators ?? this.validators,
+      name: name,
     );
   }
 
@@ -425,9 +445,9 @@ class SchemaList<T extends Schema<V>, V> extends Schema<List<V>> {
     }
 
     if (errors.isNotEmpty) {
-      return ValidationResult(path, errors: errors);
+      return ValidationResult(name, path, errors: errors, value: value);
     }
 
-    return ValidationResult.valid(path);
+    return ValidationResult.valid(name, path, value);
   }
 }

@@ -50,7 +50,8 @@ class TaskPipeline {
   }
 
   Future<Iterable<Slide>> run() async {
-    final startTime = DateTime.now();
+    await store.initialize();
+
     // Load raw markdown content from the repository.
 
     final markdownRaw = await store.readDeckMarkdown();
@@ -79,11 +80,8 @@ class TaskPipeline {
     final slides = finalizedSlides.map((slide) => Slide(
           key: slide.key,
           options: SlideOptions.parse(slide.frontmatter),
-          markdown: slide.content,
           sections: sectionParser.parse(slide.content),
         ));
-
-    await store.cleanupGeneratedAssets(startTime);
 
     // Dispose of all tasks after processing.
     for (var task in tasks) {
@@ -93,7 +91,7 @@ class TaskPipeline {
     // Convert the iterable of slides to a list for saving.
 
     // Save the processed slides back to the repository.
-    await store.saveReference(
+    await store.saveReferences(
       DeckReference(slides: slides.toList(), config: configuration),
     );
 

@@ -27,8 +27,6 @@ class SlideMapper extends ClassMapperBase<Slide> {
   static SlideOptions? _$options(Slide v) => v.options;
   static const Field<Slide, SlideOptions> _f$options =
       Field('options', _$options, opt: true);
-  static String _$markdown(Slide v) => v.markdown;
-  static const Field<Slide, String> _f$markdown = Field('markdown', _$markdown);
   static List<SectionBlock> _$sections(Slide v) => v.sections;
   static const Field<Slide, List<SectionBlock>> _f$sections =
       Field('sections', _$sections, opt: true, def: const []);
@@ -40,7 +38,6 @@ class SlideMapper extends ClassMapperBase<Slide> {
   final MappableFields<Slide> fields = const {
     #key: _f$key,
     #options: _f$options,
-    #markdown: _f$markdown,
     #sections: _f$sections,
     #comments: _f$comments,
   };
@@ -51,7 +48,6 @@ class SlideMapper extends ClassMapperBase<Slide> {
     return Slide(
         key: data.dec(_f$key),
         options: data.dec(_f$options),
-        markdown: data.dec(_f$markdown),
         sections: data.dec(_f$sections),
         comments: data.dec(_f$comments));
   }
@@ -109,7 +105,6 @@ abstract class SlideCopyWith<$R, $In extends Slide, $Out>
   $R call(
       {String? key,
       SlideOptions? options,
-      String? markdown,
       List<SectionBlock>? sections,
       List<String>? comments});
   SlideCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
@@ -137,13 +132,11 @@ class _SlideCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Slide, $Out>
   $R call(
           {String? key,
           Object? options = $none,
-          String? markdown,
           List<SectionBlock>? sections,
           List<String>? comments}) =>
       $apply(FieldCopyWithData({
         if (key != null) #key: key,
         if (options != $none) #options: options,
-        if (markdown != null) #markdown: markdown,
         if (sections != null) #sections: sections,
         if (comments != null) #comments: comments
       }));
@@ -151,7 +144,6 @@ class _SlideCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Slide, $Out>
   Slide $make(CopyWithData data) => Slide(
       key: data.get(#key, or: $value.key),
       options: data.get(#options, or: $value.options),
-      markdown: data.get(#markdown, or: $value.markdown),
       sections: data.get(#sections, or: $value.sections),
       comments: data.get(#comments, or: $value.comments));
 

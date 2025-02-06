@@ -8,26 +8,28 @@ import '../schema/schema.dart';
 
 part 'deck_configuration.mapper.dart';
 
-@MappableClass(includeCustomMappers: [DirectoryMapper(), FileMapper()])
+@MappableClass(
+  includeCustomMappers: [
+    DirectoryMapper(),
+    FileMapper(),
+  ],
+)
 class DeckConfiguration with DeckConfigurationMappable {
-  late final Directory assetDir;
-  late final File deckFile;
-  late final Directory generatedDir;
-  late final File markdownFile;
+  late final Directory _superdeckDir;
+  late final File deckJson;
+  late final Directory generatedAssetsDir;
+  late final File slidesMarkdown;
+  late final File generatedAssetsRefJson;
 
   DeckConfiguration({
-    Directory? assetDir,
-    File? deckFile,
-    Directory? generatedDir,
-    File? markdownFile,
+    File? slidesMarkdown,
   }) {
-    this.assetDir = assetDir ?? Directory(p.join('.superdeck'));
-    this.deckFile = deckFile ?? File(p.join(this.assetDir.path, 'slides.json'));
-    this.generatedDir = generatedDir ??
-        Directory(
-          p.join(this.assetDir.path, 'generated'),
-        );
-    this.markdownFile = markdownFile ?? File('slides.md');
+    _superdeckDir = Directory(p.join('.superdeck'));
+    deckJson = File(p.join(_superdeckDir.path, 'superdeck.json'));
+    generatedAssetsDir = Directory(p.join(_superdeckDir.path, 'assets'));
+    this.slidesMarkdown = slidesMarkdown ?? File('slides.md');
+    generatedAssetsRefJson =
+        File(p.join(_superdeckDir.path, 'generated_assets.json'));
   }
 
   static DeckConfiguration parse(Map<String, dynamic> map) {
@@ -37,10 +39,7 @@ class DeckConfiguration with DeckConfigurationMappable {
 
   static final schema = Schema.object(
     {
-      'assetDir': Schema.string(),
-      'deckFile': Schema.string(),
-      'generatedDir': Schema.string(),
-      'markdownFile': Schema.string(),
+      'slidesMarkdown': Schema.string(),
     },
   );
 

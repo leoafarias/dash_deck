@@ -7,14 +7,12 @@ part 'slide_model.mapper.dart';
 class Slide with SlideMappable {
   final String key;
   final SlideOptions? options;
-  final String markdown;
   final List<SectionBlock> sections;
   final List<String> comments;
 
   const Slide({
     required this.key,
     this.options,
-    required this.markdown,
     this.sections = const [],
     this.comments = const [],
   });
@@ -22,13 +20,12 @@ class Slide with SlideMappable {
   static final schema = Schema.object(
     {
       "key": Schema.string(),
-      "markdown": Schema.string(),
       "title": Schema.string(),
       'options': SlideOptions.schema,
       'sections': Schema.list(SectionBlock.schema),
       'comments': Schema.list(Schema.string()),
     },
-    required: ['key', 'markdown'],
+    required: ['key'],
     additionalProperties: true,
   );
 

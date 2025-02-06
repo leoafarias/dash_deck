@@ -21,35 +21,36 @@ class DeckConfigurationMapper extends ClassMapperBase<DeckConfiguration> {
   @override
   final String id = 'DeckConfiguration';
 
-  static Directory _$assetDir(DeckConfiguration v) => v.assetDir;
-  static const Field<DeckConfiguration, Directory> _f$assetDir =
-      Field('assetDir', _$assetDir, key: 'asset_dir', opt: true);
-  static File _$deckFile(DeckConfiguration v) => v.deckFile;
-  static const Field<DeckConfiguration, File> _f$deckFile =
-      Field('deckFile', _$deckFile, key: 'deck_file', opt: true);
-  static Directory _$generatedDir(DeckConfiguration v) => v.generatedDir;
-  static const Field<DeckConfiguration, Directory> _f$generatedDir =
-      Field('generatedDir', _$generatedDir, key: 'generated_dir', opt: true);
-  static File _$markdownFile(DeckConfiguration v) => v.markdownFile;
-  static const Field<DeckConfiguration, File> _f$markdownFile =
-      Field('markdownFile', _$markdownFile, key: 'markdown_file', opt: true);
+  static File _$slidesMarkdown(DeckConfiguration v) => v.slidesMarkdown;
+  static const Field<DeckConfiguration, File> _f$slidesMarkdown = Field(
+      'slidesMarkdown', _$slidesMarkdown,
+      key: 'slides_markdown', opt: true);
+  static File _$deckJson(DeckConfiguration v) => v.deckJson;
+  static const Field<DeckConfiguration, File> _f$deckJson =
+      Field('deckJson', _$deckJson, key: 'deck_json', mode: FieldMode.member);
+  static Directory _$generatedAssetsDir(DeckConfiguration v) =>
+      v.generatedAssetsDir;
+  static const Field<DeckConfiguration, Directory> _f$generatedAssetsDir =
+      Field('generatedAssetsDir', _$generatedAssetsDir,
+          key: 'generated_assets_dir', mode: FieldMode.member);
+  static File _$generatedAssetsRefJson(DeckConfiguration v) =>
+      v.generatedAssetsRefJson;
+  static const Field<DeckConfiguration, File> _f$generatedAssetsRefJson = Field(
+      'generatedAssetsRefJson', _$generatedAssetsRefJson,
+      key: 'generated_assets_ref_json', mode: FieldMode.member);
 
   @override
   final MappableFields<DeckConfiguration> fields = const {
-    #assetDir: _f$assetDir,
-    #deckFile: _f$deckFile,
-    #generatedDir: _f$generatedDir,
-    #markdownFile: _f$markdownFile,
+    #slidesMarkdown: _f$slidesMarkdown,
+    #deckJson: _f$deckJson,
+    #generatedAssetsDir: _f$generatedAssetsDir,
+    #generatedAssetsRefJson: _f$generatedAssetsRefJson,
   };
   @override
   final bool ignoreNull = true;
 
   static DeckConfiguration _instantiate(DecodingData data) {
-    return DeckConfiguration(
-        assetDir: data.dec(_f$assetDir),
-        deckFile: data.dec(_f$deckFile),
-        generatedDir: data.dec(_f$generatedDir),
-        markdownFile: data.dec(_f$markdownFile));
+    return DeckConfiguration(slidesMarkdown: data.dec(_f$slidesMarkdown));
   }
 
   @override
@@ -107,11 +108,7 @@ extension DeckConfigurationValueCopy<$R, $Out>
 
 abstract class DeckConfigurationCopyWith<$R, $In extends DeckConfiguration,
     $Out> implements ClassCopyWith<$R, $In, $Out> {
-  $R call(
-      {Directory? assetDir,
-      File? deckFile,
-      Directory? generatedDir,
-      File? markdownFile});
+  $R call({File? slidesMarkdown});
   DeckConfigurationCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -125,23 +122,11 @@ class _DeckConfigurationCopyWithImpl<$R, $Out>
   late final ClassMapperBase<DeckConfiguration> $mapper =
       DeckConfigurationMapper.ensureInitialized();
   @override
-  $R call(
-          {Object? assetDir = $none,
-          Object? deckFile = $none,
-          Object? generatedDir = $none,
-          Object? markdownFile = $none}) =>
-      $apply(FieldCopyWithData({
-        if (assetDir != $none) #assetDir: assetDir,
-        if (deckFile != $none) #deckFile: deckFile,
-        if (generatedDir != $none) #generatedDir: generatedDir,
-        if (markdownFile != $none) #markdownFile: markdownFile
-      }));
+  $R call({Object? slidesMarkdown = $none}) => $apply(FieldCopyWithData(
+      {if (slidesMarkdown != $none) #slidesMarkdown: slidesMarkdown}));
   @override
   DeckConfiguration $make(CopyWithData data) => DeckConfiguration(
-      assetDir: data.get(#assetDir, or: $value.assetDir),
-      deckFile: data.get(#deckFile, or: $value.deckFile),
-      generatedDir: data.get(#generatedDir, or: $value.generatedDir),
-      markdownFile: data.get(#markdownFile, or: $value.markdownFile));
+      slidesMarkdown: data.get(#slidesMarkdown, or: $value.slidesMarkdown));
 
   @override
   DeckConfigurationCopyWith<$R2, DeckConfiguration, $Out2> $chain<$R2, $Out2>(
