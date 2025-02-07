@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
 
-class NotePanel extends StatelessWidget {
-  const NotePanel({
+class CommentsPanel extends StatelessWidget {
+  const CommentsPanel({
     super.key,
-    required this.notes,
+    required this.comments,
   });
 
-  final List<String> notes;
+  final List<String> comments;
 
   @override
   Widget build(BuildContext context) {
     final style = Style(
-      $box.margin(10),
+      $box.margin(10, 10, 0, 10),
       $box.color(const Color.fromARGB(255, 35, 35, 35)),
-      $box.minHeight(100),
       $box.padding(10),
       $box.borderRadius(10),
       $flex.crossAxisAlignment.stretch(),
@@ -25,7 +24,7 @@ class NotePanel extends StatelessWidget {
         SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: notes.map(Text.new).toList(),
+            children: comments.map(Text.new).toList(),
           ),
         ),
       ],

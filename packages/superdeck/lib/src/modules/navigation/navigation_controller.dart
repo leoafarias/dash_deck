@@ -28,6 +28,8 @@ class NavigationController extends ChangeNotifier {
 
   SlideConfiguration get currentSlide => _currentSlide;
 
+  int get totalSlides => _slides.length;
+
   void updateSlides(List<SlideConfiguration> slides) {
     _router = _buildRouter(slides);
     _currentSlide = currentSlide.slideIndex < slides.length

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mix/mix.dart';
 
 import '../../modules/navigation/navigation_controller.dart';
 
@@ -11,48 +12,68 @@ class DeckBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final navigation = NavigationController.of(context);
 
-    return SizedBox(
-      height: 60,
-      width: MediaQuery.sizeOf(context).width,
-      child: ClipRect(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: const BoxDecoration(
-            color: Color.fromARGB(171, 21, 21, 21),
-            border: Border(
-              top: BorderSide(
-                color: Colors.white10,
-                width: 1,
-              ),
-            ),
+    final currentPage = navigation.currentSlide.slideIndex + 1;
+    final totalPages = navigation.totalSlides;
+
+    return _BottomBarContainer(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // view notes
+          IconButton(
+            onPressed: navigation.toggleNotes,
+            icon: navigation.isNotesOpen
+                ? const Icon(Icons.comment)
+                : const Icon(Icons.comments_disabled),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // view notes
-              IconButton(
-                onPressed: navigation.toggleNotes,
-                icon: const Icon(Icons.notes),
-              ),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: navigation.previousSlide,
-              ),
-              IconButton(
-                icon: const Icon(Icons.arrow_forward),
-                onPressed: navigation.nextSlide,
-              ),
-              const Spacer(),
-              IconButton(
-                onPressed: navigation.closeMenu,
-                icon: const Icon(Icons.close),
-              ),
-            ],
+          const Spacer(),
+          IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: navigation.previousSlide,
           ),
-        ),
+
+          IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: navigation.nextSlide,
+          ),
+          const Spacer(),
+          Text(
+            '${navigation.currentSlide.slideIndex + 1} of $totalPages',
+            style: const TextStyle(color: Colors.white),
+          ),
+          const SizedBox(width: 16),
+          IconButton(
+            onPressed: navigation.closeMenu,
+            icon: const Icon(Icons.close),
+          ),
+        ],
       ),
+    );
+  }
+}
+
+class _BottomBarContainer extends StatelessWidget {
+  const _BottomBarContainer({
+    super.key,
+    required this.child,
+  });
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Style(
+      $box.height(60),
+      $box.borderRadius(16),
+      $box.color(const Color.fromARGB(255, 17, 17, 17)),
+      $box.padding(10, 20),
+      $box.margin(12),
+    );
+
+    return Box(
+      style: style,
+      child: child,
     );
   }
 }
