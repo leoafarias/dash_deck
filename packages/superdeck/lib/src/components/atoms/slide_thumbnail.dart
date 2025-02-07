@@ -38,6 +38,7 @@ class SlideThumbnail extends StatefulWidget {
 
 class _SlideThumbnailState extends State<SlideThumbnail> {
   final _slideCaptureService = SlideCaptureService();
+  final _thumbnailKey = GlobalKey(debugLabel: 'Thumbnail');
 
   /// Generates the thumbnail for the given [slide].
   ///
@@ -56,7 +57,10 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
       return thumbnailFile;
     }
 
-    final imageData = await _slideCaptureService.generate(slide: slide);
+    final imageData = await _slideCaptureService.generate(
+      slide: slide,
+      globalKey: _thumbnailKey,
+    );
 
     await thumbnailFile.writeAsBytes(imageData, flush: false);
 
@@ -88,6 +92,7 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
   @override
   Widget build(BuildContext context) {
     return _PreviewContainer(
+      key: _thumbnailKey,
       selected: widget.selected,
       child: Stack(
         children: [
@@ -117,6 +122,7 @@ class _PreviewContainer extends StatelessWidget {
   final bool selected;
 
   const _PreviewContainer({
+    super.key,
     required this.selected,
     required this.child,
   });

@@ -10,8 +10,6 @@ import '../molecules/bottom_bar.dart';
 import '../molecules/scaled_app.dart';
 import 'note_panel.dart';
 
-final kScaffoldKey = GlobalKey<ScaffoldState>();
-
 /// Builds the "shell" for the app by building a Scaffold with a
 /// BottomNavigationBar, where [child] is placed in the body of the Scaffold.
 class AppShell extends StatelessWidget {
@@ -155,7 +153,6 @@ class _SplitViewState extends State<SplitView> with TickerProviderStateMixin {
         ),
         Expanded(
           child: Scaffold(
-            key: kScaffoldKey,
             backgroundColor: const Color.fromARGB(255, 9, 9, 9),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.miniEndFloat,

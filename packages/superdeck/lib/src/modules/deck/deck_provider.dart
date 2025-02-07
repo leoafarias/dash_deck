@@ -4,6 +4,7 @@ import 'package:superdeck/src/components/atoms/async_snapshot_widget.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 import '../common/helpers/constants.dart';
+import '../common/helpers/provider.dart';
 import 'deck_controller.dart';
 import 'deck_options.dart';
 
@@ -99,6 +100,7 @@ class _DeckControllerProviderState extends State<_DeckControllerProvider> {
     super.didUpdateWidget(oldWidget);
     final referenceChanged = widget.reference != oldWidget.reference;
     final optionsChanged = widget.options != oldWidget.options;
+
     if (referenceChanged || optionsChanged) {
       controller.update(
         slides: widget.reference.slides,
@@ -115,7 +117,8 @@ class _DeckControllerProviderState extends State<_DeckControllerProvider> {
 
   @override
   Widget build(BuildContext context) {
-    return controller.provide(
+    return InheritedNotifierData(
+      data: controller,
       child: widget.builder(controller),
     );
   }

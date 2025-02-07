@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router_paths/go_router_paths.dart';
 
 class SDPaths {
@@ -26,5 +25,3 @@ class SlidePath extends Param<SlidePath> {
 class ChatPath extends Path<ChatPath> {
   ChatPath() : super('chat');
 }
-
-final kRootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');

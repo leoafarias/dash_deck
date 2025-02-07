@@ -17,8 +17,14 @@ class MeasureSize extends StatefulWidget {
 }
 
 class _MeasureSizeState extends State<MeasureSize> {
-  final GlobalKey _widgetKey = GlobalKey();
+  late final GlobalKey _widgetKey;
   Size? _size;
+
+  @override
+  void initState() {
+    super.initState();
+    _widgetKey = GlobalKey(debugLabel: 'MeasureSize');
+  }
 
   @override
   Widget build(BuildContext context) {

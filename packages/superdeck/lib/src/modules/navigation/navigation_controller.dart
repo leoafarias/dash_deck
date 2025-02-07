@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../components/molecules/slide_screen.dart';
-import '../../components/organisms/app_shell.dart';
 import '../common/helpers/provider.dart';
 import '../deck/slide_configuration.dart';
 import '../navigation/routes.dart';
 
 class NavigationController extends ChangeNotifier {
-  late final GoRouter _router;
+  late GoRouter _router;
 
   bool _isMenuOpen = false;
   late SlideConfiguration _currentSlide;
@@ -19,7 +18,7 @@ class NavigationController extends ChangeNotifier {
     required List<SlideConfiguration> slides,
   }) {
     _router = _buildRouter(slides);
-    _registerListener(_router);
+    _registerListener();
     _currentSlide = slides[0];
     _slides = slides;
   }
@@ -34,12 +33,13 @@ class NavigationController extends ChangeNotifier {
   void updateSlides(List<SlideConfiguration> slides) {
     _router.dispose();
     _router = _buildRouter(slides);
-    _registerListener(_router);
+    _slides = slides;
+    _registerListener();
     notifyListeners();
   }
 
-  void _registerListener(GoRouter router) {
-    router.routeInformationProvider.addListener(() {
+  void _registerListener() {
+    _router.routeInformationProvider.addListener(() {
       final uri = router.routeInformationProvider.value.uri;
 
       final pathParam = uri.toString().startsWith(SDPaths.slides.path)
@@ -60,49 +60,37 @@ class NavigationController extends ChangeNotifier {
     super.dispose();
   }
 
-  Widget provide({required Widget child}) {
-    return InheritedNotifierData(
-      data: this,
-      child: child,
-    );
-  }
-
   static NavigationController of(BuildContext context) {
     return InheritedNotifierData.of<NavigationController>(context);
   }
 
   GoRouter _buildRouter(List<SlideConfiguration> slides) {
     return GoRouter(
-        initialLocation: SDPaths.slides.goRoute,
-        redirect: (context, state) =>
-            state.path == SDPaths.root.path ? SDPaths.slides.goRoute : null,
-        navigatorKey: _kRootNavigatorKey,
-        restorationScopeId: 'root',
-        routes: <RouteBase>[
-          ShellRoute(
-            navigatorKey: _kShellRouteNavigatorKey,
-            builder: (context, state, child) => AppShell(child: child),
-            routes: [
-              GoRoute(
-                parentNavigatorKey: _kShellRouteNavigatorKey,
-                path: SDPaths.slides.goRoute,
-                builder: (context, state) => SlideScreen(slides[0]),
-                routes: slides.mapIndexed((index, slide) {
-                  return GoRoute(
-                    path: index.toString(),
-                    pageBuilder: (context, state) {
-                      final slideIndex = int.parse(state.path ?? '0');
-                      return _getPageTransition(
-                        SlideScreen(slides[slideIndex]),
-                        state,
-                      );
-                    },
-                  );
-                }).toList(),
-              )
-            ],
-          ),
-        ]);
+      initialLocation: SDPaths.slides.goRoute,
+      redirect: (context, state) =>
+          state.path == SDPaths.root.path ? SDPaths.slides.goRoute : null,
+      navigatorKey: _kRootNavigatorKey,
+      restorationScopeId: 'root',
+      routes: [
+        GoRoute(
+          parentNavigatorKey: _kRootNavigatorKey,
+          path: SDPaths.slides.goRoute,
+          builder: (context, state) => SlideScreen(slides[0]),
+          routes: slides.mapIndexed((index, slide) {
+            return GoRoute(
+              path: index.toString(),
+              pageBuilder: (context, state) {
+                final slideIndex = int.parse(state.path ?? '0');
+                return _getPageTransition(
+                  SlideScreen(slides[slideIndex]),
+                  state,
+                );
+              },
+            );
+          }).toList(),
+        ),
+      ],
+    );
   }
 
   void goToSlide(int index) {

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
+import '../common/helpers/provider.dart';
 import '../deck/deck_controller.dart';
 import 'navigation_controller.dart';
 
@@ -43,24 +44,29 @@ class _NavigationProviderBuilderState extends State<NavigationProviderBuilder> {
   void didUpdateWidget(NavigationProviderBuilder oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget._deckController != oldWidget._deckController) {
-      final slidesChanged = listEquals(
+    final slidesChanged = listEquals(
+      widget._deckController.slides,
+      oldWidget._deckController.slides,
+    );
+
+    if (slidesChanged) {
+      _navigationController.updateSlides(
         widget._deckController.slides,
-        oldWidget._deckController.slides,
       );
-      if (slidesChanged) {
-        _navigationController.updateSlides(
-          widget._deckController.slides,
-        );
-      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return _navigationController.provide(
-      child: widget.builder(
-        _navigationController.router,
+    return InheritedNotifierData(
+      data: _navigationController,
+      child: ListenableBuilder(
+        listenable: _navigationController,
+        builder: (context, child) {
+          return widget.builder(
+            _navigationController.router,
+          );
+        },
       ),
     );
   }

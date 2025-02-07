@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:superdeck/src/modules/common/helpers/provider.dart';
 
 import '../../components/atoms/slide_view.dart';
-import '../../components/organisms/app_shell.dart';
 import '../common/helpers/constants.dart';
 import '../deck/slide_configuration.dart';
 
@@ -35,6 +34,7 @@ class SlideCaptureService {
   Future<Uint8List> generate({
     SlideCaptureQuality quality = SlideCaptureQuality.low,
     required SlideConfiguration slide,
+    required GlobalKey globalKey,
   }) async {
     final queueKey = shortHash(slide.key + quality.name);
     try {
@@ -54,7 +54,7 @@ class SlideCaptureService {
           data: exportingSlide,
           child: SlideView(exportingSlide),
         ),
-        context: kScaffoldKey.currentContext!,
+        context: globalKey.currentContext!,
         pixelRatio: quality.pixelRatio,
         targetSize: kResolution,
       );

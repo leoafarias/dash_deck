@@ -5,6 +5,7 @@ import '../modules/common/initializer_provider.dart';
 import '../modules/deck/deck_options.dart';
 import '../modules/deck/deck_provider.dart';
 import '../modules/navigation/navigation_provider.dart';
+import 'organisms/app_shell.dart';
 
 class SuperDeckApp extends StatelessWidget {
   const SuperDeckApp({
@@ -23,11 +24,6 @@ class SuperDeckApp extends StatelessWidget {
     return DeckControllerBuilder(
       options: options,
       builder: (controller) {
-        if (controller.slides.isEmpty) {
-          return const Center(
-            child: Text('No slides found'),
-          );
-        }
         return NavigationProviderBuilder(
           deckController: controller,
           builder: (router) {
@@ -35,6 +31,9 @@ class SuperDeckApp extends StatelessWidget {
               debugShowCheckedModeBanner: false,
               title: 'Superdeck',
               routerConfig: router,
+              builder: (context, child) {
+                return AppShell(child: child!);
+              },
               theme: theme,
             );
           },

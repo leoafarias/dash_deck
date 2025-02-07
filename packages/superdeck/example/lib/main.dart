@@ -19,12 +19,12 @@ void main() async {
             widgets: {
               'twitter': (args) {
                 return TwitterWidget(
-                  username: args['username'] as String,
-                  tweetId: args['tweetId'] as String,
+                  username: args.getString('username'),
+                  tweetId: args.getString('tweetId'),
                 );
               },
             },
-            debug: true,
+            debug: false,
             styles: {
               'announcement': AnnouncementStyle(),
               'quote': QuoteStyle(),
@@ -50,9 +50,13 @@ class TwitterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.red,
-      child: Text('Twitter: $username'),
+    return Row(
+      children: [
+        Container(
+          color: Colors.purple,
+          child: Text('Twitter: $username'),
+        ),
+      ],
     );
   }
 }

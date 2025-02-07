@@ -136,34 +136,14 @@ class FileSystemDataStore extends LocalDataStore {
   }
 
   @override
-  Stream<DeckReference> loadDeckReferenceStream() {
-    return Stream<DeckReference>.multi((controller) async {
-      // Emit the current reference immediately
-      try {
-        final reference = await loadDeckReference();
-        controller.add(reference);
-      } catch (e) {
-        controller.addError(e);
-      }
+  Stream<DeckReference> loadDeckReferenceStream() async* {
+    // Emit the current reference immediately.
+    yield await loadDeckReference();
 
-      // Listen for file modifications
-      final subscription =
-          configuration.deckJson.watch(events: FileSystemEvent.modify).listen(
-        (event) async {
-          try {
-            final reference = await loadDeckReference();
-            controller.add(reference);
-          } catch (e) {
-            controller.addError(e);
-          }
-        },
-        onError: controller.addError,
-      );
-
-      // Ensure the subscription is cancelled when there are no listeners.
-      controller.onCancel = () async {
-        await subscription.cancel();
-      };
-    });
+    // For each file modification event, emit a new deck reference.
+    await for (final _
+        in configuration.deckJson.watch(events: FileSystemEvent.modify)) {
+      yield await loadDeckReference();
+    }
   }
 }

@@ -253,7 +253,7 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetBlock> {
       return Container(
         color: Colors.red,
         child: Center(
-          child: Text('Widget not found: ${data.block.type}'),
+          child: Text('Widget not found: ${data.block.name}'),
         ),
       );
     }
@@ -267,9 +267,9 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetBlock> {
           );
         } catch (e) {
           return Container(
-            color: Colors.red,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
+              color: Colors.red,
               border: Border.all(
                 color: Colors.red,
                 width: 2,
@@ -280,9 +280,7 @@ class _WidgetBlockWidget extends _BlockWidget<WidgetBlock> {
               child: Text('''
 Error building widget: ${data.block.name}
 
-${e.toString()}
-
-'''),
+${e.toString()}'''),
             ),
           );
         }

@@ -57,13 +57,6 @@ class DeckController with ChangeNotifier {
     );
   }
 
-  Widget provide({required Widget child}) {
-    return InheritedNotifierData(
-      data: this,
-      child: child,
-    );
-  }
-
   static DeckController of(BuildContext context) {
     return InheritedNotifierData.of<DeckController>(context);
   }

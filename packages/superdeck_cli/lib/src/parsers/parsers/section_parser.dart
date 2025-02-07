@@ -43,8 +43,6 @@ class SectionParser extends BaseParser<List<SectionBlock>> {
         ..addContent(blockContent);
     }
 
-    // print(aggregator.sections);
-
     return aggregator.sections;
   }
 }

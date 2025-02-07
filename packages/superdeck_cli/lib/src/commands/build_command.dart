@@ -80,15 +80,16 @@ class BuildCommand extends Command<int> {
         'Watch mode enabled. Listening for changes in slides markdown file.',
       );
 
-      await pipeline.store.configuration.slidesFile
-          .watch(events: FileSystemEvent.modify)
-          .listen(
-        (event) {
+      await for (final event in pipeline.store.configuration.slidesFile
+          .watch(events: FileSystemEvent.modify)) {
+        try {
           logger.info('Detected modification in file: ${event.path}');
-          _runPipeline(pipeline);
-        },
-        onError: (error) => logger.err('Error watching file: $error'),
-      );
+          await _runPipeline(pipeline);
+        } on Exception catch (e, stackTrace) {
+          logger.err('Error processing file: $e');
+          logger.detail(stackTrace.toString());
+        }
+      }
     }
 
     return ExitCode.success.code;
