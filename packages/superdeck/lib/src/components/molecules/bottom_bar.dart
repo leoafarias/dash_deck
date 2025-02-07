@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../modules/navigation/navigation_controller.dart';
 
-class SdBottomBar extends StatelessWidget {
-  const SdBottomBar({
+class DeckBottomBar extends StatelessWidget {
+  const DeckBottomBar({
     super.key,
   });
 
@@ -30,6 +30,11 @@ class SdBottomBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // view notes
+              IconButton(
+                onPressed: navigation.toggleNotes,
+                icon: const Icon(Icons.notes),
+              ),
               const Spacer(),
               IconButton(
                 icon: const Icon(Icons.arrow_back),

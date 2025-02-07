@@ -1,29 +1,5 @@
 import 'package:petitparser/petitparser.dart';
 
-class HtmlCommentDefinition extends GrammarDefinition {
-  const HtmlCommentDefinition();
-
-  Parser _open() => string('<!--');
-
-  Parser _close() => string('-->');
-
-  /// Matches the full HTML comment: `<!-- comment-body -->`
-  Parser htmlComment() => ref(commentBody).between(ref(_open), ref(_close));
-
-  /// Matches the comment body:
-  /// - Consumes any character unless it forms `--`
-  /// - Stops lazily before the closing `-->`.
-  ///
-  /// This ensures we don't allow `--` anywhere **inside** the comment content,
-  /// which is the strict rule for valid HTML comments.
-  Parser commentBody() => (string('--').not() & any())
-      .starLazy(ref(_close))
-      .flatten('Invalid HTML comment (contains `--` before closing).');
-
-  @override
-  Parser start() => ref(htmlComment).trim().end();
-}
-
 extension ParserExtension<R> on Parser<R> {
   Parser between(Parser start, Parser end) =>
       (start & this & end).map((values) => values[1]);
@@ -154,4 +130,29 @@ class FrontMatterGrammarDefinition
                 yaml: (values.yaml ?? '').trim(),
                 markdown: (values.markdown ?? '').trim(),
               ));
+}
+
+class HtmlCommentDefinition extends GrammarDefinition<String> {
+  const HtmlCommentDefinition();
+
+  Parser _open() => string('<!--');
+
+  Parser _close() => string('-->');
+
+  /// Matches the full HTML comment: `<!-- comment-body -->`
+  Parser htmlComment() => ref(commentBody).between(ref(_open), ref(_close));
+
+  /// Matches the comment body:
+  /// - Consumes any character unless it forms `--`
+  /// - Stops lazily before the closing `-->`.
+  ///
+  /// This ensures we don't allow `--` anywhere **inside** the comment content,
+  /// which is the strict rule for valid HTML comments.
+  Parser commentBody() => (string('--').not() & any())
+      .starLazy(ref(_close))
+      .flatten('Invalid HTML comment (contains `--` before closing).');
+
+  @override
+  Parser<String> start() =>
+      ref(htmlComment).trim().end().map((value) => (value as String).trim());
 }

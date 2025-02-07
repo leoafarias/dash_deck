@@ -60,14 +60,7 @@ class _NavigationProviderBuilderState extends State<NavigationProviderBuilder> {
   Widget build(BuildContext context) {
     return InheritedNotifierData(
       data: _navigationController,
-      child: ListenableBuilder(
-        listenable: _navigationController,
-        builder: (context, child) {
-          return widget.builder(
-            _navigationController.router,
-          );
-        },
-      ),
+      child: widget.builder(_navigationController.router),
     );
   }
 }

@@ -1,21 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:superdeck/src/components/atoms/async_snapshot_widget.dart';
+import 'package:superdeck/src/modules/common/helpers/root_bundle_data_store.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
 import '../common/helpers/constants.dart';
 import '../common/helpers/provider.dart';
 import 'deck_controller.dart';
 import 'deck_options.dart';
-
-class _RootBundleDataStore extends LocalDataStore {
-  _RootBundleDataStore(super.configuration);
-
-  @override
-  Future<String> fileReader(String path) async {
-    return rootBundle.loadString(path);
-  }
-}
 
 class DeckControllerBuilder extends StatelessWidget {
   final DeckOptions options;
@@ -48,7 +39,7 @@ class DeckControllerBuilder extends StatelessWidget {
       builder: (snapshot) {
         final dataStore = kCanRunProcess
             ? FileSystemDataStore(snapshot)
-            : _RootBundleDataStore(snapshot);
+            : AssetBundleDataStore(snapshot);
         return AsyncStreamWidget(
           stream: dataStore.loadDeckReferenceStream(),
           builder: (snapshot) {

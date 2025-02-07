@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mix/mix.dart';
 
 class NotePanel extends StatelessWidget {
   const NotePanel({
@@ -10,32 +11,21 @@ class NotePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (notes.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    final style = Style(
+      $box.margin(10),
+      $box.color(const Color.fromARGB(255, 35, 35, 35)),
+      $box.minHeight(100),
+      $box.padding(10),
+      $box.borderRadius(10),
+      $flex.crossAxisAlignment.stretch(),
+    );
+    return VBox(
+      style: style,
       children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).dialogBackgroundColor,
-              border: Border(
-                top: BorderSide(
-                  color: Theme.of(context).dividerColor,
-                ),
-              ),
-            ),
-            padding: const EdgeInsets.all(16),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: notes
-                    .map(
-                      (note) => Text(note),
-                    )
-                    .toList(),
-              ),
-            ),
+        SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: notes.map(Text.new).toList(),
           ),
         ),
       ],

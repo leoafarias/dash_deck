@@ -5,6 +5,8 @@ import 'package:superdeck_cli/src/parsers/markdown_parser.dart';
 import 'package:superdeck_cli/src/parsers/parsers/section_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
+import 'parsers/parsers/comment_parser.dart';
+
 /// Represents the context in which a slide is processed.
 /// It holds the raw slide data and manages associated assets.
 class TaskContext {
@@ -72,15 +74,14 @@ class TaskPipeline {
     // Await all slide processing tasks to complete.
     final results = await Future.wait(futures);
 
-    final sectionParser = SectionParser();
-
     // Extract the processed slides from the results.
     final finalizedSlides = results.map((result) => result.slide);
 
     final slides = finalizedSlides.map((slide) => Slide(
           key: slide.key,
           options: SlideOptions.parse(slide.frontmatter),
-          sections: sectionParser.parse(slide.content),
+          sections: SectionParser().parse(slide.content),
+          comments: CommentParser().parse(slide.content),
         ));
 
     // Dispose of all tasks after processing.

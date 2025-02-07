@@ -1,7 +1,7 @@
 {
   "slides": [
     {
-      "key": "WML9cKLl",
+      "key": "cS8UY7ii",
       "options": {},
       "sections": [
         {
@@ -17,11 +17,11 @@
               "flex": 1,
               "scrollable": false,
               "type": "widget",
-              "username": "fsfa",
+              "username": "faafasdf",
               "tweetId": 1746481414112256000
             },
             {
-              "content": "![mermaid_graph](.superdeck/assets/mermaid_srHRIuii.png) {.code}",
+              "content": "![mermaid_graph](.superdeck/assets/mermaid_srHRIuii.png) {.code}\n\n<!-- Test of notes -->",
               "flex": 1,
               "scrollable": false,
               "type": "column"
@@ -32,7 +32,9 @@
           "type": "section"
         }
       ],
-      "comments": []
+      "comments": [
+        "Test of notes"
+      ]
     },
     {
       "key": "nPPBLQ6k",

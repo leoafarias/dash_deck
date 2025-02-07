@@ -9,7 +9,6 @@ import '../navigation/routes.dart';
 
 class NavigationController extends ChangeNotifier {
   late GoRouter _router;
-
   bool _isMenuOpen = false;
   late SlideConfiguration _currentSlide;
   late List<SlideConfiguration> _slides;
@@ -18,7 +17,6 @@ class NavigationController extends ChangeNotifier {
     required List<SlideConfiguration> slides,
   }) {
     _router = _buildRouter(slides);
-    _registerListener();
     _currentSlide = slides[0];
     _slides = slides;
   }
@@ -31,16 +29,18 @@ class NavigationController extends ChangeNotifier {
   SlideConfiguration get currentSlide => _currentSlide;
 
   void updateSlides(List<SlideConfiguration> slides) {
-    _router.dispose();
     _router = _buildRouter(slides);
+    _currentSlide = currentSlide.slideIndex < slides.length
+        ? slides[currentSlide.slideIndex]
+        : slides.last;
     _slides = slides;
-    _registerListener();
-    notifyListeners();
+
+    goToSlide(_currentSlide.slideIndex);
   }
 
-  void _registerListener() {
-    _router.routeInformationProvider.addListener(() {
-      final uri = router.routeInformationProvider.value.uri;
+  VoidCallback _routingListenerCallback() {
+    return () {
+      final uri = _router.routeInformationProvider.value.uri;
 
       final pathParam = uri.toString().startsWith(SDPaths.slides.path)
           ? uri.pathSegments.last
@@ -51,7 +51,7 @@ class NavigationController extends ChangeNotifier {
         _currentSlide = _slides[slideIndex];
         notifyListeners();
       }
-    });
+    };
   }
 
   @override
@@ -90,7 +90,7 @@ class NavigationController extends ChangeNotifier {
           }).toList(),
         ),
       ],
-    );
+    )..routeInformationProvider.addListener(_routingListenerCallback());
   }
 
   void goToSlide(int index) {
@@ -136,7 +136,6 @@ class NavigationController extends ChangeNotifier {
 }
 
 final _kRootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
-final _kShellRouteNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'shell');
 
 CustomTransitionPage<void> _getPageTransition(
   Widget child,

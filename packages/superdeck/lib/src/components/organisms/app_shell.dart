@@ -73,9 +73,9 @@ class AppShell extends StatelessWidget {
                 itemCount: deckController.slides.length,
               ),
             ),
-            IntrinsicHeight(
-              child: NotePanel(notes: currentSlide.comments),
-            ),
+            navigation.isNotesOpen
+                ? NotePanel(notes: currentSlide.comments)
+                : const SizedBox.shrink(),
           ],
         ),
         child: child,
@@ -168,7 +168,7 @@ class _SplitViewState extends State<SplitView> with TickerProviderStateMixin {
                 curve: Curves.easeInOut,
               ),
               axis: Axis.vertical,
-              child: const SdBottomBar(),
+              child: const DeckBottomBar(),
             ),
             body: Center(
               child: ScaledWidget(
