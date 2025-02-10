@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
+import 'package:superdeck/src/screens/export_screen.dart';
 
 import '../../modules/navigation/navigation_controller.dart';
 
@@ -27,6 +28,11 @@ class DeckBottomBar extends StatelessWidget {
                 ? const Icon(Icons.comment)
                 : const Icon(Icons.comments_disabled),
           ),
+          const SizedBox(width: 16),
+          IconButton(
+            onPressed: () => ExportDialogScreen.show(context),
+            icon: const Icon(Icons.save),
+          ),
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -39,7 +45,7 @@ class DeckBottomBar extends StatelessWidget {
           ),
           const Spacer(),
           Text(
-            '${navigation.currentSlide.slideIndex + 1} of $totalPages',
+            '$currentPage of $totalPages',
             style: const TextStyle(color: Colors.white),
           ),
           const SizedBox(width: 16),

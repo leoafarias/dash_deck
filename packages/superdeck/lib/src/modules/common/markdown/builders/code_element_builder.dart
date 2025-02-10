@@ -58,17 +58,12 @@ class CodeElementBuilder extends MarkdownElementBuilder {
       ],
     );
 
-    // If a hero tag is present, wrap the widget in a Hero
-    if (heroTag != null) {
-      codeWidget = _CodeElementHero(
-        tag: heroTag,
-        child: codeWidget,
-      );
-    }
-
     // Provide _CodeElementData for Hero animations
     return Builder(builder: (context) {
       final blockData = BlockData.of(context);
+      final slide = SlideConfiguration.of(context);
+
+      final hasHero = heroTag != null && !slide.isExporting;
 
       final codeOffset = getTotalModifierSpacing(spec);
 
@@ -77,6 +72,13 @@ class CodeElementBuilder extends MarkdownElementBuilder {
         blockData.size.height - codeOffset.dy,
       );
 
+      // If a hero tag is present, wrap the widget in a Hero
+      if (hasHero) {
+        codeWidget = _CodeElementHero(
+          tag: heroTag,
+          child: codeWidget,
+        );
+      }
       return CodeElementDataProvider(
         text: tagAndContent.content.trim(),
         language: language,

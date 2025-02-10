@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
-import 'package:superdeck/src/modules/thumbnail/slide_capture_service.dart';
+import 'package:superdeck/src/modules/export/slide_capture_service.dart';
 
 import '../../modules/common/helpers/constants.dart';
 import '../../modules/deck/deck_controller.dart';
@@ -57,7 +57,7 @@ class _SlideThumbnailState extends State<SlideThumbnail> {
       return thumbnailFile;
     }
 
-    final imageData = await _slideCaptureService.generate(
+    final imageData = await _slideCaptureService.capture(
       slide: slide,
       globalKey: _thumbnailKey,
     );

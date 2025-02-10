@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:mix/mix.dart';
+import 'package:superdeck/src/modules/deck/slide_configuration.dart';
 
 import '../../../../components/molecules/block_provider.dart';
 import '../../helpers/utils.dart';
@@ -17,21 +18,25 @@ class TextElementBuilder extends MarkdownElementBuilder {
   Widget? visitText(md.Text text, TextStyle? preferredStyle) {
     final (:tag, :content) = getTagAndContent(text.text);
 
-    Widget current = TextSpecWidget(
-      _transformLineBreaks(content),
-      spec: spec,
-    );
-
-    if (tag != null) {
-      current = _TextElementHero(
-        tag: tag,
-        child: current,
-      );
-    }
-
     return Builder(builder: (context) {
       final block = BlockData.of(context);
+      final slide = SlideConfiguration.of(context);
+
+      final hasHero = tag != null && !slide.isExporting;
+
       final contentOffset = getTotalModifierSpacing(spec ?? const TextSpec());
+
+      Widget current = TextSpecWidget(
+        _transformLineBreaks(content),
+        spec: spec,
+      );
+
+      if (hasHero) {
+        current = _TextElementHero(
+          tag: tag,
+          child: current,
+        );
+      }
       return TextElementDataProvider(
         text: _transformLineBreaks(content),
         spec: spec ?? const TextSpec(),

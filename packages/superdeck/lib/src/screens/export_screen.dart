@@ -1,165 +1,118 @@
-import 'dart:async';
-import 'dart:typed_data';
-
-import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:superdeck/src/components/atoms/slide_view.dart';
-import 'package:superdeck/src/modules/thumbnail/slide_capture_service.dart';
+import 'package:superdeck/src/modules/common/helpers/constants.dart';
+import 'package:superdeck/src/modules/common/helpers/provider.dart';
+import 'package:superdeck/src/modules/deck/deck_controller.dart';
+import 'package:superdeck/src/modules/export/slide_capture_service.dart';
 
-import '../modules/deck/deck_controller.dart';
+import '../components/atoms/slide_view.dart';
+import '../modules/deck/slide_configuration.dart';
+import '../modules/export/export_controller.dart';
 
-enum _ExportStatus { idle, capturing, building, complete }
+class ExportDialogScreen extends StatefulWidget {
+  const ExportDialogScreen({super.key, required this.slides});
 
-class ExportScreen extends HookWidget {
-  const ExportScreen({super.key});
+  final List<SlideConfiguration> slides;
+
+  @override
+  State<ExportDialogScreen> createState() => _ExportDialogScreenState();
+
+  static void show(BuildContext context) {
+    final deckController = DeckController.of(context);
+    showDialog(
+      context: context,
+      builder: (context) => ExportDialogScreen(slides: deckController.slides),
+    );
+  }
+}
+
+class _ExportDialogScreenState extends State<ExportDialogScreen> {
+  late ExportController _exportController;
+
+  @override
+  void initState() {
+    super.initState();
+    _setupExportController();
+  }
+
+  void _setupExportController() {
+    _exportController = ExportController(
+      slides: widget.slides,
+      slideCaptureService: SlideCaptureService(),
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => _handleExport());
+  }
+
+  Future<void> _handleExport() async {
+    try {
+      await _exportController.export();
+    } finally {
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+    }
+  }
+
+  @override
+  void didUpdateWidget(ExportDialogScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.slides != widget.slides) {
+      _exportController.dispose();
+      _setupExportController();
+    }
+  }
+
+  @override
+  void dispose() {
+    _exportController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Retrieve slides and current slide index using custom hooks or context
-    final slides = DeckController.of(context).slides;
-    final currentSlideIndex = useState(0);
+    return Dialog(
+      insetPadding: const EdgeInsets.all(0),
+      child: SizedBox.fromSize(
+        size: kResolution,
+        child: ListenableBuilder(
+            listenable: _exportController,
+            builder: (context, _) {
+              return Stack(
+                children: [
+                  PageView.builder(
+                    controller: _exportController.pageController,
+                    itemCount: _exportController.slides.length,
+                    itemBuilder: (context, index) {
+                      // Set to exporting true
+                      final slide = _exportController.slides[index].copyWith(
+                        isExporting: true,
+                        debug: false,
+                      );
 
-    // Initialize PageController with the initial index
-    final pageController =
-        usePageController(initialPage: currentSlideIndex.value);
-
-    // Create a map of GlobalKeys for each slide using useMemo
-    final slideKeys = useMemoized(
-      () => {for (var slide in slides) slide.key: GlobalKey()},
-      [slides],
-    );
-
-    // Manage export status using useState
-    final exportStatus = useState<_ExportStatus>(_ExportStatus.idle);
-
-    // Manage captured images using useState
-    final images = useState<List<Uint8List>>([]);
-
-    // Manage progress text using useMemo based on export status and images
-    final progressText = useMemoized(
-      () => switch (exportStatus.value) {
-        _ExportStatus.building => 'Building PDF...',
-        _ExportStatus.complete => 'Done',
-        _ExportStatus.capturing =>
-          'Exporting ${images.value.length} / ${slides.length}',
-        _ExportStatus.idle =>
-          'Exporting ${images.value.length} / ${slides.length}',
-      },
-      [exportStatus.value, images.value.length, slides.length],
-    );
-
-    // Initialize SlideCaptureService
-    final slideCaptureService = useMemoized(() => SlideCaptureService(), []);
-
-    // Function to wait for a short duration
-    Future<void> waitShort() async {
-      await Future.delayed(Durations.short1);
-    }
-
-    // Function to capture a single slide
-    Future<void> captureSlide(int index) async {
-      final slide = slides[index];
-      final key = slideKeys[slide.key]!;
-
-      // Navigate to the slide's page
-      pageController.jumpToPage(index);
-
-      // Wait until the slide's RenderObject is attached
-      while (!(key.currentContext?.findRenderObject()?.attached ?? false)) {
-        await waitShort();
-      }
-
-      // Capture the slide as an image
-      final image = await slideCaptureService.generateWithKey(
-        quality: SlideCaptureQuality.best, // Adjust as needed
-        key: key,
-      );
-
-      // Update images list
-      images.value = [...images.value, image];
-    }
-
-    // Function to build PDF from images
-    Future<Uint8List> buildPdf(List<Uint8List> images) async {
-      // Implement your PDF building logic here
-      // This is a placeholder implementation
-      // You can use packages like pdf or printing
-      return Uint8List(0);
-    }
-
-    // Function to save the PDF file
-    Future<void> savePdf(Uint8List pdf) async {
-      try {
-        final result = await FileSaver.instance.saveFile(
-          name: 'superdeck',
-          bytes: pdf,
-          ext: 'pdf',
-          mimeType: MimeType.pdf,
-        );
-        print('Save as result: $result');
-      } catch (e) {
-        print('Error saving pdf: $e');
-      }
-    }
-
-    // Effect to start the export process when the widget is first built
-    useEffect(() {
-      Future<void> startExport() async {
-        final currentPage = pageController.page?.toInt() ?? 0;
-        exportStatus.value = _ExportStatus.capturing;
-
-        // Start capturing each slide
-        for (var i = 0; i < slides.length; i++) {
-          await captureSlide(i);
-        }
-
-        // Update status to building PDF
-        exportStatus.value = _ExportStatus.building;
-        await waitShort();
-
-        // Build the PDF
-        final pdf = await buildPdf(images.value);
-        await waitShort();
-
-        // Navigate back to the original page
-        pageController.jumpToPage(currentPage);
-
-        // Update status to complete
-        exportStatus.value = _ExportStatus.complete;
-        images.value = [];
-        await savePdf(pdf);
-        await waitShort();
-
-        // Reset status to idle
-        exportStatus.value = _ExportStatus.idle;
-      }
-
-      // Start the export process
-      startExport();
-
-      return null; // No cleanup needed
-    }, [slides, pageController, slideKeys, slideCaptureService]);
-
-    return Column(
-      children: [
-        PageView.builder(
-          controller: pageController,
-          itemCount: slides.length,
-          itemBuilder: (context, index) {
-            final slide = slides[index];
-            return RepaintBoundary(
-              key: slideKeys[slide.key],
-              child: SlideView(slide),
-            );
-          },
-        ),
-        _PdfExportBar(
-          status: exportStatus.value,
-          progress: images.value.length / slides.length,
-          progressText: progressText,
-        ),
-      ],
+                      return RepaintBoundary(
+                        key: _exportController.getSlideKey(slide),
+                        child: InheritedData(
+                          data: slide,
+                          child: SlideView(slide),
+                        ),
+                      );
+                    },
+                  ),
+                  Positioned.fill(
+                    child: Container(
+                      color: Colors.black,
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: _PdfExportBar(
+                          exportController: _exportController,
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              );
+            }),
+      ),
     );
   }
 }
@@ -167,14 +120,10 @@ class ExportScreen extends HookWidget {
 class _PdfExportBar extends StatelessWidget {
   const _PdfExportBar({
     super.key,
-    required this.status,
-    required this.progress,
-    required this.progressText,
+    required this.exportController,
   });
 
-  final _ExportStatus status;
-  final double progress;
-  final String progressText;
+  final ExportController exportController;
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +135,7 @@ class _PdfExportBar extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          status == _ExportStatus.complete
+          exportController.exportStatus == ExportStatus.complete
               ? Icon(
                   Icons.check_circle,
                   color: Theme.of(context).colorScheme.primary,
@@ -197,12 +146,15 @@ class _PdfExportBar extends StatelessWidget {
                   width: 32,
                   child: CircularProgressIndicator(
                     color: Theme.of(context).colorScheme.primary,
-                    value: status == _ExportStatus.building ? null : progress,
+                    value:
+                        exportController.exportStatus == ExportStatus.building
+                            ? null
+                            : exportController.progress,
                   ),
                 ),
           const SizedBox(width: 16.0),
           Text(
-            progressText,
+            exportController.progressText,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Colors.white,
                 ),

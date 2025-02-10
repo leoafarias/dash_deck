@@ -111,6 +111,10 @@ class NavigationController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void goToExport() {
+    _router.go(SDPaths.export.path);
+  }
+
   void closeMenu() {
     _isMenuOpen = false;
     notifyListeners();

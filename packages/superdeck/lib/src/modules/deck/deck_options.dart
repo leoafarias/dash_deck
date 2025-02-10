@@ -1,8 +1,8 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:flutter/widgets.dart';
 
+import '../common/helpers/slide_parts.dart';
 import '../common/styles/style.dart';
-import '../slide/slide_parts.dart';
 
 part 'deck_options.mapper.dart';
 

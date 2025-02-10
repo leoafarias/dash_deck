@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:mesh/mesh.dart';
 import 'package:superdeck/superdeck.dart';
 
@@ -70,12 +69,6 @@ class _AnimatedSwitcherOMeshState extends State<_AnimatedSwitcherOMesh>
   void initState() {
     super.initState();
     _colors = _determiniscOrderBasedOnIndex(widget.slide.slideIndex);
-
-    Future.delayed(const Duration(milliseconds: 300), () {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        setState(() {});
-      });
-    });
   }
 
   @override

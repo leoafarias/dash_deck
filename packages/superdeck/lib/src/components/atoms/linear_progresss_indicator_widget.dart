@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
-class AnimatedLinearProgressIndicator extends HookWidget {
+class AnimatedLinearProgressIndicator extends StatefulWidget {
   final double progress;
 
   const AnimatedLinearProgressIndicator({
@@ -10,26 +9,43 @@ class AnimatedLinearProgressIndicator extends HookWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final animationController = useAnimationController(
+  State<AnimatedLinearProgressIndicator> createState() =>
+      _AnimatedLinearProgressIndicatorState();
+}
+
+class _AnimatedLinearProgressIndicatorState
+    extends State<AnimatedLinearProgressIndicator>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
       duration: const Duration(milliseconds: 100),
     );
+    _animation = Tween<double>(begin: 0.0, end: widget.progress)
+        .animate(_animationController);
+    _animationController.forward();
+  }
 
-    final animation =
-        Tween<double>(begin: 0.0, end: progress).animate(animationController);
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
-    useEffect(() {
-      animationController.forward();
-      return null;
-    }, []);
-
+  @override
+  Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: animation,
+      animation: _animation,
       builder: (context, child) {
         return LinearProgressIndicator(
           minHeight: 10,
           borderRadius: BorderRadius.circular(10),
-          value: animation.value,
+          value: _animation.value,
         );
       },
     );

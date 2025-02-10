@@ -3,6 +3,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:mix/mix.dart';
 import 'package:superdeck/src/components/molecules/block_provider.dart';
+import 'package:superdeck/src/modules/deck/slide_configuration.dart';
 
 import '../../../../components/atoms/cache_image_widget.dart';
 import '../../helpers/utils.dart';
@@ -22,6 +23,9 @@ class ImageElementBuilder extends MarkdownElementBuilder {
 
     return Builder(builder: (context) {
       final block = BlockData.of(context);
+      final slide = SlideConfiguration.of(context);
+
+      final hasHero = heroTag != null && !slide.isExporting;
 
       final contentOffset = getTotalModifierSpacing(spec);
 
@@ -39,7 +43,7 @@ class ImageElementBuilder extends MarkdownElementBuilder {
         ),
       );
 
-      if (heroTag != null) {
+      if (hasHero) {
         current = _ImageElementHero(
           tag: heroTag,
           child: current,

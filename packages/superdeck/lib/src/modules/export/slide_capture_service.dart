@@ -31,7 +31,7 @@ class SlideCaptureService {
   static final _generationQueue = <String>{};
   static const _maxConcurrentGenerations = 3;
 
-  Future<Uint8List> generate({
+  Future<Uint8List> capture({
     SlideCaptureQuality quality = SlideCaptureQuality.low,
     required SlideConfiguration slide,
     required GlobalKey globalKey,
@@ -68,7 +68,7 @@ class SlideCaptureService {
     }
   }
 
-  Future<Uint8List> generateWithKey({
+  Future<Uint8List> captureFromKey({
     required GlobalKey key,
     required SlideCaptureQuality quality,
   }) async {
@@ -176,8 +176,6 @@ class SlideCaptureService {
           ..flushPaint();
 
         await Future.delayed(const Duration(milliseconds: 100));
-
-        // await waitForImageProviders(rootElement);
 
         if (!isDirty) {
           log('Image generation completed.');
