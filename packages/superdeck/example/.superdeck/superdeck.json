@@ -102,19 +102,59 @@
       "comments": []
     },
     {
-      "key": "EfZXNX2z",
+      "key": "F2fTbXOG",
       "options": {},
       "sections": [
         {
           "blocks": [
             {
-              "content": "\n\n## Another image{.here}\n\n",
+              "content": "\n\n![mermaid_graph](.superdeck/assets/mermaid_srHRIuii.png) {.code}\n\n## Another image{.here}\n\n",
               "flex": 1,
               "scrollable": false,
               "type": "column"
             },
             {
               "content": "![structured_output](https://picsum.photos/800/1400) {.cover}",
+              "flex": 1,
+              "scrollable": false,
+              "type": "column"
+            }
+          ],
+          "flex": 1,
+          "scrollable": false,
+          "type": "section"
+        }
+      ],
+      "comments": []
+    },
+    {
+      "key": "0zqy1l5c",
+      "options": {},
+      "sections": [
+        {
+          "blocks": [
+            {
+              "content": "```dart\nColumn(\n  crossAxisAlignment: CrossAxisAlignment.start,\n  children: spans.map((span) {\n    return RichText(\n      text: TextSpan(\n        style: interpolatedSpec.textStyle,\n        children: [span],\n      ),\n    );\n  }).toList(),\n)\n```{.code}",
+              "flex": 1,
+              "scrollable": false,
+              "type": "column"
+            }
+          ],
+          "flex": 1,
+          "scrollable": false,
+          "type": "section"
+        }
+      ],
+      "comments": []
+    },
+    {
+      "key": "RiDZbaFZ",
+      "options": {},
+      "sections": [
+        {
+          "blocks": [
+            {
+              "content": "```dart\nColumn(\n  children: []).toList(),\n);\n```{.code}",
               "flex": 1,
               "scrollable": false,
               "type": "column"

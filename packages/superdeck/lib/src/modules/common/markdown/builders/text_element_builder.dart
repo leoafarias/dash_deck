@@ -6,34 +6,9 @@ import 'package:mix/mix.dart';
 import '../../../../components/molecules/block_provider.dart';
 import '../../helpers/utils.dart';
 import '../markdown_helpers.dart';
+import 'element_data_provider.dart';
 
 String _transformLineBreaks(String text) => text.replaceAll('<br>', '\n');
-
-class _TextElementDataProvider extends InheritedWidget {
-  final String text;
-  final TextSpec spec;
-  final Size size;
-  const _TextElementDataProvider({
-    required super.child,
-    required this.text,
-    required this.spec,
-    required this.size,
-  });
-
-  static _TextElementDataProvider of(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<_TextElementDataProvider>()!;
-  }
-
-  @override
-  bool updateShouldNotify(
-    _TextElementDataProvider oldWidget,
-  ) {
-    return oldWidget.text != text ||
-        oldWidget.spec != spec ||
-        oldWidget.size != size;
-  }
-}
 
 class TextElementBuilder extends MarkdownElementBuilder {
   final TextSpec? spec;
@@ -57,7 +32,7 @@ class TextElementBuilder extends MarkdownElementBuilder {
     return Builder(builder: (context) {
       final block = BlockData.of(context);
       final contentOffset = getTotalModifierSpacing(spec ?? const TextSpec());
-      return _TextElementDataProvider(
+      return TextElementDataProvider(
         text: _transformLineBreaks(content),
         spec: spec ?? const TextSpec(),
         size: (block.size - contentOffset) as Size,
@@ -88,8 +63,12 @@ class _TextElementHero extends StatelessWidget {
         BuildContext fromHeroContext,
         BuildContext toHeroContext,
       ) {
-        final fromBlock = _TextElementDataProvider.of(fromHeroContext);
-        final toBlock = _TextElementDataProvider.of(toHeroContext);
+        final toBlock =
+            ElementDataProvider.of<TextElementDataProvider>(toHeroContext);
+        final fromBlock = ElementDataProvider.maybeOf<TextElementDataProvider>(
+              fromHeroContext,
+            ) ??
+            toBlock;
 
         return AnimatedBuilder(
           animation: animation,

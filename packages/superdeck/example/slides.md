@@ -64,11 +64,43 @@ Column(
 
 @column
 
+```mermaid
+graph TD
+    A[Start] --> B[Input]
+    B --> C[Process]
+    C --> D[Output]
+    D --> E[End]
+``` {.code}
+
 ## Another image{.here}
 
 @column
 
 ![structured_output](https://picsum.photos/800/1400) {.cover}
+
+---
+
+```dart
+Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: spans.map((span) {
+    return RichText(
+      text: TextSpan(
+        style: interpolatedSpec.textStyle,
+        children: [span],
+      ),
+    );
+  }).toList(),
+)
+```{.code}
+
+---
+
+```dart
+Column(
+  children: []).toList(),
+);
+```{.code}
 
 ---
 

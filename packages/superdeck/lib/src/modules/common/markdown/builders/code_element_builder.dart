@@ -8,6 +8,7 @@ import '../../../../../superdeck.dart';
 import '../../helpers/syntax_highlighter.dart';
 import '../../helpers/utils.dart';
 import '../markdown_helpers.dart';
+import 'element_data_provider.dart';
 
 class CodeElementBuilder extends MarkdownElementBuilder {
   final MarkdownCodeblockSpec? spec;
@@ -76,7 +77,7 @@ class CodeElementBuilder extends MarkdownElementBuilder {
         blockData.size.height - codeOffset.dy,
       );
 
-      return _CodeElementDataProvider(
+      return CodeElementDataProvider(
         text: tagAndContent.content.trim(),
         language: language,
         spec: spec,
@@ -108,10 +109,6 @@ class _CodeElementHero extends StatelessWidget {
         BuildContext fromHeroContext,
         BuildContext toHeroContext,
       ) {
-        final fromBlock = _CodeElementDataProvider.maybeOf(fromHeroContext);
-        final toBlock =
-            _CodeElementDataProvider.maybeOf(toHeroContext) ?? fromBlock;
-
         Widget buildCodeWidget(
           Size size,
           MarkdownCodeblockSpec spec,
@@ -141,30 +138,35 @@ class _CodeElementHero extends StatelessWidget {
           );
         }
 
-        if (toBlock == null || fromBlock == null) {
-          final block = fromBlock ?? toBlock;
-          return buildCodeWidget(
-            block!.size,
-            block.spec,
-            SyntaxHighlight.render(block.text, block.language),
-          );
-        }
+        final toBlock = ElementDataProvider.of<CodeElementDataProvider>(
+          toHeroContext,
+        );
+        final fromBlock = ElementDataProvider.maybeOf<CodeElementDataProvider>(
+          fromHeroContext,
+        );
+
+        final fromBlockSize =
+            fromBlock?.size ?? ElementDataProvider.ofAny(fromHeroContext).size;
+
+        final fromBlockText = fromBlock?.text ?? toBlock.text;
+
+        final fromBlockSpec = fromBlock?.spec ?? toBlock.spec;
 
         return AnimatedBuilder(
           animation: animation,
           builder: (context, child) {
-            final interpolatedSpec = fromBlock.spec.lerp(
+            final interpolatedSpec = fromBlockSpec.lerp(
               toBlock.spec,
               animation.value,
             );
             final interpolatedSize = Size.lerp(
-              fromBlock.size,
+              fromBlockSize,
               toBlock.size,
               animation.value,
             )!;
 
             final interpolatedText = lerpString(
-              fromBlock.text,
+              fromBlockText,
               toBlock.text,
               animation.value,
             );
@@ -179,34 +181,5 @@ class _CodeElementHero extends StatelessWidget {
         );
       },
     );
-  }
-}
-
-class _CodeElementDataProvider extends InheritedWidget {
-  final String text;
-  final String language;
-  final MarkdownCodeblockSpec spec;
-  final Size size;
-  const _CodeElementDataProvider({
-    required super.child,
-    required this.text,
-    required this.language,
-    required this.spec,
-    required this.size,
-  });
-
-  static _CodeElementDataProvider? maybeOf(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<_CodeElementDataProvider>();
-  }
-
-  @override
-  bool updateShouldNotify(
-    _CodeElementDataProvider oldWidget,
-  ) {
-    return oldWidget.text != text ||
-        oldWidget.language != language ||
-        oldWidget.spec != spec ||
-        oldWidget.size != size;
   }
 }
