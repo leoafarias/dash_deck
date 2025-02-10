@@ -48,6 +48,7 @@ class _ExportDialogScreenState extends State<ExportDialogScreen> {
       await _exportController.export();
     } finally {
       if (context.mounted) {
+        // ignore: use_build_context_synchronously
         Navigator.of(context).pop();
       }
     }
