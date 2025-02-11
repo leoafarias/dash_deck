@@ -61,7 +61,6 @@ class DeckBottomBar extends StatelessWidget {
 
 class _BottomBarContainer extends StatelessWidget {
   const _BottomBarContainer({
-    super.key,
     required this.child,
   });
 

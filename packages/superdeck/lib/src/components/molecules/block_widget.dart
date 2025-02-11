@@ -213,7 +213,6 @@ class ColumnBlockWidget extends _BlockWidget<ColumnBlock> {
 
 class _ImageBlockWidget extends _BlockWidget<ImageBlock> {
   const _ImageBlockWidget({
-    super.key,
     required super.block,
     required super.size,
     required super.configuration,
@@ -237,7 +236,6 @@ class _ImageBlockWidget extends _BlockWidget<ImageBlock> {
 
 class _WidgetBlockWidget extends _BlockWidget<WidgetBlock> {
   const _WidgetBlockWidget({
-    super.key,
     required super.block,
     required super.size,
     required super.configuration,
@@ -291,7 +289,6 @@ ${e.toString()}'''),
 
 class _DartPadBlockWidget extends _BlockWidget<DartPadBlock> {
   const _DartPadBlockWidget({
-    super.key,
     required super.block,
     required super.size,
     required super.configuration,

@@ -120,7 +120,6 @@ class _ExportDialogScreenState extends State<ExportDialogScreen> {
 
 class _PdfExportBar extends StatelessWidget {
   const _PdfExportBar({
-    super.key,
     required this.exportController,
   });
 

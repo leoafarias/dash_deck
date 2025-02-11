@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mix/mix.dart';
 import 'package:superdeck/superdeck.dart';
 
-final _accent = Color(0xff73F8FB);
+const _accent = Color(0xff73F8FB);
 
 class BaseStyle extends DeckStyle {
   BaseStyle();
