@@ -4,9 +4,7 @@ environment:
   sdk: ^3.5.0
   flutter: ">=3.24.0"
 
-dev_dependencies:
-  melos: ^6.1.0
-
-
 lint_staged:
   '**.dart': dart fix --apply && dcm fix
+dependencies:
+  melos: ^6.3.2

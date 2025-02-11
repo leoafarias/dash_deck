@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:source_span/source_span.dart';
 import 'package:superdeck_cli/src/helpers/exceptions.dart';
+import 'package:superdeck_core/superdeck_core.dart';
 
 class DartProcess {
   static Future<ProcessResult> _run(List<String> args) {
@@ -10,11 +11,12 @@ class DartProcess {
   }
 
   static Future<String> format(String code) async {
+    final hash = generateValueHash(code);
     // create a temp file with the code
     final tempFile = File(
       p.join(
         Directory.systemTemp.path,
-        'temp_${DateTime.now().millisecondsSinceEpoch}.dart',
+        'temp_${DateTime.now().microsecondsSinceEpoch}_${hash}.dart',
       ),
     );
     try {

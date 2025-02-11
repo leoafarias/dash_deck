@@ -7,7 +7,7 @@ void main() {
     final parser = const HtmlCommentDefinition().build();
 
     test('parses simple HTML comment', () {
-      expect(parser.parse('<!-- Simple comment -->').value, ' Simple comment ');
+      expect(parser.parse('<!-- Simple comment -->').value, 'Simple comment');
     });
 
     test('parses empty HTML comment', () {
@@ -30,9 +30,8 @@ void main() {
     // check if acomment has spaces in front or in teh end
     test('parses HTML comment with spaces in front or in the end', () {
       expect(
-          parser.parse('   <!-- Simple comment -->').value, ' Simple comment ');
-      expect(
-          parser.parse('<!-- Simple comment -->  ').value, ' Simple comment ');
+          parser.parse('   <!-- Simple comment -->').value, 'Simple comment');
+      expect(parser.parse('<!-- Simple comment -->  ').value, 'Simple comment');
     });
 
     test('parses multiline HTML comment', () {

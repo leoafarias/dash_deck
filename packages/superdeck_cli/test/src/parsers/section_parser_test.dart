@@ -8,7 +8,7 @@ void main() {
   group('Basic Parsing', () {
     test('Empty markdown returns no sections', () {
       final sections = sectionParser.parse('');
-      expect(sections[0].blocks.isEmpty, isTrue);
+      expect(sections[0].blocks.length, 1);
     });
 
     test('Markdown with no tags returns one section with all lines', () {

@@ -3,6 +3,7 @@ name: superdeck_workspace
 sdkPath: .fvm/flutter_sdk
 packages:
   - packages/*
+  - packages/*/example
 
 command:
   bootstrap:
@@ -11,6 +12,7 @@ command:
       flutter: ">=3.19.0"
     dependencies:
       collection: ^1.18.0 
+      mix: ^1.5.4
   # publish:
     # hooks:
     #   pre: melos run gen:build
@@ -76,6 +78,10 @@ scripts:
     description: Run flutter test with coverage
     packageFilters:
       dirExists: test
+
+  clean:
+    run: melos exec -- flutter clean
+    description: Clean all packages
 
   brb:
     run: melos run gen:build

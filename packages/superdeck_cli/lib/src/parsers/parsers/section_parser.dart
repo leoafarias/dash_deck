@@ -16,24 +16,24 @@ class SectionParser extends BaseParser<List<SectionBlock>> {
 
     final aggregator = _SectionAggregator();
 
+    final firstBlock = parsedBlocks.first;
+
+    if (firstBlock.startIndex > 0) {
+      aggregator.addContent(content.substring(0, firstBlock.startIndex));
+    }
+
     for (var idx = 0; idx < parsedBlocks.length; idx++) {
       final parsedBlock = parsedBlocks[idx];
-      final isFirst = idx == 0;
+
       final isLast = idx == parsedBlocks.length - 1;
 
-      final startIndex = parsedBlock.startIndex;
-      final endIndex = parsedBlock.endIndex;
-
       String blockContent;
-      // If the first tag block is not at the start of the markdown,
-      // we need to add a new section for the content before the first tag block.
-      if (isFirst && startIndex > 0) {
-        blockContent = content.substring(0, startIndex);
-      } else if (isLast) {
-        blockContent = content.substring(endIndex).trim();
+      if (isLast) {
+        blockContent = content.substring(parsedBlock.endIndex).trim();
       } else {
         final nextBlock = parsedBlocks[idx + 1];
-        blockContent = content.substring(endIndex, nextBlock.startIndex);
+        blockContent =
+            content.substring(parsedBlock.endIndex, nextBlock.startIndex);
       }
 
       final block = Block.parse(parsedBlock.data);

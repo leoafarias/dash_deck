@@ -111,35 +111,6 @@ class _CodeElementHero extends StatelessWidget {
         BuildContext fromHeroContext,
         BuildContext toHeroContext,
       ) {
-        Widget buildCodeWidget(
-          Size size,
-          MarkdownCodeblockSpec spec,
-          List<TextSpan> spans,
-        ) {
-          return Wrap(
-            clipBehavior: Clip.hardEdge,
-            children: [
-              SizedBox.fromSize(
-                size: size,
-                child: BoxSpecWidget(
-                  spec: spec.container,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: spans.map((span) {
-                      return RichText(
-                        text: TextSpan(
-                          style: spec.textStyle,
-                          children: [span],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-            ],
-          );
-        }
-
         final toBlock = ElementDataProvider.of<CodeElementDataProvider>(
           toHeroContext,
         );
@@ -178,7 +149,28 @@ class _CodeElementHero extends StatelessWidget {
               toBlock.language,
             );
 
-            return buildCodeWidget(interpolatedSize, interpolatedSpec, spans);
+            return Wrap(
+              clipBehavior: Clip.hardEdge,
+              children: [
+                SizedBox.fromSize(
+                  size: interpolatedSize,
+                  child: BoxSpecWidget(
+                    spec: interpolatedSpec.container,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: spans.map((span) {
+                        return RichText(
+                          text: TextSpan(
+                            style: interpolatedSpec.textStyle,
+                            children: [span],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ],
+            );
           },
         );
       },

@@ -22,9 +22,9 @@ Future<void> _initializeWindowManager() async {
   // Must add this line.
   await windowManager.ensureInitialized();
 
-  final titleBarHeight = await windowManager.getTitleBarHeight();
+  // final titleBarHeight = await windowManager.getTitleBarHeight();
 
-  final newSize = Size(kResolution.width, kResolution.height + titleBarHeight);
+  final newSize = Size(kResolution.width, kResolution.height);
 
   final windowOptions = WindowOptions(
     size: newSize,
