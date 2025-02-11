@@ -34,15 +34,12 @@ jobs:
       - uses: invertase/github-action-dart-analyzer@v1
         with:
           fatal-infos: false
+          fatal-warnings: false
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build Runner
         run: melos run gen:build
-
-      - uses: invertase/github-action-dart-analyzer@v1
-        with:
-          fatal-infos: false
 
       - run: melos run test

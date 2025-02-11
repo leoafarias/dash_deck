@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:superdeck/src/modules/common/helpers/extensions.dart';
 
 class LoadingOverlay extends StatefulWidget {
   final bool isLoading;
@@ -9,7 +10,7 @@ class LoadingOverlay extends StatefulWidget {
   });
 
   @override
-  _LoadingOverlayState createState() => _LoadingOverlayState();
+  State createState() => _LoadingOverlayState();
 }
 
 class _LoadingOverlayState extends State<LoadingOverlay>
@@ -87,7 +88,7 @@ class IsometricLoading extends StatefulWidget {
   final Color color;
 
   @override
-  _IsometricLoadingState createState() => _IsometricLoadingState();
+  State createState() => _IsometricLoadingState();
 }
 
 class _IsometricLoadingState extends State<IsometricLoading>
@@ -96,9 +97,9 @@ class _IsometricLoadingState extends State<IsometricLoading>
   late Animation<double> _animation;
   late final List<Color> _colors = [
     widget.color,
-    widget.color.withOpacity(0.7),
-    widget.color.withOpacity(0.4),
-    widget.color.withOpacity(0.2),
+    widget.color.useOpacity(0.7),
+    widget.color.useOpacity(0.4),
+    widget.color.useOpacity(0.2),
   ];
 
   @override

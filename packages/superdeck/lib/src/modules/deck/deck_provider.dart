@@ -19,37 +19,20 @@ class DeckControllerBuilder extends StatelessWidget {
 
   final Widget Function(DeckController controller) builder;
 
-  Future<DeckConfiguration> _loadConfiguration() async {
-    final file = DeckConfiguration.defaultFile;
-
-    if (await file.exists()) {
-      final contents = await YamlUtils.loadYamlFile(file);
-      if (contents.isNotEmpty) {
-        return DeckConfiguration.parse(contents);
-      }
-    }
-
-    return DeckConfiguration();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return AsyncStreamWidget<DeckConfiguration>(
-      stream: Stream.fromFuture(_loadConfiguration()),
+    final configuration = DeckConfiguration();
+    final dataStore = kCanRunProcess
+        ? FileSystemDataStore(configuration)
+        : AssetBundleDataStore(configuration);
+    return AsyncStreamWidget(
+      stream: dataStore.loadDeckReferenceStream(),
       builder: (snapshot) {
-        final dataStore = kCanRunProcess
-            ? FileSystemDataStore(snapshot)
-            : AssetBundleDataStore(snapshot);
-        return AsyncStreamWidget(
-          stream: dataStore.loadDeckReferenceStream(),
-          builder: (snapshot) {
-            return _DeckControllerProvider(
-              options: options,
-              reference: snapshot,
-              builder: builder,
-              dataStore: dataStore,
-            );
-          },
+        return _DeckControllerProvider(
+          options: options,
+          reference: snapshot,
+          builder: builder,
+          dataStore: dataStore,
         );
       },
     );

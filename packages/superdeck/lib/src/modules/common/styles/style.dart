@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mix/mix.dart';
+import 'package:superdeck/src/modules/common/helpers/extensions.dart';
 
 import 'style_spec.dart';
 
@@ -114,7 +115,7 @@ class DeckStyle {
       ..bodyStyle.as(_baseTextStyle)
       ..cellPadding.all(12)
       ..border.all(color: Colors.grey, width: 2)
-      ..cellDecoration.color(Colors.grey.withOpacity(0.1));
+      ..cellDecoration.color(Colors.grey.useOpacity(0.1));
 
     final blockquoteStyle = $.blockquote.chain
       ..textStyle.as(_baseTextStyle)

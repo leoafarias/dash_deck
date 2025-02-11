@@ -3,8 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mix/mix.dart';
 import 'package:superdeck/superdeck.dart';
 
-const _accent = Color(0xff73F8FB);
-
 class BaseStyle extends DeckStyle {
   BaseStyle();
 
@@ -57,8 +55,8 @@ class CoverStyle extends DeckStyle {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.black.withOpacity(0.5),
-                Colors.black.withOpacity(0.95),
+                Colors.black.useOpacity(0.5),
+                Colors.black.useOpacity(0.95),
               ],
             ),
           ),
@@ -86,8 +84,8 @@ class AnnouncementStyle extends DeckStyle {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.black.withOpacity(0.5),
-                Colors.black.withOpacity(0.95),
+                Colors.black.useOpacity(0.5),
+                Colors.black.useOpacity(0.95),
               ],
             ),
           ),

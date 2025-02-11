@@ -5,3 +5,7 @@ extension BuildContextX on BuildContext {
   TextTheme get textTheme => theme.textTheme;
   ColorScheme get colorScheme => theme.colorScheme;
 }
+
+extension ColorX on Color {
+  Color useOpacity(double opacity) => withAlpha((255.0 * opacity).round());
+}

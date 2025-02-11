@@ -8,9 +8,6 @@ import '../test_helpers.dart';
 
 void main() {
   group('SimpleTemplate', () {
-    const rawMarkdown = '''
-# Hello
-''';
     const slide = Slide(key: 'simple-slide');
     final config = SlideConfiguration(
       slide: slide,

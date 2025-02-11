@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
@@ -7,6 +8,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:superdeck/src/modules/common/helpers/constants.dart';
 import 'package:superdeck/src/modules/deck/slide_configuration.dart';
+import 'package:universal_html/html.dart' as html;
 
 import 'slide_capture_service.dart';
 
@@ -87,7 +89,8 @@ class ExportController extends ChangeNotifier {
     for (int attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         final image = await slideCaptureService.captureFromKey(
-          quality: SlideCaptureQuality.better,
+          quality:
+              kIsWeb ? SlideCaptureQuality.low : SlideCaptureQuality.better,
           key: key,
         );
         return image;
@@ -179,15 +182,29 @@ class ExportController extends ChangeNotifier {
   /// Saves the generated PDF file.
   Future<void> _savePdf(Uint8List pdf) async {
     try {
-      final result = await FileSaver.instance.saveFile(
+      if (kIsWeb) {
+        // Create a Blob from the PDF bytes
+        final blob = html.Blob([pdf], 'application/pdf');
+
+        // Create a URL for the Blob
+        final url = html.Url.createObjectUrlFromBlob(blob);
+
+        html.AnchorElement(href: url)
+          ..setAttribute('download', 'superdeck.pdf')
+          ..click();
+
+        return;
+      }
+      log('Saving pdf');
+      final result = await FileSaver.instance.saveAs(
         name: 'superdeck',
         bytes: pdf,
         ext: 'pdf',
         mimeType: MimeType.pdf,
       );
-      print('Save result: $result');
+      log('Save result: $result');
     } catch (e) {
-      print('Error saving pdf: $e');
+      log('Error saving pdf: $e');
     }
   }
 

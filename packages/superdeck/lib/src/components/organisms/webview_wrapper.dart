@@ -9,7 +9,7 @@ class WebViewWrapper extends StatefulWidget {
   final _uniqueKey = GlobalKey();
 
   @override
-  _WebViewWrapperState createState() => _WebViewWrapperState();
+  State<WebViewWrapper> createState() => _WebViewWrapperState();
 }
 
 class _WebViewWrapperState extends State<WebViewWrapper>
@@ -74,6 +74,7 @@ class _WebViewWrapperState extends State<WebViewWrapper>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Stack(
       children: [
         WebViewWidget(key: ValueKey(_hide), controller: _controller),

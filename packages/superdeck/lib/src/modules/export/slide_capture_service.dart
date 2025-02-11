@@ -13,7 +13,7 @@ import '../common/helpers/constants.dart';
 import '../deck/slide_configuration.dart';
 
 enum SlideCaptureQuality {
-  low(0.4),
+  low(0.6),
   good(1),
   better(2),
   best(3);

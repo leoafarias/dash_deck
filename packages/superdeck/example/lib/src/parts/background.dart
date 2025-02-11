@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:mesh/mesh.dart';
 import 'package:superdeck/superdeck.dart';
 
-Color _colorFromHex(String hexString) {
-  hexString = hexString.trim();
-  if (hexString.isEmpty) {
-    return Colors.black; // Default color if null or empty
-  }
-  hexString = hexString.replaceAll(RegExp(r'[^a-fA-F0-9]'), '');
-  hexString = hexString.replaceAll('#', '');
-  if (hexString.length == 6) {
-    hexString = 'FF$hexString'; // Add opacity if not provided
-  }
-  return Color(int.parse(hexString, radix: 16));
-}
+// Color _colorFromHex(String hexString) {
+//   hexString = hexString.trim();
+//   if (hexString.isEmpty) {
+//     return Colors.black; // Default color if null or empty
+//   }
+//   hexString = hexString.replaceAll(RegExp(r'[^a-fA-F0-9]'), '');
+//   hexString = hexString.replaceAll('#', '');
+//   if (hexString.length == 6) {
+//     hexString = 'FF$hexString'; // Add opacity if not provided
+//   }
+//   return Color(int.parse(hexString, radix: 16));
+// }
 
 OMeshRect _meshBuilder(List<Color> colors) {
   return OMeshRect(
