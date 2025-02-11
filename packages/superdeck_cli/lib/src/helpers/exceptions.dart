@@ -1,72 +1,38 @@
-import 'package:superdeck_cli/src/generator_pipeline.dart';
-import 'package:superdeck_core/superdeck_core.dart';
+// ignore_for_file: avoid-duplicate-cascades
 
-class SDMarkdownParsingException implements Exception {
-  final SchemaValidationException exception;
-  final int slideLocation;
+import 'package:source_span/source_span.dart';
+import 'package:superdeck_cli/src/helpers/logger.dart';
 
-  SDMarkdownParsingException(this.exception, this.slideLocation);
-
-  String get location => exception.result.path.join(' | ');
-
-  List<String> get messages {
-    return exception.result.errors.map((e) => e.message).toList();
-  }
-}
-
-class SDTaskException implements Exception {
+class DeckTaskException implements Exception {
+  final int slideIndex;
   final String taskName;
-  final TaskController controller;
+
   final Exception exception;
 
-  SDTaskException(
-    this.taskName,
-    this.controller,
-    this.exception,
-  );
+  const DeckTaskException(this.taskName, this.exception, this.slideIndex);
 
   String get message {
-    return 'Error running task on slide ${controller.slide.index}';
+    return 'Error running task on slide $slideIndex';
   }
 
   @override
   String toString() => message;
 }
 
-class SDFormatException implements Exception {
-  final String message;
-  final int? offset;
-  final String source;
+class DeckFormatException extends SourceSpanFormatException {
+  DeckFormatException(super.message, super.span, [super.source]);
+}
 
-  SDFormatException(
-    this.message, [
-    this.source = '',
-    this.offset,
-  ]);
+void printException(Exception e) {
+  if (e is DeckTaskException) {
+    logger
+      ..err('slide: ${e.slideIndex}')
+      ..err('Task error: ${e.taskName}');
 
-  int? get lineNumber {
-    return source.substring(0, offset).split('\n').length;
-  }
-
-  String? get lineContent {
-    return source.split('\n')[lineNumber! - 1];
-  }
-
-  int? get columnNumber {
-    final lines = source.split('\n');
-    int totalOffset = 0;
-
-    for (int i = 0; i < lineNumber! - 1; i++) {
-      // +1 for the newline character
-      totalOffset += lines[i].length + 1;
-    }
-
-    // Convert zero-based index to one-based
-    return offset! - totalOffset + 1;
-  }
-
-  @override
-  String toString() {
-    return message;
+    printException(e.exception);
+  } else if (e is DeckFormatException) {
+    logger.formatError(e);
+  } else {
+    logger.err(e.toString());
   }
 }

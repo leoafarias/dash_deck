@@ -1,36 +1,64 @@
-part of 'models.dart';
+import 'package:dart_mappable/dart_mappable.dart';
+import 'package:superdeck_core/superdeck_core.dart';
+
+part 'slide_model.mapper.dart';
 
 @MappableClass()
 class Slide with SlideMappable {
-  final int index;
   final String key;
   final SlideOptions? options;
-  final String content;
-  final List<SectionBlockDto> sections;
+  final List<SectionBlock> sections;
+  final List<String> comments;
 
-  Slide({
-    required this.index,
+  const Slide({
     required this.key,
     this.options,
-    required this.content,
     this.sections = const [],
+    this.comments = const [],
   });
 
-  static Slide fromMap(Map<String, dynamic> map) {
-    Slide.schema.validateOrThrow(map);
+  static final schema = Schema.object(
+    {
+      "key": Schema.string(),
+      "title": Schema.string(),
+      'options': SlideOptions.schema,
+      'sections': Schema.list(SectionBlock.schema),
+      'comments': Schema.list(Schema.string()),
+    },
+    required: ['key'],
+    additionalProperties: true,
+  );
+
+  static Slide parse(Map<String, dynamic> map) {
+    schema.validateOrThrow(map);
     return SlideMapper.fromMap(map);
   }
+}
 
-  static const fromJson = SlideMapper.fromJson;
+@MappableClass(
+  hook: UnmappedPropertiesHook('args'),
+)
+class SlideOptions with SlideOptionsMappable {
+  final String? title;
+  final String? style;
+  final Map<String, Object?> args;
 
-  static final schema = SchemaShape(
+  const SlideOptions({
+    this.title,
+    this.style,
+    this.args = const {},
+  });
+
+  static SlideOptions parse(Map<String, dynamic> map) {
+    schema.validateOrThrow(map);
+    return SlideOptionsMapper.fromMap(map);
+  }
+
+  static final schema = Schema.object(
     {
-      "index": Schema.integer.required(),
-      "key": Schema.string.required(),
-      "content": Schema.string.required(),
-      "title": Schema.string,
-      'options': SlideOptions.schema.optional(),
+      "title": Schema.string(),
+      "style": Schema.string(),
     },
-    additionalProperties: false,
+    additionalProperties: true,
   );
 }

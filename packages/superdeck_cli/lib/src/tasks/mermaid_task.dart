@@ -1,177 +1,198 @@
 import 'dart:async';
 
 import 'package:puppeteer/puppeteer.dart';
-import 'package:superdeck_cli/src/helpers/logger.dart';
 import 'package:superdeck_cli/src/generator_pipeline.dart';
+import 'package:superdeck_cli/src/helpers/logger.dart';
+import 'package:superdeck_core/superdeck_core.dart';
 
-// ---
-// title: Hello Title
-// config:
-//   theme: base
-//   themeVariables:
-//     primaryColor: "#00ff00"
-// ---
-
-Future<String> _generateMermaidGraph(
-  Browser browser,
-  String graphDefinition,
-) async {
-  logger
-    ..detail('')
-    ..detail('Generating mermaid graph...')
-    ..detail(graphDefinition)
-    ..detail('');
-
-  final page = await browser.newPage();
-
-  await page.setContent('''
-    <html>
-      <body>
-        <pre class="mermaid">
-          $graphDefinition
-        </pre>
-        <script type="module">
-          import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-          mermaid.initialize({
-            startOnLoad: false,
-            theme: 'dark',
-          });
-          mermaid.run({
-            querySelector: 'pre.mermaid',
-          });
-        </script>
-      </body>
-    </html>
-  ''');
-
-  await page.waitForSelector('pre.mermaid > svg');
-  final element = await page.$('pre.mermaid > svg');
-  final svgContent = await element.evaluate('el => el.outerHTML');
-
-  await page.close();
-  return svgContent;
-}
-
-Future<String> _convertToRoughDraft(Browser browser, String svgContent) async {
-  print('Converting to rough draft...');
-  final page = await browser.newPage();
-
-  await page.setContent('''
-    <html>
-      <body>
-        <div class="svg-container">$svgContent</div>
-        <div class="sketch-container"></div>
-        <script src="https://unpkg.com/svg2roughjs/dist/svg2roughjs.umd.min.js"></script>
-        <script>
-          const svgElement = document.querySelector('.svg-container > svg');
-          const svgConverter = new svg2roughjs.Svg2Roughjs('.sketch-container');
-          svgConverter.svg = svgElement;
-          svgConverter.sketch();
-        </script>
-      </body>
-    </html>
-  ''');
-
-  await page.waitForSelector('.sketch-container > svg');
-  final element = await page.$('.sketch-container > svg');
-
-  final output = await element.evaluate('el => el.outerHTML');
-
-  await page.close();
-
-  return output;
-}
-
-Future<List<int>> _convertSvgToImage(Browser browser, String svgContent) async {
-  final page = await browser.newPage();
-
-  await page.setContent('''
-    <html>
-      <body>
-        <div class="svg-container">$svgContent</div>
-      </body>
-    </html>
-  ''');
-
-  final element = await page.$('.svg-container > svg');
-
-  final screenshot = await element.screenshot(
-    format: ScreenshotFormat.png,
-    omitBackground: true,
-  );
-
-  await page.close();
-
-  return screenshot;
-}
-
-Future<List<int>> generateRoughMermaidGraph(
-    Browser browser, String graphDefinition) async {
-  final svgContent = await _generateMermaidGraph(browser, graphDefinition);
-  // final roughDraft = await _convertToRoughDraft(browser, svgContent);
-
-  return _convertSvgToImage(browser, svgContent);
-}
+import '../parsers/parsers/fenced_code_parser.dart';
 
 class MermaidConverterTask extends Task {
-  const MermaidConverterTask() : super('mermaid');
+  Browser? _browser;
 
-  @override
-  FutureOr<TaskController> run(controller) async {
-    final mermaidBlockRegex = RegExp(r'```mermaid([\s\S]*?)```');
-    final slide = controller.slide;
+  /// Extract large HTML templates to constants for better readability.
+  static final _mermaidHtmlTemplate = '''
+<html>
+  <body>
+    <pre class="mermaid">__GRAPH_DEFINITION__</pre>
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({
+        startOnLoad: true,
+        // Using 'base' gives you a clean slate
+        theme: 'base',
+        themeVariables: {
+          // Background settings
+          background: '#000000',
+          primaryColor: '#000000',
+          secondaryColor: '#000000',
+          tertiaryColor: '#000000',
 
-    final matches = mermaidBlockRegex.allMatches(slide.content);
+          // Text colors
+          primaryTextColor: '#FFFF00',
+          secondaryTextColor: '#FFFF00',
+          tertiaryTextColor: '#FFFF00',
+          defaultFontColor: '#FFFF00',
 
-    if (matches.isEmpty) return controller;
-    final replacements = <({int start, int end, String markdown})>[];
+          // Border and line colors
+          primaryBorderColor: '#FFFF00',
+          secondaryBorderColor: '#FFFF00',
+          tertiaryBorderColor: '#FFFF00',
+          lineColor: '#FFFF00'
+        },
+        flowchart: {
+          // Enable HTML labels (if needed) so you can style them via CSS as well
+          htmlLabels: true,
+        }
+      });
+      mermaid.run({ querySelector: 'pre.mermaid' });
+    </script>
+  </body>
+</html>
+''';
+  MermaidConverterTask() : super('mermaid');
+  Future<Browser> _getBrowser() async {
+    _browser ??= await puppeteer.launch();
 
-    for (final Match match in matches) {
-      final mermaidSyntax = match.group(1);
+    return _browser!;
+  }
 
-      if (mermaidSyntax == null) continue;
+  /// A helper function that automates page creation, content setup, and cleanup.
+  Future<T> _withPage<T>(
+    Browser browser,
+    Future<T> Function(Page page) action,
+  ) async {
+    final page = await browser.newPage();
+    try {
+      return await action(page);
+    } finally {
+      await page.close();
+    }
+  }
 
-      final mermaidFile = buildAssetFile(
-        buildReferenceName(mermaidSyntax),
-        'png',
+  Future<String> _generateMermaidGraph(
+    Browser browser,
+    String graphDefinition,
+  ) {
+    logger.detail('Generating mermaid graph:');
+    logger.detail(graphDefinition);
+
+    final htmlContent = _mermaidHtmlTemplate.replaceAll(
+      '__GRAPH_DEFINITION__',
+      graphDefinition,
+    );
+
+    return _withPage(browser, (page) async {
+      await page.setContent(htmlContent);
+      await page.waitForSelector(
+        'pre.mermaid > svg',
+        timeout: const Duration(seconds: 5),
       );
 
-      if (!await mermaidFile.exists()) {
-        final browser = await controller.pipeline.getBrowser();
+      final element = await page.$('pre.mermaid > svg');
 
+      return await element.evaluate('el => el.outerHTML');
+    });
+  }
+
+  Future<List<int>> _convertSvgToImage(Browser browser, String svgContent) {
+    return _withPage(browser, (page) async {
+      await page.setViewport(DeviceViewport(
+        width: 1280,
+        height: 780,
+        deviceScaleFactor: 2,
+      ));
+
+      await page.setContent('''
+      <html>
+        <body>
+          <div class="svg-container">$svgContent</div>
+        </body>
+      </html>
+    ''');
+
+      final element = await page.$('.svg-container > svg');
+
+      return await element.screenshot(
+        format: ScreenshotFormat.png,
+        omitBackground: true,
+      );
+    });
+  }
+
+  Future<List<int>> _generateMermaidGraphImage(
+    Browser browser,
+    String graphDefinition,
+  ) async {
+    try {
+      final svgContent = await _generateMermaidGraph(browser, graphDefinition);
+
+      return await _convertSvgToImage(browser, svgContent);
+    } catch (e, stackTrace) {
+      logger.err('Failed to generate Mermaid graph image: $e');
+      Error.throwWithStackTrace(
+        Exception(
+          'Mermaid generation timed out or failed. Original error: $e',
+        ),
+        stackTrace,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _browser?.close();
+    _browser = null;
+  }
+
+  @override
+  Future<void> run(TaskContext context) async {
+    final stopwatch = Stopwatch()..start();
+
+    final fencedCodeParser = const FencedCodeParser();
+
+    final codeBlocks = fencedCodeParser.parse(context.slide.content);
+    final mermaidBlocks = codeBlocks.where((e) => e.language == 'mermaid');
+
+    if (mermaidBlocks.isEmpty) {
+      return;
+    }
+
+    for (final mermaidBlock in mermaidBlocks) {
+      final mermaidAsset = GeneratedAsset.mermaid(mermaidBlock.content);
+
+      final assetFile =
+          await context.dataStore.getGeneratedAssetFile(mermaidAsset);
+
+      if (await assetFile.exists()) {
+        logger.info(
+          'Mermaid asset already exists for slide index: ${context.slideIndex}',
+        );
+      } else {
+        final browser = await _getBrowser();
+
+        logger.info(
+          'Generating mermaid graph image for slide index: ${context.slideIndex}',
+        );
         final imageData =
-            await generateRoughMermaidGraph(browser, mermaidSyntax);
+            await _generateMermaidGraphImage(browser, mermaidBlock.content);
 
-        await mermaidFile.writeAsBytes(imageData);
+        await assetFile.writeAsBytes(imageData);
       }
 
-      // If file existeed or was create it then replace it
-      if (await mermaidFile.exists()) {
-        await controller.markFileAsNeeded(mermaidFile);
+      final mermaidImageSyntax = '![mermaid_graph](${assetFile.path})';
+      final updatedMarkdown = context.slide.content.replaceRange(
+        mermaidBlock.startIndex,
+        mermaidBlock.endIndex,
+        mermaidImageSyntax,
+      );
 
-        replacements.add((
-          start: match.start,
-          end: match.end,
-          markdown: '![Mermaid Diagram](${mermaidFile.path})',
-        ));
-      }
+      context.slide.content = updatedMarkdown;
     }
 
-    var replacedData = slide.content;
-
-    // Apply replacements in reverse order
-    for (var replacement in replacements.reversed) {
-      final (
-        :start,
-        :end,
-        :markdown,
-      ) = replacement;
-
-      replacedData = replacedData.replaceRange(start, end, markdown);
-    }
-
-    return controller.copyWith(
-      slide: slide.copyWith(content: replacedData),
+    stopwatch.stop();
+    logger.info(
+      'Completed MermaidConverterTask for slide index: ${context.slideIndex} in ${stopwatch.elapsedMicroseconds} microseconds',
     );
   }
 }

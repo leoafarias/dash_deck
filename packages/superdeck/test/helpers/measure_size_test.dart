@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:superdeck/helpers/measure_size.dart';
+import 'package:superdeck/src/modules/common/helpers/measure_size.dart';
 
 import '../test_helpers.dart';
 

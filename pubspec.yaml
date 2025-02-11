@@ -1,7 +1,8 @@
 name: superdeck
 
 environment:
-  sdk: ">=3.3.0 <4.0.0"
+  sdk: ^3.5.0
+  flutter: ">=3.24.0"
 
 dev_dependencies:
   melos: ^6.1.0

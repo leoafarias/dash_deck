@@ -1,18 +1,27 @@
 part of 'schema.dart';
 
-class SchemaValidationException implements Exception {
-  final ValidationResult result;
+class ValidationResult {
+  final String schemaName;
+  final List<String> path;
+  final List<ValidationError> errors;
+  final Object? value;
 
-  const SchemaValidationException(this.result);
-}
+  const ValidationResult(
+    this.schemaName,
+    this.path, {
+    required this.errors,
+    required this.value,
+  });
 
-enum SchemaErrorType {
-  unallowedAdditionalProperty,
-  enumViolated,
-  requiredPropMissing,
-  invalidType,
-  constraints,
-  unknown;
+  bool get isValid => errors.isEmpty;
+
+  const ValidationResult.valid(this.schemaName, this.path, this.value)
+      : errors = const [];
+
+  @override
+  String toString() {
+    return 'ValidationResult(schemaName: $schemaName, path: $path, errors: $errors, value: $value)';
+  }
 }
 
 sealed class ValidationError {
@@ -21,14 +30,26 @@ sealed class ValidationError {
   const ValidationError();
 }
 
-class UnalowedAdditionalPropertyValidationError extends ValidationError {
-  final String property;
+class DiscriminatorMissingValidationError extends ValidationError {
+  final String propertyKey;
 
-  const UnalowedAdditionalPropertyValidationError({
-    required this.property,
+  const DiscriminatorMissingValidationError({
+    required this.propertyKey,
   });
 
-  String get message => 'Unallowed property: [$property]';
+  @override
+  String get message => 'Missing discriminator key: [$propertyKey]';
+}
+
+class UnalowedAdditionalPropertyValidationError extends ValidationError {
+  final String propertyKey;
+
+  const UnalowedAdditionalPropertyValidationError({
+    required this.propertyKey,
+  });
+
+  @override
+  String get message => 'Unallowed property: [$propertyKey]';
 }
 
 class EnumViolatedValidationError extends ValidationError {
@@ -40,6 +61,7 @@ class EnumViolatedValidationError extends ValidationError {
     required this.possibleValues,
   });
 
+  @override
   String get message =>
       'Wrong value: [$value] \n\n Possible values: $possibleValues';
 }
@@ -51,6 +73,7 @@ class RequiredPropMissingValidationError extends ValidationError {
     required this.property,
   });
 
+  @override
   String get message => 'Missing prop: [$property]';
 }
 
@@ -63,6 +86,7 @@ class InvalidTypeValidationError extends ValidationError {
     required this.expectedType,
   });
 
+  @override
   String get message => 'Invalid type: expected [$expectedType] got [$value]';
 }
 
@@ -70,25 +94,41 @@ class ConstraintsValidationError extends ValidationError {
   final String _message;
   const ConstraintsValidationError(this._message);
 
+  @override
   String get message => 'Constraints: $_message';
 }
 
 class UnknownValidationError extends ValidationError {
   const UnknownValidationError();
 
+  @override
   String get message => 'Unknown Validation error';
 }
 
-class ValidationResult {
-  final List<String> path;
-  final List<ValidationError> errors;
+/// An exception thrown when schema validation fails.
+class SchemaValidationException implements Exception {
+  final ValidationResult result;
 
-  const ValidationResult({
-    required this.path,
-    required this.errors,
-  });
+  const SchemaValidationException(this.result);
 
-  bool get isValid => errors.isEmpty;
+  @override
+  String toString() {
+    final errorMessages =
+        result.errors.map((e) => '${e.runtimeType}: ${e.message}').join('\n');
+    final location = result.path.isNotEmpty
+        ? 'Location: ${result.path.join('.')}'
+        : 'No specific location in schema.';
+    // return 'SchemaValidationException:\nSchema: ${result.schemaName}\n$errorMessages\n$location';
+    return '''
+Validation Failed:
 
-  const ValidationResult.valid(this.path) : errors = const [];
+Schema: ${result.schemaName}
+Value: ${result.value}
+
+Errors:
+$errorMessages
+
+Location: $location
+''';
+  }
 }

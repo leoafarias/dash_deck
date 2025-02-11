@@ -16,3 +16,6 @@ targets:
       mix_generator|class_utility:
         generate_for:
           - lib/**/*.dart
+      mix_generator|tokens:
+        generate_for:
+          - lib/**/*.dart
