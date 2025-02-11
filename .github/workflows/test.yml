@@ -17,14 +17,21 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
 
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build Runner
-        run: dart run build_runner build --delete-conflicting-outputs
+      - name: Setup Melos
+        uses: bluefireteam/melos-action@v3
 
       - uses: invertase/github-action-dart-analyzer@v1
         with:
           fatal-infos: false
-          
-      - run: flutter test
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Runner
+        run: melos run gen:build
+
+      - uses: invertase/github-action-dart-analyzer@v1
+        with:
+          fatal-infos: false
+
+      - run: melos run test

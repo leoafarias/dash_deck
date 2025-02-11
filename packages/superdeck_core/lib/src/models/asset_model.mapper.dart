@@ -207,7 +207,7 @@ class GeneratedAssetsReferenceMapper
 
   static DateTime _$lastModified(GeneratedAssetsReference v) => v.lastModified;
   static const Field<GeneratedAssetsReference, DateTime> _f$lastModified =
-      Field('lastModified', _$lastModified, key: 'last_modified');
+      Field('lastModified', _$lastModified, key: r'last_modified');
   static List<File> _$files(GeneratedAssetsReference v) => v.files;
   static const Field<GeneratedAssetsReference, List<File>> _f$files =
       Field('files', _$files);

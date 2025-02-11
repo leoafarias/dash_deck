@@ -23,26 +23,26 @@ class DeckConfigurationMapper extends ClassMapperBase<DeckConfiguration> {
 
   static const Field<DeckConfiguration, File> _f$slidesMarkdown = Field(
       'slidesMarkdown', null,
-      key: 'slides_markdown', mode: FieldMode.param, opt: true);
+      key: r'slides_markdown', mode: FieldMode.param, opt: true);
   static Directory _$superdeckDir(DeckConfiguration v) => v.superdeckDir;
   static const Field<DeckConfiguration, Directory> _f$superdeckDir = Field(
       'superdeckDir', _$superdeckDir,
-      key: 'superdeck_dir', mode: FieldMode.member);
+      key: r'superdeck_dir', mode: FieldMode.member);
   static File _$deckJson(DeckConfiguration v) => v.deckJson;
   static const Field<DeckConfiguration, File> _f$deckJson =
-      Field('deckJson', _$deckJson, key: 'deck_json', mode: FieldMode.member);
+      Field('deckJson', _$deckJson, key: r'deck_json', mode: FieldMode.member);
   static Directory _$assetsDir(DeckConfiguration v) => v.assetsDir;
   static const Field<DeckConfiguration, Directory> _f$assetsDir = Field(
       'assetsDir', _$assetsDir,
-      key: 'assets_dir', mode: FieldMode.member);
+      key: r'assets_dir', mode: FieldMode.member);
   static File _$assetsRefJson(DeckConfiguration v) => v.assetsRefJson;
   static const Field<DeckConfiguration, File> _f$assetsRefJson = Field(
       'assetsRefJson', _$assetsRefJson,
-      key: 'assets_ref_json', mode: FieldMode.member);
+      key: r'assets_ref_json', mode: FieldMode.member);
   static File _$slidesFile(DeckConfiguration v) => v.slidesFile;
   static const Field<DeckConfiguration, File> _f$slidesFile = Field(
       'slidesFile', _$slidesFile,
-      key: 'slides_file', mode: FieldMode.member);
+      key: r'slides_file', mode: FieldMode.member);
 
   @override
   final MappableFields<DeckConfiguration> fields = const {
