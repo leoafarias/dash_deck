@@ -1,10 +1,10 @@
 library superdeck;
 
 export 'package:superdeck/src/components/molecules/block_widget.dart';
+export 'package:superdeck/src/components/parts/slide_parts.dart';
 export 'package:superdeck/src/components/superdeck_app.dart';
 export 'package:superdeck/src/modules/common/helpers/extensions.dart';
 export 'package:superdeck/src/modules/common/helpers/provider.dart';
-export 'package:superdeck/src/modules/common/helpers/slide_parts.dart';
 export 'package:superdeck/src/modules/common/styles/style.dart';
 export 'package:superdeck/src/modules/common/styles/style_spec.dart';
 export 'package:superdeck/src/modules/deck/deck_options.dart';

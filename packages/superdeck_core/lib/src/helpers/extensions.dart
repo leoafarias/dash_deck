@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 extension StringX on String {
   String capitalize() {
     return "${this[0].toUpperCase()}${substring(1)}";
@@ -29,9 +27,3 @@ extension ListX<T> on List<T> {
 }
 
 /// Formats [json]
-String prettyJson(dynamic json) {
-  var spaces = ' ' * 2;
-  var encoder = JsonEncoder.withIndent(spaces);
-
-  return encoder.convert(json);
-}

@@ -3,8 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'package:mix/mix.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
+import '../../components/parts/slide_parts.dart';
 import '../common/helpers/provider.dart';
-import '../common/helpers/slide_parts.dart';
 import 'deck_options.dart';
 
 part 'slide_configuration.mapper.dart';

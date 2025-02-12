@@ -311,11 +311,12 @@ Test content 2
       )
     ],
   },
-  // multiple tags in the same line
+
   {
-    'description': 'Test Case 9: Multiple tags in the same line',
+    'description': 'Test Case 9: Multiple tags in different lines',
     'input': '''
-@tag1 {key: value} @tag2 {key2: value2}
+@tag1 {key: value}
+@tag2 {key2: value2}
 ''',
     'expectedBlocks': [
       ParsedBlock(
@@ -372,7 +373,8 @@ void main() {
       test(description, () {
         final blocks = const BlockParser().parse(testCase['input']);
         expect(blocks.length, testCase['expectedBlocks'].length,
-            reason: 'Number of parsed blocks does not match expected.');
+            reason:
+                '$description - Number of parsed blocks does not match expected.');
 
         for (int i = 0; i < testCase['expectedBlocks'].length; i++) {
           final expected = testCase['expectedBlocks'][i] as ParsedBlock;

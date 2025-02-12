@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:superdeck_cli/src/parsers/parsers/base_parser.dart';
 import 'package:superdeck_cli/src/parsers/parsers/block_parser.dart';
 import 'package:superdeck_core/superdeck_core.dart';
@@ -9,9 +11,11 @@ class SectionParser extends BaseParser<List<SectionBlock>> {
   List<SectionBlock> parse(String content) {
     final parsedBlocks = const BlockParser().parse(content);
 
+    final updatedContent = _updateIgnoredTags(content);
+
     // If there are no tag blocks, we can just add the entire markdown as a single section.
     if (parsedBlocks.isEmpty) {
-      return [SectionBlock.text(content)];
+      return [SectionBlock.text(updatedContent)];
     }
 
     final aggregator = _SectionAggregator();
@@ -19,7 +23,7 @@ class SectionParser extends BaseParser<List<SectionBlock>> {
     final firstBlock = parsedBlocks.first;
 
     if (firstBlock.startIndex > 0) {
-      aggregator.addContent(content.substring(0, firstBlock.startIndex));
+      aggregator.addContent(updatedContent.substring(0, firstBlock.startIndex));
     }
 
     for (var idx = 0; idx < parsedBlocks.length; idx++) {
@@ -29,11 +33,13 @@ class SectionParser extends BaseParser<List<SectionBlock>> {
 
       String blockContent;
       if (isLast) {
-        blockContent = content.substring(parsedBlock.endIndex).trim();
+        blockContent = updatedContent.substring(parsedBlock.endIndex).trim();
       } else {
         final nextBlock = parsedBlocks[idx + 1];
-        blockContent =
-            content.substring(parsedBlock.endIndex, nextBlock.startIndex);
+        blockContent = updatedContent.substring(
+          parsedBlock.endIndex,
+          nextBlock.startIndex,
+        );
       }
 
       final block = Block.parse(parsedBlock.data);
@@ -45,6 +51,25 @@ class SectionParser extends BaseParser<List<SectionBlock>> {
 
     return aggregator.sections;
   }
+}
+
+String _updateIgnoredTags(String content) {
+  final lines = LineSplitter().convert(content);
+
+  List<String> updatedLines = [];
+
+  for (final line in lines) {
+    final ignoreTag = '_@';
+    final trimmedLine = line.trim();
+    if (trimmedLine.startsWith(ignoreTag)) {
+      updatedLines.add(line.replaceFirst(ignoreTag, '@'));
+      continue;
+    }
+
+    updatedLines.add(line);
+  }
+
+  return updatedLines.join('\n');
 }
 
 class _SectionAggregator {

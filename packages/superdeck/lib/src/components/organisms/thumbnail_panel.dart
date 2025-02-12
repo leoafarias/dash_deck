@@ -3,8 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-import '../../modules/common/helpers/utils.dart';
-
 class ThumbnailPanel extends StatefulWidget {
   const ThumbnailPanel({
     super.key,
@@ -12,9 +10,11 @@ class ThumbnailPanel extends StatefulWidget {
     required this.itemCount,
     required this.activeIndex,
     required this.onItemTap,
+    required this.scrollDirection,
   });
 
   final int activeIndex;
+  final Axis scrollDirection;
 
   final Widget Function(int index, bool selected) itemBuilder;
   final void Function(int index) onItemTap;
@@ -106,7 +106,7 @@ class _ThumbnailPanelState extends State<ThumbnailPanel> {
     return Container(
       color: Colors.black,
       child: ScrollablePositionedList.builder(
-          scrollDirection: context.isSmall ? Axis.horizontal : Axis.vertical,
+          scrollDirection: widget.scrollDirection,
           itemCount: widget.itemCount,
           itemPositionsListener: _itemPositionsListener,
           itemScrollController: _itemScrollController,

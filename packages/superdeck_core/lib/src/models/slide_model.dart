@@ -62,3 +62,28 @@ class SlideOptions with SlideOptionsMappable {
     additionalProperties: true,
   );
 }
+
+class ErrorSlide extends Slide {
+  ErrorSlide({
+    required String title,
+    required String message,
+    required Exception error,
+  }) : super(
+          key: 'error',
+          sections: [
+            SectionBlock([
+              ColumnBlock('''
+> [!CAUTION]
+> $title
+> $message
+
+
+```dart
+${error.toString()}
+```
+'''),
+              ColumnBlock('')
+            ]),
+          ],
+        );
+}

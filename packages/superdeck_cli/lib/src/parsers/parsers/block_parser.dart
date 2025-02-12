@@ -1,6 +1,7 @@
-import 'package:superdeck_cli/src/helpers/logger.dart';
+import 'package:source_span/source_span.dart';
 import 'package:superdeck_core/superdeck_core.dart';
 
+import '../../helpers/exceptions.dart';
 import 'base_parser.dart';
 
 class ParsedBlock {
@@ -47,26 +48,42 @@ class BlockParser extends BaseParser<List<ParsedBlock>> {
     // }
 
     // Get the "tag", which could be any word, and also maybe it does not have space
-    final tagRegex = RegExp(r'(?<!\S)@(\w+)(?:\s*{([^{}]*)})?');
+    final tagRegex = RegExp(r'^\s*@(\w+)(?:\s*{([^{}]*)})?', multiLine: true);
 
     final matches = tagRegex.allMatches(text);
 
-    try {
-      return matches.map((match) {
-        final type = match.group(1) ?? '';
-        final options = match.group(2) ?? '';
+    return matches.map((match) {
+      final typeString = match.group(1) ?? '';
+      final optionsString = match.group(2) ?? '';
 
-        return ParsedBlock(
-          type: type,
-          data: YamlUtils.convertYamlToMap(options),
-          startIndex: match.start,
-          endIndex: match.end,
+      Map<String, dynamic> optiuons;
+
+      try {
+        optiuons = YamlUtils.convertYamlToMap(optionsString);
+      } on Exception catch (e, stackTrace) {
+        // Create a SourceSpan for the options content.
+
+        final sourceSpan = SourceSpan(
+          SourceLocation(match.start),
+          SourceLocation(match.end),
+          optionsString,
         );
-      }).toList();
-    } catch (e) {
-      logger.err('Failed to parse tag blocks: $e');
+        Error.throwWithStackTrace(
+          DeckFormatException(
+            'Failed to parse tag blocks: $e',
+            sourceSpan,
+            text,
+          ),
+          stackTrace,
+        );
+      }
 
-      return [];
-    }
+      return ParsedBlock(
+        type: typeString,
+        data: optiuons,
+        startIndex: match.start,
+        endIndex: match.end,
+      );
+    }).toList();
   }
 }

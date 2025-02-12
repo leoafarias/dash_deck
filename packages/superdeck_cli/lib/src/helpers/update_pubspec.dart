@@ -25,11 +25,14 @@ String updatePubspecAssets(
   // Get the 'assets' list from the 'flutter' section, or an empty list if it doesn't exist
   final assets = flutterSection['assets']?.toList() ?? [];
 
+  bool needsUpdate = false;
+
   final superDeckDirPath = configuration.superdeckDir.path;
 
   // Add the '.superdeck/' path to the assets list if it's not already present
   if (!assets.contains('${superDeckDirPath}/')) {
     assets.add('${superDeckDirPath}/');
+    needsUpdate = true;
   }
 
   final assetsDirPath = configuration.assetsDir.path;
@@ -37,6 +40,11 @@ String updatePubspecAssets(
   // Add the '.superdeck/generated/' path to the assets list if it's not already present
   if (!assets.contains('${assetsDirPath}/')) {
     assets.add('${assetsDirPath}/');
+    needsUpdate = true;
+  }
+
+  if (!needsUpdate) {
+    return pubspecContents;
   }
 
   // Update the 'assets' key in the 'flutter' section with the modified assets list

@@ -6,6 +6,8 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:superdeck_core/superdeck_core.dart';
 
+import 'pretty_json.dart';
+
 abstract interface class IDataStore {
   final DeckConfiguration configuration;
 
@@ -41,8 +43,24 @@ class LocalDataStore extends IDataStore {
 
   @override
   Future<DeckReference> loadDeckReference() async {
-    final content = await fileReader(configuration.deckJson.path);
-    return DeckReferenceMapper.fromJson(content);
+    try {
+      // if (!await configuration.deckJson.exists()) {
+      //   throw Exception('Deck reference file not found');
+      // }
+      final content = await fileReader(configuration.deckJson.path);
+      return DeckReferenceMapper.fromJson(content);
+    } on Exception catch (e) {
+      return DeckReference(
+        slides: [
+          ErrorSlide(
+            title: 'Superdeck reference error',
+            message: configuration.deckJson.path,
+            error: e,
+          ),
+        ],
+        config: configuration,
+      );
+    }
   }
 
   @override

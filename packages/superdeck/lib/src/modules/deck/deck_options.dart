@@ -1,7 +1,7 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:flutter/widgets.dart';
 
-import '../common/helpers/slide_parts.dart';
+import '../../components/parts/slide_parts.dart';
 import '../common/styles/style.dart';
 
 part 'deck_options.mapper.dart';
@@ -18,7 +18,7 @@ class DeckOptions with DeckOptionsMappable {
     this.baseStyle = const DeckStyle(),
     this.styles = const <String, DeckStyle>{},
     this.widgets = const <String, WidgetBlockBuilder>{},
-    this.parts = const SlideParts(),
+    this.parts = SlideParts.defaultParts,
     this.debug = false,
   });
 }

@@ -69,7 +69,6 @@ class BuildCommand extends Command<int> {
 
     // Update pubspec assets and log the update.
     await _ensurePubspecAssets(deckConfig);
-    logger.info('Pubspec assets updated.');
 
     // Run the pipeline initially.
     await _runPipeline(pipeline);
@@ -106,5 +105,8 @@ Future<void> _ensurePubspecAssets(DeckConfiguration configuration) async {
   final pubspecContents = await configuration.pubspecFile.readAsString();
   final updatedPubspecContents =
       await updatePubspecAssets(configuration, pubspecContents);
-  await configuration.pubspecFile.writeAsString(updatedPubspecContents);
+  if (updatedPubspecContents != pubspecContents) {
+    await configuration.pubspecFile.writeAsString(updatedPubspecContents);
+    logger.info('Pubspec assets updated.');
+  }
 }
