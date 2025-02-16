@@ -1,182 +1,115 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mix/mix.dart';
 import 'package:superdeck/superdeck.dart';
 
-final _util = SlideSpecUtility.self;
-final _h1 = _util.h1;
-final _h2 = _util.h2;
-final _h3 = _util.h3;
+class BaseStyle extends DeckStyle {
+  BaseStyle();
 
-final _h6 = _util.h6;
-
-final _paragraph = _util.paragraph;
-
-final _code = _util.code;
-final _blockquote = _util.blockquote;
-
-final _outerContainer = _util.outerContainer;
-final _contentContainer = _util.contentContainer;
-
-final _textStyle = _util.textStyle;
-final _innerContainer = _util.innerContainer;
-
-Style get radStyle {
-  return Style(
-    _h1.textStyle.as(GoogleFonts.poppins()),
-    _h1.textStyle.fontSize(140),
-    _code.decoration.border.all(
-      color: Colors.white,
-      width: 1,
-    ),
-    _code.decoration.color.black(),
-    _code.padding.all(40),
-    _outerContainer.margin.all(60),
-    _innerContainer.borderRadius(25),
-    _innerContainer.shadow(
-      blurRadius: 0,
-      spreadRadius: 10,
-      color: Colors.red.withOpacity(1),
-    ),
-    _innerContainer.gradient.radial(
-      stops: [0.0, 1.0],
-      radius: 0.7,
-      colors: [Colors.purple, Colors.deepPurple],
-    ),
-    $on.focus(
-      _innerContainer.color.yellow(),
-    ),
-    $on.hover.event((e) {
-      if (e == null) return const Style.empty();
-      final position = e.position;
-      final dx = position.x * 10;
-      final dy = position.y * 10;
-
-      return Style(
-        _innerContainer.transform(_transformMatrix(position)),
-        _innerContainer.shadow.offset(dx, dy),
-        _innerContainer.gradient.radial(
-          center: position,
-        ),
-      );
-    }),
-    ($on.press | $on.longPress)(
-      _innerContainer.shadow(
-        blurRadius: 5,
-        spreadRadius: 1,
-        offset: Offset.zero,
-        color: Colors.purpleAccent,
-      ),
-      _innerContainer.border.all(color: Colors.white, width: 1),
-      _innerContainer.gradient.radial
-          .colors([Colors.purpleAccent, Colors.purpleAccent]),
-    ),
-  );
+  @override
+  Style build() {
+    return super.build().merge(
+          Style(
+              // $.baseTextStyle.as(GoogleFonts.poppins()),
+              // $.h1.chain
+              //   ..style.fontWeight.w900()
+              //   ..style.fontSize(100),
+              // $.h2.chain
+              //   ..style.fontWeight.w100()
+              //   ..style.fontSize(80),
+              // $.h3.chain..style.fontSize(36),
+              // $.alert.all.chain
+              //   ..heading.style.fontSize(24)
+              //   ..icon.size(36)
+              //   ..description.style.fontSize(24)
+              //   ..description.style.fontWeight.w400(),
+              // $.alert.note.chain
+              //   ..heading.style.color(_accent)
+              //   ..icon.color(_accent)
+              //   ..container.border.left.color(_accent),
+              // $.code.chain
+              //   ..textStyle.as(GoogleFonts.jetBrainsMono())
+              //   ..decoration.color(
+              //     const Color.fromARGB(255, 3, 17, 19),
+              //   )
+              //   ..decoration.border.all(
+              //         color: const Color.fromARGB(255, 6, 49, 50),
+              //         width: 1,
+              //       ),
+              ),
+        );
+  }
 }
 
-Style get customStyle {
-  return Style(
-    _textStyle.as(GoogleFonts.poppins()),
-    _h1.textStyle.as(GoogleFonts.smooch()),
-    _h1.textStyle.fontSize(200),
-    _h1.textStyle.height(0),
-    _h1.textStyle.shadow(
-      color: Colors.deepOrange,
-      blurRadius: 20,
-    ),
-    _h2.textStyle.fontSize(36),
-    _contentContainer.borderRadius(25),
-    _innerContainer.gradient.linear(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [
-        Colors.black.withOpacity(0.5),
-        Colors.deepPurple.withOpacity(0.9),
-      ],
-    ),
-    _contentContainer.padding.vertical(0),
-    _outerContainer.padding(40),
-    _outerContainer.gradient.linear(
-      colors: [
-        Colors.red,
-        Colors.redAccent,
-      ],
-    ),
-    _innerContainer.borderRadius(25),
-    _innerContainer.border.all(
-      color: Colors.deepOrange,
-      width: 4,
-    ),
-    _innerContainer.shadow(
-      color: Colors.black.withOpacity(0.4),
-      blurRadius: 20,
-      spreadRadius: 5,
-    ),
-  );
+class CoverStyle extends DeckStyle {
+  CoverStyle();
+
+  @override
+  Style build() {
+    return super.build().merge(
+          Style(
+            $.h1.chain
+              ..style.as(GoogleFonts.poppins())
+              ..style.fontSize(100),
+            $.blockContainer.gradient.linear(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black.useOpacity(0.5),
+                Colors.black.useOpacity(0.95),
+              ],
+            ),
+          ),
+        );
+  }
 }
 
-Style get coverStyle {
-  return Style(
-    _h1.textStyle.as(GoogleFonts.poppins()),
-    _h1.textStyle.fontSize(100),
-    _contentContainer.gradient.linear(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [
-        Colors.black.withOpacity(0.5),
-        Colors.black.withOpacity(0.95),
-      ],
-    ),
-  );
+class AnnouncementStyle extends DeckStyle {
+  AnnouncementStyle();
+  @override
+  Style build() {
+    return super.build().merge(
+          Style(
+            $.baseTextStyle.height(0.6),
+            $.h1.chain
+              ..style.fontSize(140)
+              ..style.bold()
+              ..style.color(const Color.fromARGB(255, 201, 195, 139)),
+            $.h2.style.fontSize(140),
+            $.h3.chain
+              ..style.fontSize(60)
+              ..style.color(Colors.white)
+              ..style.fontWeight(FontWeight.w100),
+            $.blockContainer.gradient.linear(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black.useOpacity(0.5),
+                Colors.black.useOpacity(0.95),
+              ],
+            ),
+          ),
+        );
+  }
 }
 
-Style get announcementStyle {
-  return Style(
-    _textStyle.height(0.6),
-    _h1.textStyle.fontSize(140),
-    _h1.textStyle.bold(),
-    _h1.textStyle.color(Colors.yellow),
-    _h2.textStyle.fontSize(140),
-    _h3.textStyle.fontSize(60),
-    _h3.textStyle.color(Colors.white),
-    _h3.textStyle.fontWeight(FontWeight.w100),
-    _contentContainer.gradient.linear(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [
-        Colors.black.withOpacity(0.5),
-        Colors.black.withOpacity(0.95),
-      ],
-    ),
-  );
-}
-
-Style get quoteStyle {
-  return Style(
-    _blockquote.textStyle.as(GoogleFonts.notoSerif()),
-    _blockquote.decoration.border.left(
-      width: 4,
-      color: Colors.red,
-    ),
-    _paragraph.textStyle.fontSize(32),
-    _h6.textStyle.as(GoogleFonts.notoSerif()),
-    _h6.textStyle.fontSize(20),
-  );
-}
-
-Style get showSectionsStyle {
-  return Style(
-    _contentContainer.border.all(
-      color: Colors.blue,
-      width: 2,
-    ),
-  );
-}
-
-Matrix4 _transformMatrix(Alignment alignment) {
-  final double rotateX = alignment.y * 0.2;
-  final double rotateY = -alignment.x * 0.2;
-  return Matrix4.identity()
-    ..rotateX(rotateX)
-    ..rotateY(rotateY)
-    ..translate(0.0, 0.0, 100.0);
+class QuoteStyle extends DeckStyle {
+  QuoteStyle();
+  @override
+  Style build() {
+    return super.build().merge(
+          Style(
+            $.blockquote.chain
+              ..textStyle.as(GoogleFonts.notoSerif())
+              ..decoration.border.left(
+                    width: 4,
+                    color: Colors.red,
+                  ),
+            $.p.style.fontSize(32),
+            $.h6.chain
+              ..style.as(GoogleFonts.notoSerif())
+              ..style.fontSize(20),
+          ),
+        );
+  }
 }

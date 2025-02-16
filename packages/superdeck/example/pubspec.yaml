@@ -1,29 +1,25 @@
-name: superdeck_example
+name: 'superdeck_example'
 description: An example presentation for SuperDeck
-
-publish_to: "none" # Remove this line if you wish to publish to pub.dev
-
-version: 1.0.0+1
-
+publish_to: none
+version: '1.0.0+1'
 environment:
-  sdk: ">=3.3.0 <4.0.0"
-
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: '>=3.19.0'
 dependencies:
   flutter:
     sdk: flutter
-  google_fonts: ^6.2.0
-  superdeck:
-    path: ../
-
+  google_fonts: '^6.2.1'
+  mesh: '^0.4.1'
+  mix: '^1.5.4'
+  superdeck: '^0.0.1'
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.2
-  superdeck_cli:
-    path: ../../superdeck_cli
-
+  flutter_lints: '^4.0.0'
+  superdeck_cli: '^0.0.1'
 flutter:
   uses-material-design: true
   assets:
+    - assets/
     - .superdeck/
-    - .superdeck/generated/
+    - .superdeck/assets/

@@ -1,324 +1,335 @@
 ---
-style: quote
-layout: image
-options:
-  src: https://picsum.photos/600/600.webp
-  fit: cover
-content:
-  alignment: bottom_right
----
 
-> Create your Flutter presentations faster and easier than ever.
-> You can quote me on that
-> ### Leo Farias
+@column
 
----
-background: https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGt1MnQ5N2k3cXVma24wb3V5cThlZ3ExY2NvY3czcmozang0bGQ1ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XzWd8acQ37byKR4tmd/giphy.gif
-style: cover
----
+## Another image Another image Another image Another image Another image Another image Another image Another image Another image Another image {.here}
 
-# Complex layout
-
----
-layout: image
-content:
-  alignment: bottom_right
-  flex: 1
-style: show_sections
-options:
-  src: https://picsum.photos/900/700?waves
-  fit: cover
-  position: left
-  flex: 1
----
-
-## Image Layout
-
-Create beautiful slides with images that fit your content.
-
-##### Options
-```yaml
-content:
-options:
-  src: https//www.url.com/image.jpg
-  fit: cover
-  position: left
-  flex: 1
-```
-
-> Define position fit and flex options for the image.
-
-
-
----
-layout: two_column
-style: show_sections
-sections:
-  left:
-    flex: 2
-  right:
-    alignment: bottom_left
----
-
-::left::
-
-# Two Column
-
-This is a two-column layout. You can use it to compare two different concepts or ideas.
-
-::right::
-
-### Section Options
-
-Easily customize the content of each section to suit your needs.
-
-Use front matter to define the layout of each section
-
-
-```yaml
-sections:
-  left:
-    flex: 2
-  right:
-    alignment: bottom_left
-```
-
----
-layout: two_column_header
-content:
-  alignment: center
-  flex: 2
-sections:
-  left:
-    flex: 2
-  right:
-    alignment: bottom_left
-  header:
-    alignment: bottom_left
-style: show_sections
----
-
-# Two Column + Header
-
-
-::left::
-
-### Left Section
-Easily customize the content of each section to suit your needs.
-
-Use front matter to define the layout of each section
-::right::
-
-#### Section Options
-
-```yaml
-sections:
-  left:
-    alignment: bottom_right
-    flex: 2
-  right:
-    alignment: bottom_left
-  header:
-    alignment: bottom_left
-```
- 
-
----
-style: rad
-layout: two_column
-content:
-  alignment: center
-sections:
-  left:
-  right:
-    alignment: bottom_left
-    flex: 2
----
-
-# Mix
-
-Integration with Mix gives you complete control over all styling elements in your slides with a simple and intuitive API.
-
-::right::
-
-```dart
-VariantAttribute get radStyle {
-  return const SlideVariant('rad')(
-    $.h1.textStyle.as(GoogleFonts.poppins()),
-    $.h1.textStyle.fontSize(140),
-    $.code.decoration.border.all(
-      color: Colors.red,
-      width: 3,
-    ),
-    $.code.decoration(
-      color: Colors.black54,
-    ),
-    $.code.padding.all(40),
-
-    $.outerContainer.margin.all(60),
-
-    $.innerContainer.borderRadius(25),
-    $.innerContainer.shadow(
-      blurRadius: 0,
-      spreadRadius: 10,
-      color: Colors.red.withOpacity(1),
-    ),
-    $.innerContainer.gradient.radial(
-      stops: [0.0, 1.0],
-      radius: 0.7,
-      colors: [Colors.purple, Colors.deepPurple],
-    ),
-
-    // Events
-    onMouseHover((event) {
-      final position = event.position;
-      final dx = position.x * 10;
-      final dy = position.y * 10;
-
-      return Style(
-        $.innerContainer.transform(_transformMatrix(position)),
-        $.innerContainer.shadow.offset(dx, dy),
-        $.innerContainer.gradient.radial(
-          center: position,
-        ),
-      );
-    }),
-
-    (onPressed | onLongPressed)(
-      $.innerContainer.shadow(
-        blurRadius: 5,
-        spreadRadius: 1,
-        offset: Offset.zero,
-        color: Colors.purpleAccent,
-      ),
-      $.innerContainer.border.all(color: Colors.white, width: 1),
-      $.innerContainer.gradient.radial
-          .colors([Colors.purpleAccent, Colors.purpleAccent]),
-    ),
-  );
+@twitter {
+  username: faafasdf
+  tweetId: 1746481414112256000
 }
 
-```
-
----
-style: cover
-background: https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGswdWJvY2oxazJoY3g2Y2poNHBvZXlpYmd5YTg0Z2g0ODRrbng4MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/oB6KlAvOuaLtxYy8l4/giphy.gif
----
-
-# Markdown support
-
----
-style: show_sections
-layout: two_column
-sections:
-content:
-  flex: 4
----
-
-::left::
-
-
-**Bold Text**
-
-*Italic Text*
-
-~~Strikethrough~~
-
-`Inline Code`
-
-[Link here](https://github.com/leoafarias/superdeck)
-
-::right::
-
-Lists
-
-1. Ordered list item 1
-2. Ordered list item 2
-
-- Unordered list item 1
-- Unordered list item 2
-
-Quotes
-
-> If you want to go fast, go alone. 
-> If you want to go far, go together.
-> ### African Proverb
-
-
----
-layout: two_column
----
-
-::left::
-
-
-Code
-```dart
-int factorial(int n) {
-  return n == 0 ? 1 : n * factorial(n - 1);
-}
-
-```
-
-Tasks
-- [ ] Item 1
-- [x] Item 2
-
-Subtasks
-
-- [x] Item 1
-  - [ ] Subitem 1
-
-::right::
-
-Images
-![Unsplash Image](https://picsum.photos/300/200?landscape)
-
-
-Table
-
-| Header 1 | Header 2 |
-|----------|----------|
-| Cell 1A  | Cell 1B  |
-| Cell 2A  | Cell 2B  |
-
-Divider
-
-___
-
-
-
----
-title: "Mermaid example"
-layout: two_column
----
-
-::left::
+@column
 
 ```mermaid
-flowchart TD
-    A[This is crazy] -->|Get money| B(Go shopping)
-    B --> C{Let me car}
-    C -->|One| D[Laptop]
-    C -->|Two| E[iPhone]
-    C -->|Three| F[fa:fa-car Car]
+graph TD
+    A[Start] --> B[Input]
+    B --> C[Process]
+    C --> D[Output]
+    D --> E[End]
+``` {.code}
+
+<!-- Test of notes -->
+
+---
+
+@column
+
+@column
+# Hi
+@column
+
+
+
+---
+
+@section
+@section {flex: 2}
+@column {
+  align: center
+  flex: 2
+}
+
+
+```dart
+Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: spans.map((span) {
+    return RichText(
+      text: TextSpan(
+        style: interpolatedSpec.textStyle,
+        children: [span],
+      ),
+    );
+  }).toList(),
+)
+```{.code}
+
+@column
+
+![structured_output](https://picsum.photos/800/1400) {.cover}
+
+---
+
+
+@column
+
+```mermaid
+graph TD
+    A[Start] --> B[Input]
+    B --> C[Process]
+    C --> D[Output]
+    D --> E[End]
+``` {.code}
+
+## Another image{.here}
+
+@column
+
+![structured_output](https://picsum.photos/800/1400) {.cover}
+
+---
+
+```dart
+Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: spans.map((span) {
+    return RichText(
+      text: TextSpan(
+        style: interpolatedSpec.textStyle,
+        children: [span],
+      ),
+    );
+  }).toList(),
+)
+```{.code}
+
+---
+
+```dart
+Column(
+  children: []).toList(),
+);
+```{.code}
+
+---
+
+@column
+
+![structured_output](https://picsum.photos/800/1400) {.cover}
+
+@dartpad {
+  id: idhere
+  code: ""
+}
+
+@column
+
+## Yes different image{.here}
+
+---
+
+@column {
+  align: center_right
+}
+
+#### Leo Farias
+leoafarias{.here}
+
+
+@column {
+  align: center_left
+}
+
+- Founder/CEO/CTO
+- Open Source Contributor
+- Flutter & Dart GDE
+- Passionate about UI/UX/DX
+
+---
+
+@column
+
+@column {
+  align: center_left 
+  flex: 2
+}
+> [!WARNING]  
+> This presentation contains live AI-generated content. Unexpected things may occur during the demonstration. 
+
+@column
+
+---
+
+
+
+@column {
+  flex: 2 
+  align: center_right
+}
+### Generative UI
+@column
+## VS
+@column {
+  flex: 2
+}
+### AI Assisted Code Generation
+
+---
+
+
+### What is Generative UI?{.animate}
+
+@column
+
+- LLMs are great at generating content based on context
+- GUIs are great at providing structured, interactive interfaces for user input and navigation
+
+---
+
+# LLM ❤️ GUI{.animate}
+
+
+---
+
+@column
+@column {
+  flex: 2
+  align: center
+}
+Creates dynamic, context-aware UIs by interpreting actions and maintaining state with LLMs for fluid, interactive responses.{.animate}
+
+@column
+
+---
+
+### Benefits of UI over Chat{.animate}
+
+- More intuitive and user-friendly, especially for complex tasks
+- Faster feedback loop between users and LLMs
+- Enhances efficiency and interaction
+
+---
+
+
+
+@column {
+  flex: 3 
+  align: center
+}
+### Flutter is Well-Suited <br>for Generative UI
+Built for any screen: Ideal for generating<br>adaptive UIs across devices and platforms.
+@column
+
+---
+
+
+## How can LLMs Understtand Your UI?
+
+@column
+![structured_output](assets/structured_output.png)
+
+
+---
+
+@column
+
+### Structured Output
+
+@column
+```dart 
+final schema = Schema.array(
+  description: 'List of recipes',
+  items: Schema.object(
+    properties: {
+      'recipeName': Schema.string(
+        description: 'Name of the recipe.',
+        nullable: false,
+      ),
+    },
+    requiredProperties: ['recipeName'],
+  ),
+);
 ```
-  
-
-::right::
-
-## Mermaid Support
-
-Superdeck allows you to use Mermaid diagrams in your slides. It automatically converts the code into a visual representation.
 
 ---
-layout: widget
-options:
-  name: demo
-  args:
-    text: Hello, Superdeck!
-    height: 200.0
-    width: 300.0
+
+@section
+```dart
+
+final model = GenerativeModel(
+  model: 'gemini-1.5-pro',
+  apiKey: apiKey,
+  generationConfig: GenerationConfig(
+    responseMimeType: 'application/json',
+    responseSchema: schema,
+  ),
+);
+
+final prompt = 'List a few popular cookie recipes.';
+final response = await model.generateContent([Content.text(prompt)]);
+
+```
+
 ---
 
-## Showcase your widgets
+@column
+### Color Palette Generator
+
+Generate a color palette based on a given text.
+
+- Name of the palette
+- Font family
+- Font color
+- Color for each corner of the palette
+
+--- 
+
+@column
+```dart
+final schema = Schema.object(properties: {
+  'name': Schema.string(
+    description:
+        'The text content to display on color palette. Format: #FF0000',
+    nullable: false,
+  ),
+  'font': Schema.enumString(
+    enumValues: ColorPaletteFontFamily.enumString,
+    description: 'The font to use for the poster text.',
+    nullable: false,
+  ),
+  'fontColor': Schema.string(
+    description: 'The hex color value of the poster text. Format: #FF0000',
+    nullable: false,
+  ),
+  'topLeftColor': Schema.string(
+    description:
+        'The hex color value top left corner of color palette. Format: #FF0000',
+    nullable: false,
+  ),
+  'topRightColor': Schema.string(
+    description:
+        'The hex color value top right corner of color palette. Format: #FF0000',
+    nullable: false,
+  ),
+  'bottomLeftColor': Schema.string(
+    description:
+        'The hex color value bottom left corner of color palette. Format: #FF0000',
+    nullable: false,
+  ),
+  'bottomRightColor': Schema.string(
+    description:
+        'The hex color value bottom right corner of color palette. Format: #FF0000',
+    nullable: false,
+  )
+}, requiredProperties: [
+  'name',
+  'font',
+  'fontColor',
+  'topLeftColor',
+  'topRightColor',
+  'bottomLeftColor',
+  'bottomRightColor',
+]);
+
+```
+
+---
+style: demo
+---
+
+@colorPalette {
+  schema: true
+  prompts: [tropical, 
+  vibrant, pastel, chocolatey pink unicorn, cyberpunk]
+}

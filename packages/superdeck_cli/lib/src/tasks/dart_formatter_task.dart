@@ -1,40 +1,34 @@
 import 'dart:async';
 
-import 'package:dart_style/dart_style.dart';
-import 'package:superdeck_cli/src/slides_pipeline.dart';
+import 'package:superdeck_cli/src/generator_pipeline.dart';
+import 'package:superdeck_cli/src/helpers/dart_process.dart';
+
+import '../parsers/parsers/fenced_code_parser.dart';
 
 class DartFormatterTask extends Task {
-  const DartFormatterTask() : super('dart_formatter');
+  DartFormatterTask() : super('dart_formatter');
 
   @override
-  FutureOr<TaskController> run(controller) async {
-    final formattedMarkdown = _formatDartCodeBlocks(controller);
+  Future<void> run(TaskContext context) async {
+    final fencedCodeParser = const FencedCodeParser();
+    final codeBlocks = fencedCodeParser.parse(context.slide.content);
 
-    return controller.copyWith(
-      slide: controller.slide.copyWith(content: formattedMarkdown),
-    );
-  }
+    final dartBlocks = codeBlocks.where((e) => e.language == 'dart');
 
-  String _formatDartCodeBlocks(
-    TaskController controller,
-  ) {
-    final codeBlockRegex = RegExp(r'```dart\n([\s\S]*?)\n```');
-    final markdown = controller.slide.content;
-    return markdown.replaceAllMapped(codeBlockRegex, (match) {
-      final code = match.group(1)!;
-      final formatter = DartFormatter();
-      final formattedCode = formatter.format(code);
+    for (final dartBlock in dartBlocks) {
+      try {
+        final formattedCode = await DartProcess.format(dartBlock.content);
 
-      final replacement = '```dart\n$formattedCode\n```';
+        final updatedMarkdown = context.slide.content.replaceRange(
+          dartBlock.startIndex,
+          dartBlock.endIndex,
+          '```dart\n$formattedCode\n```',
+        );
 
-      controller.markdownReplacements.add(
-        (
-          pattern: match.group(0)!,
-          replacement: replacement,
-        ),
-      );
-
-      return replacement;
-    });
+        context.slide.content = updatedMarkdown;
+      } catch (e) {
+        logger.severe('Failed to format Dart code: $e');
+      }
+    }
   }
 }

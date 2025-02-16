@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:superdeck/helpers/syntax_highlighter.dart';
+import 'package:superdeck/src/modules/common/helpers/syntax_highlighter.dart';
 
 void main() {
   group('parseLineNumbers Tests', () {

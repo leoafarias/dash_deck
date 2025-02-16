@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:superdeck/helpers/deep_merge.dart';
+import 'package:superdeck/src/modules/common/helpers/deep_merge.dart';
 
 void main() {
   group('deepMerge', () {
