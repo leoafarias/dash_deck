@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
-import 'package:superdeck/src/screens/export_screen.dart';
+import 'package:superdeck/src/modules/slide_capture/pdf_export_screen.dart';
 
 import '../../modules/deck/deck_controller.dart';
 import '../../modules/navigation/navigation_controller.dart';
@@ -33,7 +33,7 @@ class DeckBottomBar extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           IconButton(
-            onPressed: () => ExportDialogScreen.show(context),
+            onPressed: () => PdfExportDialogScreen.show(context),
             icon: const Icon(Icons.save),
           ),
           const SizedBox(width: 16),

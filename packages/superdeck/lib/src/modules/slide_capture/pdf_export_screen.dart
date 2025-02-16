@@ -4,28 +4,29 @@ import 'package:superdeck/src/modules/common/helpers/provider.dart';
 import 'package:superdeck/src/modules/deck/deck_controller.dart';
 import 'package:superdeck/src/modules/slide_capture/slide_capture_service.dart';
 
-import '../components/atoms/slide_view.dart';
-import '../modules/deck/slide_configuration.dart';
-import '../modules/slide_capture/pdf_controller.dart';
+import '../../components/atoms/slide_view.dart';
+import '../deck/slide_configuration.dart';
+import 'pdf_controller.dart';
 
-class ExportDialogScreen extends StatefulWidget {
-  const ExportDialogScreen({super.key, required this.slides});
+class PdfExportDialogScreen extends StatefulWidget {
+  const PdfExportDialogScreen({super.key, required this.slides});
 
   final List<SlideConfiguration> slides;
 
   @override
-  State<ExportDialogScreen> createState() => _ExportDialogScreenState();
+  State<PdfExportDialogScreen> createState() => _PdfExportDialogScreenState();
 
   static void show(BuildContext context) {
     final deckController = DeckController.of(context);
     showDialog(
       context: context,
-      builder: (context) => ExportDialogScreen(slides: deckController.slides),
+      builder: (context) =>
+          PdfExportDialogScreen(slides: deckController.slides),
     );
   }
 }
 
-class _ExportDialogScreenState extends State<ExportDialogScreen> {
+class _PdfExportDialogScreenState extends State<PdfExportDialogScreen> {
   late PdfController _exportController;
 
   @override
@@ -55,7 +56,7 @@ class _ExportDialogScreenState extends State<ExportDialogScreen> {
   }
 
   @override
-  void didUpdateWidget(ExportDialogScreen oldWidget) {
+  void didUpdateWidget(PdfExportDialogScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.slides != widget.slides) {
       _exportController.dispose();
@@ -125,6 +126,19 @@ class _PdfExportBar extends StatelessWidget {
 
   final PdfController exportController;
 
+  /// Human readable progress text
+  String get _progressText {
+    final current = exportController.progressTuple.$1;
+    final total = exportController.progressTuple.$2;
+    return switch (exportController.exportStatus) {
+      PdfExportStatus.building => 'Building PDF...',
+      PdfExportStatus.complete => 'Done',
+      PdfExportStatus.capturing => 'Exporting $current / $total',
+      PdfExportStatus.idle => 'Exporting $current / $total',
+      PdfExportStatus.preparing => 'Preparing...',
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -154,7 +168,7 @@ class _PdfExportBar extends StatelessWidget {
                 ),
           const SizedBox(width: 16.0),
           Text(
-            exportController.progressText,
+            _progressText,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Colors.white,
                 ),

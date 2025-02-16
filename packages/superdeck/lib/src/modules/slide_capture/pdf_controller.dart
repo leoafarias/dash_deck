@@ -56,6 +56,12 @@ class PdfController extends ChangeNotifier {
   PdfExportStatus _exportStatus = PdfExportStatus.idle;
   final List<Uint8List> _images = [];
   bool _disposed = false;
+  bool _cancelled = false;
+
+  void _checkExportAllowed() {
+    if (_disposed) throw _ExportCancelledException('Controller disposed');
+    if (_cancelled) throw _ExportCancelledException();
+  }
 
   /// The list of slides to export
   final List<SlideConfiguration> slides;
@@ -82,18 +88,8 @@ class PdfController extends ChangeNotifier {
   double get progress =>
       _slideKeys.isNotEmpty ? _images.length / _slideKeys.length : 0.0;
 
-  /// Human readable progress text
-  String get progressText {
-    return switch (_exportStatus) {
-      PdfExportStatus.building => 'Building PDF...',
-      PdfExportStatus.complete => 'Done',
-      PdfExportStatus.capturing =>
-        'Exporting ${_images.length} / ${_slideKeys.length}',
-      PdfExportStatus.idle =>
-        'Exporting ${_images.length} / ${_slideKeys.length}',
-      PdfExportStatus.preparing => 'Preparing...',
-    };
-  }
+  (int current, int total) get progressTuple =>
+      (_images.length, _slideKeys.length);
 
   /// Waits for a render boundary widget to be painted
   Future<void> _waitForRenderBoundaryPaint(GlobalKey key) async {
@@ -131,8 +127,10 @@ class PdfController extends ChangeNotifier {
   }
 
   /// Prepares slides for export by ensuring they are properly rendered
-  Future<void> prepare() async {
+  Future<void> _prepare() async {
     for (var i = 0; i < _slideKeys.length; i++) {
+      // just return if cancelled
+      if (_cancelled) return;
       final slide = slides[i];
       final key = _slideKeys[slide.key]!;
 
@@ -150,49 +148,60 @@ class PdfController extends ChangeNotifier {
   ///
   /// Captures slides as images and combines them into a PDF document.
   Future<void> export() async {
+    _cancelled = false;
     _exportStatus = PdfExportStatus.preparing;
     notifyListeners();
 
-    await prepare();
+    try {
+      await _prepare();
 
-    _exportStatus = PdfExportStatus.capturing;
-    notifyListeners();
-
-    for (var i = 0; i < _slideKeys.length; i++) {
-      final slide = slides[i];
-      final key = _slideKeys[slide.key]!;
-
-      await _pageController.animateToPage(
-        i,
-        duration: const Duration(milliseconds: 1),
-        curve: Curves.linear,
-      );
-
-      await _waitForRenderBoundaryPaint(key);
-      if (disposed) return;
-
-      final image = await _captureImageWithRetry(key);
-      if (disposed) return;
-
-      _images.add(image);
+      _exportStatus = PdfExportStatus.capturing;
       notifyListeners();
+
+      for (var i = 0; i < _slideKeys.length; i++) {
+        _checkExportAllowed(); // check before starting this iteration
+
+        final slide = slides[i];
+        final key = _slideKeys[slide.key]!;
+
+        await _pageController.animateToPage(
+          i,
+          duration: const Duration(milliseconds: 1),
+          curve: Curves.linear,
+        );
+
+        _checkExportAllowed();
+        await _waitForRenderBoundaryPaint(key);
+        _checkExportAllowed();
+
+        final image = await _captureImageWithRetry(key);
+        _checkExportAllowed();
+
+        _images.add(image);
+        notifyListeners();
+      }
+
+      _exportStatus = PdfExportStatus.building;
+      notifyListeners();
+
+      await Future.delayed(_waitDuration);
+      _checkExportAllowed();
+
+      final pdf = await compute(_buildPdf, [..._images]);
+      _checkExportAllowed();
+
+      _savePdf(pdf);
+
+      _exportStatus = PdfExportStatus.complete;
+      _images.clear();
+      notifyListeners();
+    } on _ExportCancelledException catch (e) {
+      // Handle cancellation: update status and notify listeners.
+      _exportStatus = PdfExportStatus.idle;
+      notifyListeners();
+      // Optionally, log the cancellation.
+      log(e.toString());
     }
-
-    _exportStatus = PdfExportStatus.building;
-    notifyListeners();
-    await Future.delayed(_waitDuration);
-    if (disposed) return;
-
-    final pdf = await compute(_buildPdf, [..._images]);
-    if (disposed) return;
-
-    notifyListeners();
-
-    _savePdf(pdf);
-
-    _exportStatus = PdfExportStatus.complete;
-    _images.clear();
-    notifyListeners();
   }
 
   /// Saves the generated PDF file
@@ -222,6 +231,10 @@ class PdfController extends ChangeNotifier {
     } catch (e) {
       log('Error saving pdf: $e');
     }
+  }
+
+  void cancel() {
+    _cancelled = true;
   }
 
   @override
@@ -263,4 +276,11 @@ Future<Uint8List> _buildPdf(List<Uint8List> images) async {
   }
 
   return await pdf.save();
+}
+
+class _ExportCancelledException implements Exception {
+  final String message;
+  _ExportCancelledException([this.message = 'Export cancelled']);
+  @override
+  String toString() => message;
 }
