@@ -4,6 +4,8 @@ import 'package:superdeck/src/components/molecules/scaled_app.dart';
 import 'package:superdeck/src/components/organisms/comments_panel.dart';
 import 'package:superdeck/src/components/organisms/thumbnail_panel.dart';
 import 'package:superdeck/src/modules/common/helpers/constants.dart';
+import 'package:superdeck/src/modules/common/helpers/utils.dart';
+import 'package:superdeck/src/modules/slide_capture/thumbnail_controller.dart';
 
 import '../../modules/deck/deck_controller.dart';
 import '../../modules/navigation/navigation_controller.dart';
@@ -27,7 +29,7 @@ class AppShell extends StatelessWidget {
     return KeyboardShortcuts(
       child: SplitView(
         isOpen: navigation.isMenuOpen,
-        isSmallLayout: true,
+        isSmallLayout: context.isSmall,
         child: child,
       ),
     );
@@ -61,6 +63,7 @@ class _SplitViewState extends State<SplitView>
   @override
   void initState() {
     super.initState();
+
     _animationController = AnimationController(
       duration: _animationDuration,
       vsync: this,
@@ -70,6 +73,14 @@ class _SplitViewState extends State<SplitView>
       parent: _animationController,
       curve: Curves.easeInOut,
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final deckController = DeckController.of(context);
+      ThumbnailController.of(context).generateThumbnails(
+        deckController.slides,
+        context,
+      );
+    });
   }
 
   @override
@@ -106,7 +117,7 @@ class _SplitViewState extends State<SplitView>
       itemBuilder: (index, selected) {
         return SlideThumbnail(
           selected: selected,
-          slideConfig: deckController.slides[index],
+          slide: deckController.slides[index],
         );
       },
       itemCount: deckController.slides.length,

@@ -5,6 +5,7 @@ import 'package:superdeck_core/superdeck_core.dart';
 
 import '../common/helpers/constants.dart';
 import '../common/helpers/provider.dart';
+import '../slide_capture/thumbnail_controller.dart';
 import 'deck_controller.dart';
 import 'deck_options.dart';
 
@@ -57,16 +58,18 @@ class _DeckControllerProvider extends StatefulWidget {
 }
 
 class _DeckControllerProviderState extends State<_DeckControllerProvider> {
-  late final DeckController controller;
+  late final DeckController _deckController;
+  late final ThumbnailController _thumbnailController;
 
   @override
   void initState() {
     super.initState();
-    controller = DeckController.build(
+    _deckController = DeckController.build(
       slides: widget.reference.slides,
       options: widget.options,
       dataStore: widget.dataStore,
     );
+    _thumbnailController = ThumbnailController();
   }
 
   @override
@@ -76,7 +79,7 @@ class _DeckControllerProviderState extends State<_DeckControllerProvider> {
     final optionsChanged = widget.options != oldWidget.options;
 
     if (referenceChanged || optionsChanged) {
-      controller.update(
+      _deckController.update(
         slides: widget.reference.slides,
         options: widget.options,
       );
@@ -86,14 +89,18 @@ class _DeckControllerProviderState extends State<_DeckControllerProvider> {
   @override
   void dispose() {
     super.dispose();
-    controller.dispose();
+    _deckController.dispose();
+    _thumbnailController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return InheritedNotifierData(
-      data: controller,
-      child: widget.builder(controller),
+      data: _deckController,
+      child: InheritedNotifierData(
+        data: _thumbnailController,
+        child: widget.builder(_deckController),
+      ),
     );
   }
 }

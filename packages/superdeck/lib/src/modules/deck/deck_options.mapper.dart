@@ -35,7 +35,7 @@ class DeckOptionsMapper extends ClassMapperBase<DeckOptions> {
           opt: true, def: const <String, WidgetBlockBuilder>{});
   static SlideParts _$parts(DeckOptions v) => v.parts;
   static const Field<DeckOptions, SlideParts> _f$parts =
-      Field('parts', _$parts, opt: true, def: const SlideParts());
+      Field('parts', _$parts, opt: true, def: SlideParts.defaultParts);
   static bool _$debug(DeckOptions v) => v.debug;
   static const Field<DeckOptions, bool> _f$debug =
       Field('debug', _$debug, opt: true, def: false);

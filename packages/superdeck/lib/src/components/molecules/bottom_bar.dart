@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
 import 'package:superdeck/src/screens/export_screen.dart';
 
+import '../../modules/deck/deck_controller.dart';
 import '../../modules/navigation/navigation_controller.dart';
+import '../../modules/slide_capture/thumbnail_controller.dart';
 
 class DeckBottomBar extends StatelessWidget {
   const DeckBottomBar({
@@ -12,7 +14,8 @@ class DeckBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final navigation = NavigationController.of(context);
-
+    final thumbnail = ThumbnailController.of(context);
+    final deck = DeckController.of(context);
     final currentPage = navigation.currentSlide.slideIndex + 1;
     final totalPages = navigation.totalSlides;
 
@@ -32,6 +35,15 @@ class DeckBottomBar extends StatelessWidget {
           IconButton(
             onPressed: () => ExportDialogScreen.show(context),
             icon: const Icon(Icons.save),
+          ),
+          const SizedBox(width: 16),
+          IconButton(
+            onPressed: () => thumbnail.generateThumbnails(
+              deck.slides,
+              context,
+              force: true,
+            ),
+            icon: const Icon(Icons.replay_circle_filled_rounded),
           ),
           const Spacer(),
           IconButton(

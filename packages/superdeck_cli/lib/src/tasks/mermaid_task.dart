@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:puppeteer/puppeteer.dart';
 import 'package:superdeck_cli/src/generator_pipeline.dart';
@@ -161,8 +162,10 @@ class MermaidConverterTask extends Task {
     for (final mermaidBlock in mermaidBlocks) {
       final mermaidAsset = GeneratedAsset.mermaid(mermaidBlock.content);
 
-      final assetFile =
-          await context.dataStore.getGeneratedAssetFile(mermaidAsset);
+      final assetPath =
+          await context.dataStore.getGeneratedAssetPath(mermaidAsset);
+
+      final assetFile = File(assetPath);
 
       if (await assetFile.exists()) {
         logger.info(

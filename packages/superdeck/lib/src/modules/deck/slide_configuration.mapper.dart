@@ -36,6 +36,9 @@ class SlideConfigurationMapper extends ClassMapperBase<SlideConfiguration> {
   static SlideParts? _$parts(SlideConfiguration v) => v.parts;
   static const Field<SlideConfiguration, SlideParts> _f$parts =
       Field('parts', _$parts, opt: true);
+  static String _$thumbnailFile(SlideConfiguration v) => v.thumbnailFile;
+  static const Field<SlideConfiguration, String> _f$thumbnailFile =
+      Field('thumbnailFile', _$thumbnailFile);
   static Map<String, Widget Function(Map<String, dynamic>)> _$_widgets(
           SlideConfiguration v) =>
       v._widgets;
@@ -53,6 +56,7 @@ class SlideConfigurationMapper extends ClassMapperBase<SlideConfiguration> {
     #_slide: _f$_slide,
     #debug: _f$debug,
     #parts: _f$parts,
+    #thumbnailFile: _f$thumbnailFile,
     #_widgets: _f$_widgets,
     #isExporting: _f$isExporting,
   };
@@ -64,6 +68,7 @@ class SlideConfigurationMapper extends ClassMapperBase<SlideConfiguration> {
         slide: data.dec(_f$_slide),
         debug: data.dec(_f$debug),
         parts: data.dec(_f$parts),
+        thumbnailFile: data.dec(_f$thumbnailFile),
         widgets: data.dec(_f$_widgets),
         isExporting: data.dec(_f$isExporting));
   }
@@ -136,6 +141,7 @@ abstract class SlideConfigurationCopyWith<$R, $In extends SlideConfiguration,
       Slide? slide,
       bool? debug,
       SlideParts? parts,
+      String? thumbnailFile,
       Map<String, Widget Function(Map<String, dynamic>)>? widgets,
       bool? isExporting});
   SlideConfigurationCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
@@ -170,6 +176,7 @@ class _SlideConfigurationCopyWithImpl<$R, $Out>
           Slide? slide,
           bool? debug,
           Object? parts = $none,
+          String? thumbnailFile,
           Map<String, Widget Function(Map<String, dynamic>)>? widgets,
           bool? isExporting}) =>
       $apply(FieldCopyWithData({
@@ -178,6 +185,7 @@ class _SlideConfigurationCopyWithImpl<$R, $Out>
         if (slide != null) #slide: slide,
         if (debug != null) #debug: debug,
         if (parts != $none) #parts: parts,
+        if (thumbnailFile != null) #thumbnailFile: thumbnailFile,
         if (widgets != null) #widgets: widgets,
         if (isExporting != null) #isExporting: isExporting
       }));
@@ -188,6 +196,7 @@ class _SlideConfigurationCopyWithImpl<$R, $Out>
       slide: data.get(#slide, or: $value._slide),
       debug: data.get(#debug, or: $value.debug),
       parts: data.get(#parts, or: $value.parts),
+      thumbnailFile: data.get(#thumbnailFile, or: $value.thumbnailFile),
       widgets: data.get(#widgets, or: $value._widgets),
       isExporting: data.get(#isExporting, or: $value.isExporting));
 

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:superdeck/src/modules/common/helpers/constants.dart';
 import 'package:superdeck/src/modules/common/helpers/provider.dart';
 import 'package:superdeck/src/modules/deck/deck_controller.dart';
-import 'package:superdeck/src/modules/export/slide_capture_service.dart';
+import 'package:superdeck/src/modules/slide_capture/slide_capture_service.dart';
 
 import '../components/atoms/slide_view.dart';
 import '../modules/deck/slide_configuration.dart';
-import '../modules/export/export_controller.dart';
+import '../modules/slide_capture/pdf_controller.dart';
 
 class ExportDialogScreen extends StatefulWidget {
   const ExportDialogScreen({super.key, required this.slides});
@@ -26,7 +26,7 @@ class ExportDialogScreen extends StatefulWidget {
 }
 
 class _ExportDialogScreenState extends State<ExportDialogScreen> {
-  late ExportController _exportController;
+  late PdfController _exportController;
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _ExportDialogScreenState extends State<ExportDialogScreen> {
   }
 
   void _setupExportController() {
-    _exportController = ExportController(
+    _exportController = PdfController(
       slides: widget.slides,
       slideCaptureService: SlideCaptureService(),
     );
@@ -123,7 +123,7 @@ class _PdfExportBar extends StatelessWidget {
     required this.exportController,
   });
 
-  final ExportController exportController;
+  final PdfController exportController;
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +135,7 @@ class _PdfExportBar extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          exportController.exportStatus == ExportStatus.complete
+          exportController.exportStatus == PdfExportStatus.complete
               ? Icon(
                   Icons.check_circle,
                   color: Theme.of(context).colorScheme.primary,
@@ -146,10 +146,10 @@ class _PdfExportBar extends StatelessWidget {
                   width: 32,
                   child: CircularProgressIndicator(
                     color: Theme.of(context).colorScheme.primary,
-                    value:
-                        exportController.exportStatus == ExportStatus.building
-                            ? null
-                            : exportController.progress,
+                    value: exportController.exportStatus ==
+                            PdfExportStatus.building
+                        ? null
+                        : exportController.progress,
                   ),
                 ),
           const SizedBox(width: 16.0),

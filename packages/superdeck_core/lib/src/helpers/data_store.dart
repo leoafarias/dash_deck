@@ -19,8 +19,8 @@ abstract interface class IDataStore {
 
   Stream<DeckReference> loadDeckReferenceStream();
 
-  File getGeneratedAssetFile(GeneratedAsset asset) {
-    return File(p.join(configuration.assetsDir.path, asset.fileName));
+  String getGeneratedAssetPath(GeneratedAsset asset) {
+    return p.join(configuration.assetsDir.path, asset.fileName);
   }
 
   Future<String> readAssetByPath(String path);
@@ -92,9 +92,9 @@ class FileSystemDataStore extends LocalDataStore {
   }
 
   @override
-  File getGeneratedAssetFile(GeneratedAsset asset) {
+  String getGeneratedAssetPath(GeneratedAsset asset) {
     _generatedAssets.add(asset);
-    return super.getGeneratedAssetFile(asset);
+    return super.getGeneratedAssetPath(asset);
   }
 
   Future<void> saveReferences(

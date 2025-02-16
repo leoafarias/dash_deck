@@ -1,14 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:mix/mix.dart';
-import 'package:superdeck/src/modules/export/slide_capture_service.dart';
 
 import '../../modules/common/helpers/constants.dart';
-import '../../modules/deck/deck_controller.dart';
 import '../../modules/deck/slide_configuration.dart';
-import 'cache_image_widget.dart';
-import 'loading_indicator.dart';
+import '../../modules/slide_capture/thumbnail_controller.dart';
 
 enum _PopMenuAction {
   refreshThumbnail(
@@ -22,94 +17,27 @@ enum _PopMenuAction {
   final IconData icon;
 }
 
-class SlideThumbnail extends StatefulWidget {
+class SlideThumbnail extends StatelessWidget {
   final bool selected;
-  final SlideConfiguration slideConfig;
+  final SlideConfiguration slide;
 
   const SlideThumbnail({
     super.key,
     required this.selected,
-    required this.slideConfig,
+    required this.slide,
   });
 
   @override
-  State<SlideThumbnail> createState() => _SlideThumbnailState();
-}
-
-class _SlideThumbnailState extends State<SlideThumbnail> {
-  final _slideCaptureService = SlideCaptureService();
-  final _thumbnailKey = GlobalKey(debugLabel: 'Thumbnail');
-
-  /// Generates the thumbnail for the given [slide].
-  ///
-  /// If [force] is true, it regenerates the thumbnail even if it already exists.
-  Future<File> _generateThumbnail({
-    required SlideConfiguration slide,
-    required DeckController controller,
-    bool force = false,
-  }) async {
-    final thumbnailFile = controller.getSlideThumbnailFile(slide);
-
-    final isValid =
-        await thumbnailFile.exists() && (await thumbnailFile.length()) > 0;
-
-    if (isValid && !force) {
-      return thumbnailFile;
-    }
-
-    final imageData = await _slideCaptureService.capture(
-      slide: slide,
-      globalKey: _thumbnailKey,
-    );
-
-    await thumbnailFile.writeAsBytes(imageData, flush: false);
-
-    return thumbnailFile;
-  }
-
-  // Future<void> _handleAction(_PopMenuAction action) async {
-  //   switch (action) {
-  //     case _PopMenuAction.refreshThumbnail:
-  //       final thumbnailFile = _getThumbnailFile(widget.slide);
-
-  //       if (await thumbnailFile.exists()) {
-  //         await thumbnailFile.delete();
-  //       }
-  //       await _thumbnailGeneration.refresh();
-  //   }
-  // }
-
-  Future<File> _load(BuildContext context) async {
-    final controller = DeckController.of(context);
-    return kCanRunProcess
-        ? await _generateThumbnail(
-            slide: widget.slideConfig,
-            controller: controller,
-          )
-        : controller.getSlideThumbnailFile(widget.slideConfig);
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final thumbnailController = ThumbnailController.of(context);
+    final asyncThumbnail = thumbnailController.get(slide, context);
     return _PreviewContainer(
-      key: _thumbnailKey,
-      selected: widget.selected,
+      selected: selected,
       child: Stack(
         children: [
           AspectRatio(
             aspectRatio: kAspectRatio,
-            child: FutureBuilder(
-              future: _load(context),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Image(
-                    gaplessPlayback: true,
-                    image: getImageProvider(snapshot.requireData.uri),
-                  );
-                }
-                return const IsometricLoading();
-              },
-            ),
+            child: asyncThumbnail.build(context),
           ),
         ],
       ),

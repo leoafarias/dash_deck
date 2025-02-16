@@ -13,7 +13,7 @@ import '../common/helpers/constants.dart';
 import '../deck/slide_configuration.dart';
 
 enum SlideCaptureQuality {
-  low(0.6),
+  thumbnail(0.3),
   good(1),
   better(2),
   best(3);
@@ -32,14 +32,14 @@ class SlideCaptureService {
   static const _maxConcurrentGenerations = 3;
 
   Future<Uint8List> capture({
-    SlideCaptureQuality quality = SlideCaptureQuality.low,
+    SlideCaptureQuality quality = SlideCaptureQuality.thumbnail,
     required SlideConfiguration slide,
-    required GlobalKey globalKey,
+    required BuildContext context,
   }) async {
     final queueKey = shortHash(slide.key + quality.name);
     try {
       while (_generationQueue.length > _maxConcurrentGenerations) {
-        await Future.delayed(const Duration(milliseconds: 100));
+        await Future.delayed(const Duration(milliseconds: 50));
       }
 
       _generationQueue.add(queueKey);
@@ -54,7 +54,8 @@ class SlideCaptureService {
           data: exportingSlide,
           child: SlideView(exportingSlide),
         ),
-        context: globalKey.currentContext!,
+        // ignore: use_build_context_synchronously
+        context: context,
         pixelRatio: quality.pixelRatio,
         targetSize: kResolution,
       );

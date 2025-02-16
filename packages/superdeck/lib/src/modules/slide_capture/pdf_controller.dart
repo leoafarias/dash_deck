@@ -12,15 +12,39 @@ import 'package:universal_html/html.dart' as html;
 
 import 'slide_capture_service.dart';
 
-enum ExportStatus { idle, capturing, building, complete, preparing }
+/// Status of the export process
+enum PdfExportStatus {
+  /// Initial state, no export in progress
+  idle,
 
-class ExportController extends ChangeNotifier {
-  ExportController({
+  /// Currently capturing slide images
+  capturing,
+
+  /// Building PDF from captured images
+  building,
+
+  /// Export completed successfully
+  complete,
+
+  /// Preparing slides for export
+  preparing
+}
+
+/// Controller for exporting slides to PDF
+///
+/// Handles capturing slides as images and combining them into a PDF document.
+/// Supports both web and native platforms.
+class PdfController extends ChangeNotifier {
+  /// Creates a new [PdfController]
+  ///
+  /// [slides] - List of slides to export
+  /// [slideCaptureService] - Service used to capture slide images
+  /// [waitDuration] - Duration to wait between operations
+  PdfController({
     required this.slides,
     required this.slideCaptureService,
     Duration waitDuration = const Duration(milliseconds: 100),
   }) : _waitDuration = waitDuration {
-    // Create a PageController and build the keys for the slides.
     _pageController = PageController(initialPage: 0);
     _slideKeys = {
       for (var slide in slides) slide.key: GlobalKey(),
@@ -29,90 +53,89 @@ class ExportController extends ChangeNotifier {
 
   late final PageController _pageController;
   late final Map<String, GlobalKey> _slideKeys;
-  ExportStatus _exportStatus = ExportStatus.idle;
+  PdfExportStatus _exportStatus = PdfExportStatus.idle;
   final List<Uint8List> _images = [];
-
   bool _disposed = false;
 
-  /// The list of slides to export.df
+  /// The list of slides to export
   final List<SlideConfiguration> slides;
 
-  /// Service used to capture slides.
+  /// Service used to capture slides
   final SlideCaptureService slideCaptureService;
 
-  /// A duration used to wait between operations.
+  /// Duration used to wait between operations
   final Duration _waitDuration;
 
+  /// Whether this controller has been disposed
   bool get disposed => _disposed;
 
+  /// Page controller for navigating between slides
   PageController get pageController => _pageController;
 
+  /// Gets the [GlobalKey] for a specific slide
   GlobalKey getSlideKey(SlideConfiguration slide) => _slideKeys[slide.key]!;
 
-  ExportStatus get exportStatus => _exportStatus;
+  /// Current status of the export process
+  PdfExportStatus get exportStatus => _exportStatus;
 
+  /// Export progress from 0.0 to 1.0
   double get progress =>
       _slideKeys.isNotEmpty ? _images.length / _slideKeys.length : 0.0;
 
+  /// Human readable progress text
   String get progressText {
     return switch (_exportStatus) {
-      ExportStatus.building => 'Building PDF...',
-      ExportStatus.complete => 'Done',
-      ExportStatus.capturing =>
+      PdfExportStatus.building => 'Building PDF...',
+      PdfExportStatus.complete => 'Done',
+      PdfExportStatus.capturing =>
         'Exporting ${_images.length} / ${_slideKeys.length}',
-      ExportStatus.idle => 'Exporting ${_images.length} / ${_slideKeys.length}',
-      ExportStatus.preparing => 'Preparing...',
+      PdfExportStatus.idle =>
+        'Exporting ${_images.length} / ${_slideKeys.length}',
+      PdfExportStatus.preparing => 'Preparing...',
     };
   }
 
+  /// Waits for a render boundary widget to be painted
   Future<void> _waitForRenderBoundaryPaint(GlobalKey key) async {
-    // First, wait until the key’s context is available.
     while (key.currentContext == null) {
       await Future.delayed(const Duration(milliseconds: 10));
     }
 
     final repaintBoundary = key.currentContext!.findRenderObject()!;
-
     final isAttached = repaintBoundary.attached;
 
-    // Now, wait until the widget is attached.
     while (!isAttached) {
       await Future.delayed(const Duration(milliseconds: 10));
     }
 
-    // Await the end of the frame to ensure painting is complete.
     await WidgetsBinding.instance.endOfFrame;
   }
 
+  /// Captures an image from a [GlobalKey] with retry logic
   Future<Uint8List> _captureImageWithRetry(GlobalKey key) async {
-    const int maxAttempts = 3;
+    const maxAttempts = 3;
     for (int attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        final image = await slideCaptureService.captureFromKey(
-          quality:
-              kIsWeb ? SlideCaptureQuality.low : SlideCaptureQuality.better,
+        return await slideCaptureService.captureFromKey(
+          quality: kIsWeb
+              ? SlideCaptureQuality.thumbnail
+              : SlideCaptureQuality.better,
           key: key,
         );
-        return image;
       } catch (error) {
-        if (attempt == maxAttempts) {
-          // If we've reached the maximum number of attempts, rethrow the error.
-          rethrow;
-        }
-        // Wait 100 milliseconds before retrying.
+        if (attempt == maxAttempts) rethrow;
         await Future.delayed(const Duration(milliseconds: 100));
       }
     }
-    // This line should never be reached.
     throw Exception('Failed to capture image after $maxAttempts attempts.');
   }
 
+  /// Prepares slides for export by ensuring they are properly rendered
   Future<void> prepare() async {
     for (var i = 0; i < _slideKeys.length; i++) {
       final slide = slides[i];
       final key = _slideKeys[slide.key]!;
 
-      // Navigate to the slide.
       await _pageController.animateToPage(
         i,
         duration: const Duration(milliseconds: 1),
@@ -123,21 +146,22 @@ class ExportController extends ChangeNotifier {
     }
   }
 
-  /// Starts the export process.
+  /// Starts the export process
+  ///
+  /// Captures slides as images and combines them into a PDF document.
   Future<void> export() async {
-    _exportStatus = ExportStatus.preparing;
+    _exportStatus = PdfExportStatus.preparing;
     notifyListeners();
 
     await prepare();
 
-    _exportStatus = ExportStatus.capturing;
+    _exportStatus = PdfExportStatus.capturing;
     notifyListeners();
 
     for (var i = 0; i < _slideKeys.length; i++) {
       final slide = slides[i];
       final key = _slideKeys[slide.key]!;
 
-      // Navigate to the slide.
       await _pageController.animateToPage(
         i,
         duration: const Duration(milliseconds: 1),
@@ -145,48 +169,39 @@ class ExportController extends ChangeNotifier {
       );
 
       await _waitForRenderBoundaryPaint(key);
-
       if (disposed) return;
 
-      // Capture the slide as an image.
       final image = await _captureImageWithRetry(key);
-
       if (disposed) return;
+
       _images.add(image);
       notifyListeners();
     }
 
-    _exportStatus = ExportStatus.building;
+    _exportStatus = PdfExportStatus.building;
     notifyListeners();
     await Future.delayed(_waitDuration);
-
     if (disposed) return;
 
-    // Build the PDF from the captured images.
     final pdf = await compute(_buildPdf, [..._images]);
-
     if (disposed) return;
-
-    // Restore the original page.
 
     notifyListeners();
 
-    await _savePdf(pdf);
+    _savePdf(pdf);
 
-    // Reset state.
-    _exportStatus = ExportStatus.complete;
+    _exportStatus = PdfExportStatus.complete;
     _images.clear();
     notifyListeners();
   }
 
-  /// Saves the generated PDF file.
+  /// Saves the generated PDF file
+  ///
+  /// Uses different approaches for web and native platforms
   Future<void> _savePdf(Uint8List pdf) async {
     try {
       if (kIsWeb) {
-        // Create a Blob from the PDF bytes
         final blob = html.Blob([pdf], 'application/pdf');
-
-        // Create a URL for the Blob
         final url = html.Url.createObjectUrlFromBlob(blob);
 
         html.AnchorElement(href: url)
@@ -195,6 +210,7 @@ class ExportController extends ChangeNotifier {
 
         return;
       }
+
       log('Saving pdf');
       final result = await FileSaver.instance.saveAs(
         name: 'superdeck',
@@ -216,6 +232,9 @@ class ExportController extends ChangeNotifier {
   }
 }
 
+/// Builds a PDF document from a list of images
+///
+/// This runs on a separate isolate via [compute]
 Future<Uint8List> _buildPdf(List<Uint8List> images) async {
   final pdf = pw.Document();
 

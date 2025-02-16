@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:superdeck_core/superdeck_core.dart';
@@ -30,16 +28,11 @@ class DeckController with ChangeNotifier {
       this.slides = _buildSlides(
         slides: newSlides,
         options: this.options,
+        dataStore: _dataStore,
       );
 
       notifyListeners();
     }
-  }
-
-  File getSlideThumbnailFile(SlideConfiguration slide) {
-    return _dataStore.getGeneratedAssetFile(
-      GeneratedAsset.thumbnail(slide.key),
-    );
   }
 
   factory DeckController.build({
@@ -52,6 +45,7 @@ class DeckController with ChangeNotifier {
       slides: _buildSlides(
         slides: slides,
         options: options,
+        dataStore: dataStore,
       ),
       dataStore: dataStore,
     );
@@ -65,6 +59,7 @@ class DeckController with ChangeNotifier {
 List<SlideConfiguration> _buildSlides({
   required List<Slide> slides,
   required DeckOptions options,
+  required IDataStore dataStore,
 }) {
   if (slides.isEmpty) {
     return [
@@ -72,6 +67,7 @@ List<SlideConfiguration> _buildSlides({
         slideIndex: 0,
         slide: _emptySlide,
         options: options,
+        dataStore: dataStore,
       )
     ];
   }
@@ -80,6 +76,7 @@ List<SlideConfiguration> _buildSlides({
       slideIndex: index,
       slide: slide,
       options: options,
+      dataStore: dataStore,
     );
   }).toList();
 }
@@ -88,6 +85,7 @@ SlideConfiguration _convertSlide({
   required int slideIndex,
   required Slide slide,
   required DeckOptions options,
+  required IDataStore dataStore,
 }) {
   final widgetBlocks = slide.sections
       .expand((section) => section.blocks)
@@ -106,6 +104,9 @@ SlideConfiguration _convertSlide({
   final styleName = slide.options?.style;
   final baseStyle = options.baseStyle;
   final style = baseStyle.build().merge(styles[styleName]?.build());
+  final thumbnailFile = dataStore.getGeneratedAssetPath(
+    GeneratedAsset.thumbnail(slide.key),
+  );
   return SlideConfiguration(
     slideIndex: slideIndex,
     style: style,
@@ -113,6 +114,7 @@ SlideConfiguration _convertSlide({
     debug: options.debug,
     parts: options.parts,
     widgets: slideWidgets,
+    thumbnailFile: thumbnailFile,
   );
 }
 

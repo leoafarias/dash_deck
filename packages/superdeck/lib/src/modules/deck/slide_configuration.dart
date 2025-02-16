@@ -17,6 +17,7 @@ class SlideConfiguration with SlideConfigurationMappable {
   final bool debug;
   final SlideParts? parts;
   final Map<String, WidgetBlockBuilder> _widgets;
+  final String thumbnailFile;
 
   final bool isExporting;
   SlideConfiguration({
@@ -25,6 +26,7 @@ class SlideConfiguration with SlideConfigurationMappable {
     required Slide slide,
     this.debug = false,
     this.parts,
+    required this.thumbnailFile,
     Map<String, WidgetBlockBuilder> widgets = const {},
     this.isExporting = false,
   })  : _slide = slide,
